@@ -11,9 +11,9 @@
     <name>OzTrack</name>
     <url>http://oztrack.org/</url>
     <scm>
-        <connection>scm:git:git@github.com:uq-eresearch/oztrack.git</connection>
-        <developerConnection>scm:git:git@github.com:uq-eresearch/oztrack.git</developerConnection>
-        <url>scm:git:git@github.com:uq-eresearch/oztrack.git</url>
+        <connection>scm:git:git@github.com:AtlasOfLivingAustralia/oztrack.git</connection>
+        <developerConnection>scm:git:git@github.com:AtlasOfLivingAustralia/oztrack.git</developerConnection>
+        <url>scm:git:git@github.com:AtlasOfLivingAustralia/oztrack.git</url>
     </scm>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -132,6 +132,8 @@
                             <port>8181</port>
                         </connector>
                     </connectors>
+                    <stopKey>STOP</stopKey>
+                    <stopPort>8005</stopPort>
                 </configuration>
             </plugin>
             <!-- Run jslint using mvn jslint4java:lint -->
@@ -447,9 +449,9 @@
             <version>1.5</version>
         </dependency>
         <dependency>
-            <groupId>net.tanesha.recaptcha4j</groupId>
+            <groupId>com.google.code.maven-play-plugin.net.tanesha.recaptcha4j</groupId>
             <artifactId>recaptcha4j</artifactId>
-            <version>0.0.7</version>
+            <version>0.0.8</version>
         </dependency>
     </dependencies>
     <repositories>
@@ -478,5 +480,10 @@
             <name>libs-releases</name>
             <url>http://maven.metadata.net/artifactory/libs-releases</url>
         </repository>
-   </repositories>
+        <repository>
+            <id>sonatype-nexus-staging</id>
+            <name>Nexus Release Repository</name>
+            <url>https://oss.sonatype.org/content/repositories/releases</url>
+        </repository>
+    </repositories>
 </project>
