@@ -207,7 +207,7 @@ Depending on your installation of Apache, you may need to place site configurati
     sudo service apache2 restart
     sudo tee /etc/apache2/sites-available/oztrack.conf > /dev/null << EOF
     <VirtualHost _default_:80>
-      ServerName oztrack.org
+      ServerName www.oztrack.org
       ProxyPreserveHost on
       ProxyPass /geoserver http://localhost:8080/geoserver nocanon retry=0
       ProxyPassReverse /geoserver http://localhost:8080/geoserver
@@ -216,10 +216,21 @@ Depending on your installation of Apache, you may need to place site configurati
     </VirtualHost>
     
     <VirtualHost _default_:443>
-      ServerName https://oztrack.org
+      ServerName www.oztrack.org
       SSLEngine on
       SSLCertificateFile /etc/apache2/ssl/oztrack.crt
       SSLCertificateKeyFile /etc/apache2/ssl/oztrack.key
+      SSLCertificateChainFile /etc/apache2/ssl/oztrack.org.chain.crt
+
+      # insert additional HTTPS config as suited to your browser support (do you support IE pre-11?)... 
+      # see https://mozilla.github.io/server-side-tls/ssl-config-generator/
+      # test HTTPS config with https://www.ssllabs.com/ssltest/
+      # example HTTPS config for IE back to IE7 as at April 2015:
+      SSLProtocol all -SSLv3
+      SSLCipherSuite ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA
+      SSLHonorCipherOrder on
+      SSLCompression off
+
       ProxyPreserveHost on
       ProxyPass /geoserver http://localhost:8443/geoserver nocanon retry=0
       ProxyPassReverse /geoserver http://localhost:8443/geoserver
