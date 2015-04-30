@@ -651,3 +651,5 @@ The jQuery UI theme used on this project is produced using the jQuery UI ThemeRo
 ThemeRoller-generated CSS file to pre-fill settings in the theme creation form.
 
     grep 'jqueryui\.com\/themeroller\/?' src/main/webapp/css/jquery-ui/*.css
+
+### oztrack   [![Build Status](https://travis-ci.org/AtlasOfLivingAustralia/oztrack.svg?branch=master)](https://travis-ci.org/AtlasOfLivingAustralia/oztrack)
