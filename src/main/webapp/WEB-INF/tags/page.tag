@@ -34,12 +34,12 @@
             <div id="banner-left">
                 <div id="banner-logo">
                     <a href="${pageContext.request.contextPath}/">
-                        <img src="${pageContext.request.contextPath}/img/header_logo.png" />
+                        <img src="${pageContext.request.contextPath}/img/zoatrack_logo_20150511.png" />
                     </a>
                 </div>
                 <c:if test="${testServer}">
                 <div id="banner-msg">
-                    <div style="font-weight: bold; color: red; margin-bottom: 3px;">OzTrack Testing</div>
+                    <div style="font-weight: bold; color: red; margin-bottom: 3px;">ZoaTrack Testing</div>
                     <div>
                         This site is a pre-release version of OzTrack made available for testing.<br>
                         Warning: any data uploaded to this site may be deleted without notice.
@@ -118,8 +118,17 @@
 <c:if test="${not fluid}">
 <div id="footer">
     <div id="logos">
+
+        <a target="_blank" href="http://ala.org.au/"><img src="${pageContext.request.contextPath}/img/logo_ala.png" width="77px" height="60px"/></a>
+        <a target="_blank" href="http://une.edu.au/"><img src="${pageContext.request.contextPath}/img/logo_UNE.gif" width="93px" height="78px"/></a>
+        <a target="_blank" href="http://tern.edu.au/"><img src="${pageContext.request.contextPath}/img/logo_tern.gif" width="111px" height="97px"/></a>
+        <a target="_blank" href="http://sims.edu.au/"><img src="${pageContext.request.contextPath}/img/logo_SIMS.gif" width="131px" height="59px"/></a>
+        <a target="_blank" href="http://mq.edu.au//"><img src="${pageContext.request.contextPath}/img/logo_MQlogo1.png" width="125px" height="38px"/></a>
+<br>
+        <a target="_blank" href="http://mq.edu.au//"><img src="${pageContext.request.contextPath}/img/logo_uni_auckland.png" width="76px" height="89px"/></a>
         <a target="_blank" href="http://nectar.org.au/"><img src="${pageContext.request.contextPath}/img/nectar-logo.png" width="140px" height="32px"/></a>
-        <a target="_blank" href="http://ands.org.au/"><img src="${pageContext.request.contextPath}/img/ands-logo.png" width="90px" height="40px" style="margin-top: -8px;"/></a>
+
+        <!--a target="_blank" href="http://ands.org.au/"><img src="${pageContext.request.contextPath}/img/ands-logo.png" width="90px" height="40px" style="margin-top: -8px;"/></a-->
         <a target="_blank" href="http://itee.uq.edu.au/~eresearch/"><img src="${pageContext.request.contextPath}/img/uq_logo.png" width="140px" height="40px"/></a>
     </div>
     <div id="copyright">
