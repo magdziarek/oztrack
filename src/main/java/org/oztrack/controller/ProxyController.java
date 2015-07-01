@@ -33,6 +33,11 @@ public class ProxyController {
         handle("http://bie.ala.org.au/search/auto.json", outerRequest, outerResponse);
     }
 
+    @RequestMapping(value="/proxy/blog", method=RequestMethod.GET)
+    public void getBlogFeed(HttpServletRequest outerRequest, HttpServletResponse outerResponse) throws IOException {
+        handle("https://oztrackblog.wordpress.com/feed", outerRequest, outerResponse);
+    }
+
     private void handle(String baseUrl, HttpServletRequest request, HttpServletResponse response) throws IOException, ClientProtocolException {
         DefaultHttpClient client = HttpClientUtils.createDefaultHttpClient();
         HttpGet innerRequest = new HttpGet(URI.create(baseUrl + ((request.getQueryString() != null) ? ("?" + request.getQueryString()) : "")));
