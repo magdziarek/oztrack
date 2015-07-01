@@ -6,6 +6,7 @@
     <css>/css/vendor/jquery-ui/jquery-ui.custom.min.css</css>
     <css>/css/generated/bootstrap/bootstrap.css</css>
     <css>/css/vendor/bootstrap-editable/bootstrap-editable.css</css>
+    <css>/css/vendor/jquery-datatables/jquery.dataTables.min.css</css>
     <js>/js/vendor/moment/moment.min.js</js>
     <js>/js/vendor/jquery/jquery.min.js</js>
     <js>/js/vendor/jquery-ui/jquery-ui.custom.min.js</js>
@@ -23,6 +24,7 @@
     <js>/js/vendor/bootstrap/bootstrap-typeahead.js</js>
     <js>/js/vendor/bootstrap/bootstrap-affix.js</js>
     <js>/js/vendor/bootstrap-editable/bootstrap-editable-inline.js</js>
+    <js>/js/vendor/jquery-datatables/jquery.dataTables.min.js</js>
     <js>/js/oztrack.js</js>
   </group>
   <group name="openlayers">
