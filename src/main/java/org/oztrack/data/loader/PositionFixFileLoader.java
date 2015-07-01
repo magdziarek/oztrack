@@ -351,9 +351,9 @@ public class PositionFixFileLoader extends DataFileLoader {
     private Date timeHandler(Date date, String timeString) throws FileProcessingException {
 
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
+            calendar.setTime(date);
 
-        String [] timeTokens = timeString.split(":");
+            String [] timeTokens = timeString.split(":");
 
         try {
          if ((timeTokens.length >= 1) && !timeTokens[0].trim().isEmpty()) {

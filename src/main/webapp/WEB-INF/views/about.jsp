@@ -6,9 +6,8 @@
 <%@ taglib tagdir="/WEB-INF/tags" prefix="tags" %>
 <tags:page title="About">
     <jsp:attribute name="description">
-        OzTrack is a free-to-use web-based platform for analysing and visualising
-        individual-based animal location data. The OzTrack project is supported
-        by the NeCTAR e-Research Tools program.
+        ZoaTrack is a free-to-use web-based platform for analysing and visualising
+        individual-based animal location data.
     </jsp:attribute>
     <jsp:attribute name="head">
         <style type="text/css">
@@ -31,16 +30,11 @@
         &rsaquo; <span class="active">About</span>
     </jsp:attribute>
     <jsp:body>
-        <h1>About OzTrack</h1>
+        <h1>About ZoaTrack</h1>
         ${settings.aboutText}
         <h2>Further information</h2>
         <div id="about-buttons" class="row">
-            <c:if test="${not empty settings.peopleText}">
-            <div class="span6">
-                <a class="btn btn-large btn-block" href="${pageContext.request.contextPath}/about/people">People involved in OzTrack</a>
-            </div>
-            </c:if>
-            <c:if test="${not empty settings.publicationsText}">
+           <c:if test="${not empty settings.publicationsText}">
             <div class="span6">
                 <a class="btn btn-large btn-block" href="${pageContext.request.contextPath}/about/publications">Publications</a>
             </div>

@@ -23,7 +23,7 @@
             Update details for the ${project.title} project.
         </c:when>
         <c:otherwise>
-            Create a new OzTrack project.
+            Create a new ZoaTrack project.
         </c:otherwise>
         </c:choose>
     </jsp:attribute>
@@ -387,7 +387,7 @@
                         <form:input path="title" id="title" cssClass="input-xxlarge"/>
                         <div class="help-inline">
                             <div class="help-popover" title="Title">
-                                A short title (less than 50 characters if possible) to identify your project in OzTrack.
+                                A short title (less than 50 characters if possible) to identify your project in ZoaTrack.
                             </div>
                         </div>
                         <form:errors path="title" element="div" cssClass="help-block formErrors"/>
@@ -462,7 +462,7 @@
                         <p class="help-block" style="margin: 5px 0 9px 0;">
                             A <strong>Spatial Reference System (SRS)</strong> specifies how the coordinates used to represent
                             spatial data are interpreted as real-world locations on the Earth's surface.
-                            The system you select here will be used by the analysis features of OzTrack,
+                            The system you select here will be used by the analysis features of ZoaTrack,
                             such as home range calculators, and will affect the accuracy of results.
                             Click the link below to select an Australian or New Zealand SRS based on the location of your tracking data.
                             If in doubt, enter <tt>EPSG:3577</tt> for the
@@ -569,7 +569,7 @@
                             "/>
                             <span class="project-access-open-title">Open Access</span>
                             <div style="margin: 0.5em 0;">
-                                Data in this project will be made publicly available in OzTrack.
+                                Data in this project will be made publicly available in ZoaTrack.
                                 Releasing data under an open-access licence benefits the wider scientific community
                                 and increases the potential impact of your research.
                                 Many research funding bodies and research institutions require that data from
@@ -585,9 +585,9 @@
                             </form:radiobutton>
                             <span class="project-access-embargo-title">Delayed Open Access</span>
                             <div style="margin: 0.5em 0;">
-                                Data in this project will be made publicly available in OzTrack after an embargo period.
+                                Data in this project will be made publicly available in ZoaTrack after an embargo period.
                                 However, note that metadata including title, description, location, and animal species
-                                are made publicly available for all projects in OzTrack.
+                                are made publicly available for all projects in ZoaTrack.
                             </div>
                             <div style="margin: 0.5em 0;">
                                 <c:choose>
@@ -644,7 +644,7 @@
                             <div style="margin: 0.5em 0;">
                                 Data in this project will only be accessible to you.
                                 However, note that metadata including title, description, location, and animal species
-                                are made publicly available for all projects in OzTrack.
+                                are made publicly available for all projects in ZoaTrack.
                             </div>
                         </label>
                         </c:if>

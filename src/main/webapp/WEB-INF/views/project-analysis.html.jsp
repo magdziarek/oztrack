@@ -674,7 +674,7 @@
                         <span>Animals</span>
                         <div class="help-popover" title="Animals">
                             Choose one or more animals for analysis and visualisation.
-                            OzTrack can generate layers for multiple animals at a time; however, the processing time is
+                            ZoaTrack can generate layers for multiple animals at a time; however, the processing time is
                             positively related to the number of animals and location fixes included in the analysis.
                         </div>
                     </div>
