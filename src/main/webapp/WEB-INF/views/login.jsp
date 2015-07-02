@@ -9,7 +9,7 @@
 <c:set var="baseUrl"><%= OzTrackApplication.getApplicationContext().getBaseUrl() %></c:set>
 <tags:page title="Login">
     <jsp:attribute name="description">
-        Log in to OzTrack. OzTrack is a free-to-use web-based platform for
+        Log in to ZoaTrack. ZoaTrack is a free-to-use web-based platform for
         analysing and visualising individual-based animal location data.
     </jsp:attribute>
     <jsp:attribute name="tail">
@@ -65,10 +65,12 @@
             </div>
             </c:if>
             <div class="${aafEnabled ? 'span6' : 'span12'}">
+
                 <form id="nativeLoginForm" class="form-vertical form-bordered" style="height: 230px;"
                     method="POST" action="${fn:replace(baseUrl, 'http://', 'https://')}/login">
+
                     <fieldset>
-                        <div class="legend">Login ${aafEnabled ? 'using' : 'to'} OzTrack</div>
+                        <div class="legend">Login ${aafEnabled ? 'using' : 'to'} ZoaTrack</div>
                         <div class="control-group required">
                             <label class="control-label" for="username">Username</label>
                             <div class="controls">

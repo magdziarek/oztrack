@@ -11,10 +11,10 @@
     <jsp:attribute name="description">
         <c:choose>
         <c:when test="${user.id != null}">
-            Update your OzTrack account.
+            Update your ZoaTrack account.
         </c:when>
         <c:otherwise>
-            Register a new OzTrack account.
+            Register a new ZoaTrack account.
         </c:otherwise>
         </c:choose>
     </jsp:attribute>
@@ -160,7 +160,7 @@
                         <div class="help-inline">
                             <div class="help-popover" title="AAF ID">
                                 Providing your Australian Access Federation (AAF) ID allows you to login
-                                through your home institution as an alternative to using your OzTrack
+                                through your home institution as an alternative to using your ZoaTrack
                                 username and password.<br>
                                 <br>
                                 Your AAF ID is made up of your username and the domain name for your
@@ -178,7 +178,7 @@
                         <form:input path="username" id="username"/>
                         <div class="help-inline">
                             <div class="help-popover" title="Username">
-                                This will be the name that you log on to OzTrack with.
+                                This will be the name that you log on to ZoaTrack with.
                             </div>
                         </div>
                         <form:errors path="username" element="div" cssClass="help-block formErrors"/>
@@ -271,17 +271,17 @@
                     </div>
                 </div>
                 <div class="control-group">
-                    <label class="control-label" for="email">Nationality:</label>
+                    <label class="control-label" for="email">Country of Origin:</label>
                     <div class="controls">
                         <form:select path="country">
                             <form:option value="">Select country</form:option>
                             <form:options items="${countries}" itemValue="id" itemLabel="title"/>
                         </form:select>
                         <div class="help-inline">
-                            <div class="help-popover" title="Nationality">
+                            <div class="help-popover" title="Country of Origin">
                                 <p>
                                     This field is optional. If provided, it will be used to show statistics for the nationality
-                                    of contributors to OzTrack and also to allow the metadata for projects to be harvested
+                                    of contributors to ZoaTrack and also to allow the metadata for projects to be harvested
                                     for a specific nation. For example, the Australian National Data Service's
                                     <a href="http://researchdata.ands.org.au/">Research Data Australia</a> repository
                                     harvests records produced by Australian researchers.

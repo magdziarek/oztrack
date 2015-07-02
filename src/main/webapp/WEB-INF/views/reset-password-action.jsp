@@ -8,7 +8,7 @@
 <c:set var="aafEnabled"><%= OzTrackApplication.getApplicationContext().isAafEnabled() %></c:set>
 <tags:page title="Reset Password">
     <jsp:attribute name="description">
-        Reset a forgotten password in OzTrack.
+        Reset a forgotten password in ZoaTrack.
     </jsp:attribute>
     <jsp:attribute name="tail">
         <script type="text/javascript">

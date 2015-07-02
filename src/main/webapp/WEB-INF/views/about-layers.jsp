@@ -6,8 +6,8 @@
 <%@ taglib tagdir="/WEB-INF/tags" prefix="tags" %>
 <tags:page title="Environmental layers">
     <jsp:attribute name="description">
-        OzTrack is a free-to-use web-based platform for analysing and visualising
-        individual-based animal location data. OzTrack incorporates a number of
+        ZoaTrack is a free-to-use web-based platform for analysing and visualising
+        individual-based animal location data. ZoaTrack incorporates a number of
         external environmental layers.
     </jsp:attribute>
     <jsp:attribute name="tail">

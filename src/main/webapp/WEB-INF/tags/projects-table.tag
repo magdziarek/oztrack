@@ -8,12 +8,12 @@
 <c:choose>
 <c:when test="${empty projects}">
     <p>
-        There are currently no ${adjective} projects in OzTrack.
+        There are currently no ${adjective} projects in ZoaTrack.
     </p>
 </c:when>
 <c:otherwise>
     <p>
-        There are currently <c:out value="${fn:length(projects)}"/> ${adjective} projects in OzTrack.
+        There are currently <c:out value="${fn:length(projects)}"/> ${adjective} projects in ZoaTrack.
     </p>
     <table class="table table-bordered table-condensed">
         <col style="width: 320px;" />

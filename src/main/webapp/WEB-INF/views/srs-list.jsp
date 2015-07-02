@@ -6,7 +6,7 @@
 <%@ taglib tagdir="/WEB-INF/tags" prefix="tags" %>
 <tags:page title="Spatial Reference Systems">
     <jsp:attribute name="description">
-        Update spatial reference systems in OzTrack.
+        Update spatial reference systems in ZoaTrack.
     </jsp:attribute>
     <jsp:attribute name="breadcrumbs">
         <a href="${pageContext.request.contextPath}/">Home</a>

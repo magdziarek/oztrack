@@ -359,10 +359,10 @@ public enum AnalysisType {
         "parameter value alpha are retained.  The smaller the value of alpha, the finer the " +
         "resolution of the hull and the greater the exposure of non-use areas. As alpha " +
         "increases, the polygon surface will increase until it is equivalent to a 100% minimum " +
-        "convex polygon.</p>\n" +
+        "convex polygon. </p>\n" +
         "\n" +
         "<p>This calculation is undertaken within R using the alphahull package (Pateiro-Lopez " +
-        "&amp; Rodriguez-Casal 2011).</p>\n" +
+        "&amp; Rodriguez-Casal 2011). The analysis is heavy on computing resources and can take up to 20 minutes to calculate depending on the number of location fixes. Be patient.</p>\n" +
         "\n" +
         "<p style=\"font-weight: bold;\">References</p>\n" +
         "\n" +
@@ -408,7 +408,7 @@ public enum AnalysisType {
         "<p>This calculation is undertaken within R using the LoCoH series of functions within " +
         "the adehabitatHR library of functions (Calenge 2008). Users may either fix the number " +
         "of nearest neighbours (k-1) to the root point (i.e. the fixed k-LoCoH), or fix the " +
-        "maximum radius from root points when generating local hulls (i.e. the fixed r-LoCoH).</p>\n" +
+        "maximum radius from root points when generating local hulls (i.e. the fixed r-LoCoH). This analysis is heavy on computing resources and can take up to 20 minutes to calculate depending on the number of location fixes. Be patient.</p>\n" +
         "\n" +
         "<p style=\"font-weight: bold;\">References</p>" +
         "\n" +

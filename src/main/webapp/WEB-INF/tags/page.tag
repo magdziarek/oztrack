@@ -20,116 +20,175 @@
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <c:if test="${not empty description}">
-    <meta name="description" content="${description}" />
+        <meta name="description" content="${description}" />
     </c:if>
-    <title>OzTrack${(not empty title) ? ': ' : ' - '}${(not empty title) ? title : 'Free Animal Tracking Software'}</title>
+    <title>ZoaTrack${(not empty title) ? ': ' : ' - '}${(not empty title) ? title : 'Free Animal Tracking Software'}</title>
     <link rel="shortcut icon" href="${pageContext.request.contextPath}/favicon.ico" />
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/optimised/core.css"/>
+    <style type="text/css">
+
+
+        .navbar {
+            opacity:0.95;
+        }
+
+        .navbar-inner {
+        .border-radius(0);
+            min-height: 0;
+            line-height: 0;
+            text-align: center;
+        }
+
+        .navbar .nav {
+            float: none;
+            display: inline-block;
+            *display: inline; /* ie7 fix */
+            *zoom: 1; /* hasLayout ie7 trigger */
+            margin: 0 auto;
+        }
+
+        .navbar-brand {
+            padding-right:120px;
+        }
+        .navbar-brand img {
+            vertical-align:unset;
+            padding: 3px 20px;
+        }
+
+        .navbar .nav > li > a {
+            font-size: 1.2em;
+            padding-bottom: 18px;
+        }
+
+        #login {
+            float: right;
+            padding-top: 8px;
+        }
+
+        #main {
+            margin: 55px 0px;
+        }
+        .icon-user {
+            margin-top:3px;
+        }
+
+        .navbar-inverse .nav .active > a {
+            background-color:transparent;
+            color:#D78B00;
+        }
+
+        .dropdown-menu > .active > a,
+        .dropdown-menu > .active > a:hover,
+        .dropdown-menu > .active > a:focus  {
+            color:#D78B00;
+            background-color:#000000;
+            background-image:none;
+        }
+
+        .dropdown-menu .divider {
+            height: auto;
+        }
+
+
+    </style>
     <jsp:invoke fragment="head"/>
 </head>
 <body>
-<div id="header">
-    <div class="container${fluid ? '-fluid' : ''}">
-        <div id="banner">
-            <div id="banner-left">
-                <div id="banner-logo">
-                    <a href="${pageContext.request.contextPath}/">
-                        <img src="${pageContext.request.contextPath}/img/header_logo.png" />
-                    </a>
-                </div>
-                <c:if test="${testServer}">
-                <div id="banner-msg">
-                    <div style="font-weight: bold; color: red; margin-bottom: 3px;">OzTrack Testing</div>
-                    <div>
-                        This site is a pre-release version of OzTrack made available for testing.<br>
-                        Warning: any data uploaded to this site may be deleted without notice.
-                    </div>
-                </div>
-                </c:if>
-            </div>
-            <div id="banner-right">
-            </div>
-        </div>
-    </div>
-    <div class="navbar-outer">
-        <div class="container${fluid ? '-fluid' : ''}">
-            <c:if test="${!empty navExtra}">
-            <div id="nav-extra">
-                <jsp:invoke fragment="navExtra"/>
-            </div>
-            </c:if>
-            <div id="login">
-                <c:choose>
-                <c:when test="${currentUser != null}">
-                <div class="btn-group">
-                    <a class="btn btn-inverse dropdown-toggle" data-toggle="dropdown" href="#">
-                        <span><c:out value="${currentUser.fullName}"/></span>
-                        <span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu pull-right">
-                        <li><a href="${pageContext.request.contextPath}/users/${currentUser.id}/edit">Edit profile</a></li>
-                        <c:if test="${currentUser.admin}">
-                        <li><a href="${pageContext.request.contextPath}/settings">Settings</a></li>
-                        </c:if>
-                        <li><a href="${pageContext.request.contextPath}/logout">Logout</a></li>
-                    </ul>
-                </div>
-                </c:when>
-                <c:otherwise>
-                <a class="btn btn-inverse" href="${fn:replace(baseUrl, 'http://', 'https://')}/users/new">Register</a>
-                <a class="btn btn-inverse" href="${fn:replace(baseUrl, 'http://', 'https://')}/login">Login</a>
-                </c:otherwise>
-                </c:choose>
-            </div>
-            <div class="navbar navbar-inverse">
-              <div class="navbar-inner">
-                <ul class="nav">
-                  <li id="navHome"><a href="${pageContext.request.contextPath}/">Home</a></li>
-                  <li id="navTrack"><a href="${pageContext.request.contextPath}/projects">Projects</a></li>
-                  <li id="navAbout"><a href="${pageContext.request.contextPath}/about">About</a></li>
-                  <li id="navContact"><a href="${pageContext.request.contextPath}/contact">Contact</a></li>
-                </ul>
-              </div>
-            </div>
-        </div>
-    </div>
-</div>
-<div id="main">
+
 <div class="container${fluid ? '-fluid' : ''}">
-    <c:if test="${!empty breadcrumbs}">
-    <div id="crumbs">
-        <jsp:invoke fragment="breadcrumbs"/>
-    </div>
-    </c:if>
-    <jsp:invoke var="sidebarContent" fragment="sidebar"/>
-    <div class="row${fluid ? '-fluid' : ''}">
-    <c:if test="${!empty sidebarContent}">
-    <div id="left-menu" class="span3">
-        ${sidebarContent}
-    </div>
-    </c:if>
-    <div id="content" class="${empty sidebarContent ? 'span12' : 'span9'}">
-        <jsp:doBody/>
-        <div style="clear:both;"></div>
-    </div> <!-- content -->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar-inner">
+            <a class="navbar-brand" href="${pageContext.request.contextPath}/home"><img src="${pageContext.request.contextPath}/img/zoatrack_logo.png"/></a>
+
+            <ul class="nav">
+                <c:if test="${!empty navExtra}">
+                    <jsp:invoke fragment="navExtra"/>
+                </c:if>
+                <li id="navBrowse"><a href="${pageContext.request.contextPath}/projects">Browse the repository</a></li>
+                <li id="navToolkit" class="dropdown">
+                    <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Toolkit <b class="caret"></b></a>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="${pageContext.request.contextPath}/projects/new">Create a Project</a></li>
+                        <li role="presentation" class="divider"></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="${pageContext.request.contextPath}/toolkit/getstarted">Getting Started</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="${pageContext.request.contextPath}/toolkit/analysis">Home Range Estimation</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="${pageContext.request.contextPath}/toolkit/datamgt">Data Management</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="${pageContext.request.contextPath}/about/layers">Environment Layers</a></li>
+                        <li role="presentation" class="divider"></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="${pageContext.request.contextPath}/about">About ZoaTrack</a></li>
+                    </ul>
+                </li>
+                <li id="navContact"><a href="${pageContext.request.contextPath}/contact">Contact Us</a></li>
+            </ul>
+            <ul class="nav" id="login" >
+                <c:choose>
+                    <c:when test="${currentUser != null}">
+                        <li id="navLogin" class="dropdown">
+                            <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-user icon-white"></i>&nbsp;&nbsp;<c:out value="${currentUser.fullName}"/> <b class="caret"></b></a>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="drop2">
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="${pageContext.request.contextPath}/projects">Projects</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="${pageContext.request.contextPath}/projects/new">Create a Project</a></li>
+                                <li role="presentation" class="divider"></li>
+                                <li><a href="${pageContext.request.contextPath}/users/${currentUser.id}/edit">Edit profile</a></li>
+                                <c:if test="${currentUser.admin}">
+                                    <li><a href="${pageContext.request.contextPath}/settings">Settings</a></li>
+                                </c:if>
+                                <li><a href="${pageContext.request.contextPath}/logout">Logout</a></li>
+                            </ul>
+                        </li>
+                    </c:when>
+                    <c:otherwise>
+                        <li><a href="${fn:replace(baseUrl, 'http://', 'https://')}/login">Login</a></li>
+                        <li><a href="${fn:replace(baseUrl, 'http://', 'https://')}/users/new">Register</a></li>
+                    </c:otherwise>
+                </c:choose>
+            </ul>
+        </div>
     </div>
 </div>
+
+
+<div id="main">
+    <div class="container${fluid ? '-fluid' : ''}">
+        <c:if test="${!empty breadcrumbs}">
+            <div id="crumbs">
+                <jsp:invoke fragment="breadcrumbs"/>
+            </div>
+        </c:if>
+        <jsp:invoke var="sidebarContent" fragment="sidebar"/>
+        <div class="row${fluid ? '-fluid' : ''}">
+            <c:if test="${!empty sidebarContent}">
+                <div id="left-menu" class="span3">
+                        ${sidebarContent}
+                </div>
+            </c:if>
+            <div id="content" class="${empty sidebarContent ? 'span12' : 'span9'}">
+                <jsp:doBody/>
+                <div style="clear:both;"></div>
+            </div> <!-- content -->
+        </div>
+    </div>
 </div>
 <c:if test="${not fluid}">
-<div id="footer">
-    <div id="logos">
-        <a target="_blank" href="http://nectar.org.au/"><img src="${pageContext.request.contextPath}/img/nectar-logo.png" width="140px" height="32px"/></a>
-        <a target="_blank" href="http://ands.org.au/"><img src="${pageContext.request.contextPath}/img/ands-logo.png" width="90px" height="40px" style="margin-top: -8px;"/></a>
-        <a target="_blank" href="http://itee.uq.edu.au/~eresearch/"><img src="${pageContext.request.contextPath}/img/uq_logo.png" width="140px" height="40px"/></a>
+    <div id="footer">
+        <div id="logos">
+
+            <a target="_blank" href="http://ala.org.au/"><img src="${pageContext.request.contextPath}/img/logo_ala.png" width="77px" height="60px"/></a>
+            <a target="_blank" href="http://une.edu.au/"><img src="${pageContext.request.contextPath}/img/logo_UNE.gif" width="93px" height="78px"/></a>
+            <a target="_blank" href="http://tern.edu.au/"><img src="${pageContext.request.contextPath}/img/logo_tern.gif" width="111px" height="97px"/></a>
+            <a target="_blank" href="http://sims.edu.au/"><img src="${pageContext.request.contextPath}/img/logo_SIMS.png" width="131px" height="59px"/></a>
+            <a target="_blank" href="http://csiro.au/"><img src="${pageContext.request.contextPath}/img/logo_CSIRO.png" width="100px" height="100px"/></a>
+            <a target="_blank" href="http://mq.edu.au//"><img src="${pageContext.request.contextPath}/img/logo_MQlogo1.png" width="125px" height="38px"/></a>
+            <br/>
+            <a target="_blank" href="http://mq.edu.au//"><img src="${pageContext.request.contextPath}/img/logo_uni_auckland.png" width="76px" height="89px"/></a>
+            <a target="_blank" href="http://nectar.org.au/"><img src="${pageContext.request.contextPath}/img/nectar-logo.png" width="140px" height="32px"/></a>
+            <a target="_blank" href="http://itee.uq.edu.au/~eresearch/"><img src="${pageContext.request.contextPath}/img/uq_logo.png" width="140px" height="40px"/></a>
+        </div>
+        <div id="site-licence">
+            All site content, except where otherwise noted, is licensed under a
+            <a rel="license" target="_blank" href="http://creativecommons.org/licenses/by/3.0/au/">Creative Commons Attribution license</a>.
+        </div>
     </div>
-    <div id="copyright">
-        &copy; 2011-2013 The University of Queensland
-    </div>
-    <div id="site-licence">
-        All site content, except where otherwise noted, is licensed under a
-        <a rel="license" target="_blank" href="http://creativecommons.org/licenses/by/3.0/au/">Creative Commons Attribution license</a>.
-    </div>
-</div>
 </c:if>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/optimised/core.js"></script>
 <jsp:invoke fragment="tail"/>

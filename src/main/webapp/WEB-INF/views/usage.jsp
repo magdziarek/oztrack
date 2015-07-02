@@ -7,7 +7,7 @@
 <c:set var="dateTimeFormatPattern" value="yyyy-MM-dd HH:mm"/>
 <tags:page title="Usage">
     <jsp:attribute name="description">
-        Summary of OzTrack usage statistics.
+        Summary of ZoaTrack usage statistics.
     </jsp:attribute>
     <jsp:attribute name="breadcrumbs">
         <a href="${pageContext.request.contextPath}/">Home</a>
@@ -17,7 +17,7 @@
     <jsp:body>
         <h1>Usage Summary</h1>
         <p>
-            OzTrack usage summary as of
+            ZoaTrack usage summary as of
             <jsp:useBean id="now" class="java.util.Date" />
             <fmt:formatDate pattern="${dateTimeFormatPattern}" value="${now}" />.
         </p>

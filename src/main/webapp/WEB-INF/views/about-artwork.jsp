@@ -6,8 +6,8 @@
 <%@ taglib tagdir="/WEB-INF/tags" prefix="tags" %>
 <tags:page title="Artwork credits">
     <jsp:attribute name="description">
-        OzTrack is a free-to-use web-based platform for analysing and visualising
-        individual-based animal location data. OzTrack incorporates artwork from
+        ZoaTrack is a free-to-use web-based platform for analysing and visualising
+        individual-based animal location data. ZoaTrack incorporates artwork from
         a number of sources.
     </jsp:attribute>
     <jsp:attribute name="tail">

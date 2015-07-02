@@ -82,7 +82,7 @@ public class ProjectListController {
         );
         binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("yyyy-MM-dd"), true));
     }
-
+/*
     @InitBinder("openAccessProjects")
     public void initOpenAccessProjectsBinder(WebDataBinder binder) {
         binder.setAllowedFields();
@@ -97,7 +97,7 @@ public class ProjectListController {
     public void initClosedAccessProjectsBinder(WebDataBinder binder) {
         binder.setAllowedFields();
     }
-
+*/
     @ModelAttribute("project")
     public Project getProject() {
         Project project = new Project();
@@ -106,7 +106,7 @@ public class ProjectListController {
         project.setSrsIdentifier("EPSG:3577");
         return project;
     }
-
+/*
     @ModelAttribute("openAccessProjects")
     public List<Project> getOpenAccessProjects() {
         return projectDao.getProjectsByAccess(ProjectAccess.OPEN);
@@ -121,10 +121,12 @@ public class ProjectListController {
     public List<Project> getClosedAccessProjects() {
         return projectDao.getProjectsByAccess(ProjectAccess.CLOSED);
     }
-
+*/
     @RequestMapping(value="/projects", method=RequestMethod.GET)
     @PreAuthorize("permitAll")
     public String getListView(Model model) {
+        List<Project> projects = projectDao.getAll();
+        model.addAttribute("projects", projects);
         return "projects";
     }
 

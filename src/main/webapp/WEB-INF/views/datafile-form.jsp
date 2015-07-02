@@ -116,7 +116,7 @@ DATE,TIME,LATITUDE,LONGITUDE
 
         <h3>Columns</h3>
         <p>
-            OzTrack accepts CSV and Excel files containing the following headers:<br>
+            ZoaTrack accepts CSV and Excel files containing the following headers:<br>
         </p>
         <ul>
             <li><tt>DATE</tt>, <tt>UTCDATE</tt>, <tt>LOCDATE</tt>, or <tt>ACQUISITIONTIME</tt>: date or date/time value (required)</li>
@@ -190,7 +190,7 @@ DATE,TIME,LATITUDE,LONGITUDE
             </tbody>
         </table>
         <p>
-            Note: OzTrack will look for the headings specified above to populate the date and time fields.
+            Note: ZoaTrack will look for the headings specified above to populate the date and time fields.
             The date fields above (including <tt>ACQUIISITIONTIME</tt>) can contain either a date or a date
             and time stamp. The time stamp can be in a separate field to the date, but the date field must
             precede it (left to right).
@@ -208,11 +208,11 @@ DATE,TIME,LATITUDE,LONGITUDE
         <h3>Animal IDs</h3>
         <p>
             If there is an <tt>ID</tt> or <tt>ANIMALID</tt> field in the file,
-            OzTrack will assume that this field is the identifier of the animals.
+            ZoaTrack will assume that this field is the identifier of the animals.
         </p>
         <p>
             If there is no <tt>ID</tt> or <tt>ANIMALID</tt> field in the file,
-            OzTrack will assume that the file pertains to a single animal and will automatically generate an ID for it.
+            ZoaTrack will assume that the file pertains to a single animal and will automatically generate an ID for it.
             You can add the details for the animal later.
         </p>
     </jsp:body>

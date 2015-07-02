@@ -6,7 +6,7 @@
 <%@ taglib tagdir="/WEB-INF/tags" prefix="tags" %>
 <tags:page title="Settings">
     <jsp:attribute name="description">
-        Update institution records in OzTrack.
+        Update institution records in ZoaTrack.
     </jsp:attribute>
     <jsp:attribute name="breadcrumbs">
         <a href="${pageContext.request.contextPath}/">Home</a>

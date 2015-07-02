@@ -6,7 +6,7 @@
 <%@ taglib tagdir="/WEB-INF/tags" prefix="tags" %>
 <tags:page title="Contacts">
     <jsp:attribute name="description">
-        Contact OzTrack staff. OzTrack is a free-to-use web-based platform
+        Contact ZoaTrack staff. ZoaTrack is a free-to-use web-based platform
         for analysing and visualising individual-based animal location data.
     </jsp:attribute>
     <jsp:attribute name="tail">

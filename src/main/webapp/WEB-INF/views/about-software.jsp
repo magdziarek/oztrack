@@ -6,8 +6,8 @@
 <%@ taglib tagdir="/WEB-INF/tags" prefix="tags" %>
 <tags:page title="Software information">
     <jsp:attribute name="description">
-        OzTrack is a free-to-use web-based platform for analysing and visualising
-        individual-based animal location data. OzTrack is based on freely available,
+        ZoaTrack is a free-to-use web-based platform for analysing and visualising
+        individual-based animal location data. ZoaTrack is based on freely available,
         open-source software.
     </jsp:attribute>
     <jsp:attribute name="tail">
@@ -24,13 +24,13 @@
     </jsp:attribute>
     <jsp:body>
         <h1>Software information</h1>
-        <p>OzTrack is freely available, open-source software. See the <a target="_blank" href="https://github.com/uq-eresearch/oztrack/">OzTrack project on GitHub</a>.</p>
-        <p>The diagram below gives an overview of the software architecture for OzTrack:</p>
+        <p>ZoaTrack is freely available, open-source software. See the <a target="_blank" href="https://github.com/AtlasOfLivingAustralia/oztrack">ZoaTrack  project on GitHub</a>.</p>
+        <p>The diagram below gives an overview of the software architecture for ZoaTrack:</p>
         <p>
             <img src="${pageContext.request.contextPath}/img/architecture.png" style="border: 1px solid #D0D0BB;"/>
         </p>
         <h3>Server components</h3>
-        <p>OzTrack uses the following server components:</p>
+        <p>ZoaTrack uses the following server components:</p>
         <ul class="icons">
             <li class="software"><a target="_blank" href="http://www.oracle.com/technetwork/java/index.html">Java</a>: general-purpose, object-oriented language</li>
             <li class="software"><a target="_blank" href="http://tomcat.apache.org/">Tomcat</a> or <a target="_blank" href="http://www.eclipse.org/jetty/">Jetty</a>: HTTP server and Java Servlet container</li>
@@ -42,7 +42,7 @@
             <li class="software"><a target="_blank" href="http://www.rforge.net/Rserve/">Rserve (Server, REngine Java client)</a>: TCP/IP server allowing other programs (e.g. Java) to use facilities of R</li>
         </ul>
         <h3>Java technologies</h3>
-        <p>The OzTrack web application uses these Java technologies:</p>
+        <p>The ZoaTrack web application uses these Java technologies:</p>
         <ul class="icons">
             <li class="software"><a target="_blank" href="http://www.oracle.com/technetwork/java/javaee/servlet/index.html">Java Servlets, JSP, JSTL</a>: Java technologies for building Web-based applications</li>
             <li class="software"><a target="_blank" href="http://www.springsource.org/">Spring Framework (Context, Web MVC), Spring Security</a>: application development framework for Java</li>
@@ -60,7 +60,7 @@
             <li class="software"><a target="_blank" href="http://flywaydb.org/">Flyway</a>: database migration framework for Java</li>
         </ul>
         <h3>R packages</h3>
-        <p>The OzTrack analysis tools use these R packages:</p>
+        <p>The ZoaTrack analysis tools use these R packages:</p>
         <ul class="icons">
             <li class="software">
                 <a target="_blank" href="http://cran.r-project.org/web/packages/adehabitatHR/index.html">adehabitatHR</a>:

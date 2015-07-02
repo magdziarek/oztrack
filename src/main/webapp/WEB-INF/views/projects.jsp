@@ -4,73 +4,298 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="tags" %>
-<tags:page title="Projects">
+
+<tags:page>
     <jsp:attribute name="description">
-        View all projects in the OzTrack animal tracking database.
+        ZoaTrack is a free-to-use web-based platform for analysing and visualising
+        individual-based animal location data. Upload your tracking data now.
+    </jsp:attribute>
+    <jsp:attribute name="head">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/optimised/openlayers.css" type="text/css">
+        <style type="text/css">
+            #welcome{
+                background-color: #e6e6c0;
+                padding: 6px;
+                -khtml-border-radius: 8px;
+                -webkit-border-radius: 8px;
+                -moz-border-radius: 8px;
+                -ms-border-radius: 8px;
+                -o-border-radius: 8px;
+                border-radius: 8px;
+                margin-left:10px;
+            }
+
+            #homeMap{
+                height:300px;
+                background-color: #e6e6c0;
+            }
+
+            #map-instructions-container {
+                position: relative;
+                z-index: 1100;
+            }
+            #map-instructions {
+                position: absolute;
+                margin:2px 2px;
+                background-color: white;
+                opacity: 0.7;
+                text-align: center;
+                font-size: 12px;
+                padding: 5px;
+                -khtml-border-radius: 5px;
+                -webkit-border-radius: 5px;
+                -moz-border-radius: 5px;
+                -ms-border-radius: 5px;
+                -o-border-radius: 5px;
+                border-radius: 5px;
+            }
+            .home-popup {
+                margin-top: 0;
+                padding: 0 10px;
+                width: 400px;
+            }
+            .home-popup-title {
+                margin-bottom: 1em;
+                font-size: 15px;
+                font-weight: bold;
+            }
+            .home-popup-attr-name {
+                font-weight: bold;
+                margin-bottom: 0.25em;
+            }
+            .home-popup-attr-value {
+                margin-bottom: 0.75em;
+            }
+            .home-popup-footer {
+                margin-top: 1em;
+            }
+
+            #welcome-table {
+                background-color: #e6e6c0;
+                font-size: 11px;
+            }
+            #welcome-table h1 {
+                font-size: 13px;
+                margin: 4px 0px;
+            }
+
+            #blog-table td a {
+                text-decoration: none;
+            }
+
+            #blog-table td {
+                padding-top:15px;
+                padding-bottom:15px;
+            }
+
+
+            #project-list-div {
+                margin:10px 0;
+            }
+
+            a.morelink {
+                text-decoration:none;
+                outline: none;
+                color: #aaaaaa;
+            }
+            .morecontent span {
+                display: none;
+            }
+
+            #project-list-div{
+                font-size:11px;
+            }
+
+            #project-list-div label, input, button, select, textarea {
+                font-size: 11px;
+            }
+
+            table.dataTable thead th, table.dataTable thead td {
+                padding: 0px 8px;
+                vertical-align: middle;
+            }
+
+            #project-list-div select {
+                width: 50px;
+            }
+
+
+
+            tr.clickable-row { cursor: pointer; }
+
+            #createprojectbutton {
+                position:absolute;
+                padding: 2px 20px;
+                margin-left:200px;
+            }
+
+            #projects-table_length {
+                float: right;
+            }
+
+            #projects-table_filter {
+                float: left;
+            }
+
+        </style>
     </jsp:attribute>
     <jsp:attribute name="tail">
+        <script src="${pageContext.request.scheme}://maps.google.com/maps/api/js?v=3.9&sensor=false"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/optimised/openlayers.js"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/home.js"></script>
         <script type="text/javascript">
+
+
             $(document).ready(function() {
-                $('#navTrack').addClass('active');
+
+                $('#navBrowse').addClass('active');
+                map = createHomeMap('homeMap');
+
+                $(".clickable-row").click(function() {
+                    window.document.location = $(this).data('url');
+                });
+
+                var showChar = 50;
+                var ellipsestext = "...";
+                var moretext = "more";
+                var lesstext = "less";
+
+                $('.more').each(function() {
+
+                    var content = $(this).html();
+                    if(content.length > showChar) {
+
+                        var c = content.substr(0, showChar);
+                        var h = content.substr(showChar, content.length - showChar);
+
+                        var html = c + '<span class="moreellipses">' + ellipsestext + ' </span>' +
+                                '<span class="morecontent"><span>' + h +
+                                '</span>  <a href="" class="morelink">' + moretext + '</a></span>';
+
+                        $(this).html(html);
+                    }
+                });
+
+                $(".morelink").click(function(){
+                    if($(this).hasClass("less")) {
+                        $(this).removeClass("less");
+                        $(this).html(moretext);
+                    } else {
+                        $(this).addClass("less");
+                        $(this).html(lesstext);
+                    }
+                    $(this).parent().prev().toggle();
+                    $(this).prev().toggle();
+                    return false;
+                });
+
+                $('#projects-table').DataTable({
+                   "aLengthMenu": [[5, 10, 50, -1], [5, 10, 50, "All"]],
+                    //"pageLength": 5,
+                    "aoColumnDefs": [
+                        // null,
+                        // {"aTargets":[1], "mRender": function (data, type, row) { return ;}},
+                        //    null,
+                        {"aTargets":[4],"iDataSort" : 5 },
+                        {"aTargets":[5],"bVisible": false},
+                        {"aTargets":[0],"bVisible": false}
+                    ],
+                    "sDom": '<"H"f<"#createprojectbuttonarea">lr>t<"F"ip>'
+                } );
+                $( "#createprojectbuttonarea" ).html('<button id="createprojectbutton">Create a new ZoaTrack Project</button>');
+                $("#createprojectbutton").click( function () {
+                    window.document.location = "${pageContext.request.contextPath}/projects/new"
+                });
             });
+
         </script>
     </jsp:attribute>
-    <jsp:attribute name="breadcrumbs">
-        <a href="${pageContext.request.contextPath}/">Home</a>
-        &rsaquo; <span class="active">Projects</span>
-    </jsp:attribute>
-    <jsp:attribute name="sidebar">
-        <c:if test="${currentUser != null}">
-        <div class="sidebar-actions">
-            <div class="sidebar-actions-title">Manage Projects</div>
-            <ul class="icons sidebar-actions-list">
-                <li class="create-project"><a href="${pageContext.request.contextPath}/projects/new">Create new project</a></li>
-            </ul>
-        </div>
-        </c:if>
-    </jsp:attribute>
+
     <jsp:body>
-        <h1>Projects</h1>
-        <c:if test="${currentUser != null}">
-            <c:choose>
-            <c:when test="${(empty currentUser.projectUsers)}">
-                <p>You have no projects to work with yet. You might like to <a href="${pageContext.request.contextPath}/projects/new">add a project</a>.</p>
-            </c:when>
-            <c:otherwise>
-                <h2>My Projects</h2>
-                <p>
-                    You have access to <c:out value="${fn:length(currentUser.projectUsers)}"/> projects.
-                    Select a project to work with from the list below, or <a href="${pageContext.request.contextPath}/projects/new">create a new project</a>.
-                </p>
-                <table class="table table-bordered table-condensed">
-                    <col style="width: 320px;" />
-                    <col style="width: 230px;" />
-                    <col style="width: 150px;" />
+        <div class="row">
+        <div class="span12" id="welcome">
+
+            <div class="span12" id="homeMap">
+
+                <div id="map-instructions-container">
+                    <div id="map-instructions">
+                        Click markers to view project details
+                    </div>
+                </div>
+            </div>
+
+            <div class="span12" id="project-list-div">
+                <table id="projects-table" class="table table-condensed table-hover"
+                       data-page-length='5'
+                       data-order='[[0, "desc"], [4, "desc"],[ 1, "desc" ]]'>
                     <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Spatial Coverage</th>
-                            <th>Created Date</th>
-                        </tr>
+                    <tr>
+                        <th></th>
+                        <th class="span3">Title</th>
+                        <th class="span3">Species</th>
+                        <th class="span2">Spatial Coverage</th>
+                        <th class="span1">Updated Date</th>
+                        <th>Sortable Date</th>
+                        <th class="span2">Access Type</th>
+                        <c:if test="${currentUser != null}"><th>Role</th></c:if>
+                        <th class="span1"></th>
+                    </tr>
                     </thead>
                     <tbody>
-                        <c:forEach items="${currentUser.projectUsers}" var="projectUser">
-                        <tr>
-                            <td><a href="${pageContext.request.contextPath}/projects/${projectUser.project.id}"><c:out value="${projectUser.project.title}"/></a></td>
-                            <td><c:out value="${projectUser.project.spatialCoverageDescr}"/></td>
-                            <td><fmt:formatDate value="${projectUser.project.createDate}" type="date" dateStyle="long"/></td>
-                        </tr>
+                    <c:forEach items="${projects}" var="project">
+                        <c:set var="userAccessToTracks" value='false'/>
+                        <c:set var="projectUrl" value="${pageContext.request.contextPath}/projects/${project.id}"/>
+                        <c:set var="userRole" value=""/>
+
+                        <c:forEach items="${project.projectUsers}" var="projectUser">
+                            <c:if test="${(currentUser != null && projectUser.user == currentUser) || project.access == 'OPEN'}">
+                                <c:set var="userAccessToTracks" value="true"/>
+                                <c:set var="projectUrl" value="${pageContext.request.contextPath}/projects/${project.id}/analysis"/>
+                                <c:if test="${(currentUser != null && projectUser.user == currentUser)}">
+                                    <c:set var="userRole" value="${projectUser.role.title}"/>
+                                </c:if>
+                            </c:if>
                         </c:forEach>
+
+                        <tr class="clickable-row" data-url="${projectUrl}">
+                            <td>
+                                <c:choose>
+                                    <c:when test="${userRole == 'Manager'}">1003</c:when>
+                                    <c:when test="${userRole == 'Writer'}">1002</c:when>
+                                    <c:when test="${userRole == 'Reader'}">1001</c:when>
+                                    <c:when test="${project.id == 1 || project.id == 3}">900</c:when>
+                                    <c:when test="${project.access == 'OPEN'}">800</c:when>
+                                </c:choose>
+                            </td>
+                            <td><c:out value="${project.title}"/></td>
+                            <td><c:if test="${project.speciesScientificName != null}">
+                                <span style="font-style: italic"><c:out value="${project.speciesScientificName}"/></span><br/>
+                            </c:if>
+                                <span class="more"><c:out value="${project.speciesCommonName}"/></span></td>
+                            <td><c:out value="${project.spatialCoverageDescr}"/></td>
+                            <td><fmt:formatDate value="${project.updateDate}" type="date" pattern="dd/MM/yyyy"/></td>
+                            <td><fmt:formatDate value="${project.updateDate}" type="date" pattern="yyyyMMdd" /></td>
+                            <td>
+                                <c:choose>
+                                    <c:when test="${project.access == 'OPEN'}">Open Access<br/></c:when>
+                                    <c:when test="${project.access == 'CLOSED'}">Closed Access<br/></c:when>
+                                    <c:when test="${project.access == 'EMBARGO'}">Delayed Access<br/></c:when>
+                                </c:choose></td>
+                            <c:if test="${currentUser != null}">
+                                <td>
+                                    <c:if test="${userRole != ''}"><c:out value="${userRole}"/></c:if>
+                                </td></c:if>
+                            <td><c:choose>
+                                <c:when test="${userAccessToTracks == 'true'}">
+                                    <span class="label label-success">Tracks</span></c:when>
+                                <c:otherwise>
+                                    <span class="label label-info">Metadata</span></c:otherwise>
+                            </c:choose></td>
+                        </tr>
+                    </c:forEach>
                     </tbody>
                 </table>
-            </c:otherwise>
-            </c:choose>
-        </c:if>
-        <h2>Open Access Projects</h2>
-        <tags:projects-table projects="${openAccessProjects}" adjective="open access"/>
-        <h2>Delayed Open Access Projects</h2>
-        <tags:projects-table projects="${embargoAccessProjects}" adjective="delayed open access"/>
-        <h2>Closed Access Projects</h2>
-        <tags:projects-table projects="${closedAccessProjects}" adjective="closed access"/>
-    </jsp:body>
+            </div>
+        </div>
+     </jsp:body>
 </tags:page>
