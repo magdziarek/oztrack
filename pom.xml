@@ -14,9 +14,9 @@
     <groupId>org.oztrack</groupId>
     <artifactId>oztrack</artifactId>
     <packaging>war</packaging>
-    <version>2.0-SNAPSHOT</version>
+    <version>3.0-SNAPSHOT</version>
     <name>OzTrack</name>
-    <url>http://oztrack.org/</url>
+    <url>http://zoatrack.org/</url>
     <scm>
         <connection>scm:git:git@github.com:AtlasOfLivingAustralia/oztrack.git</connection>
         <developerConnection>scm:git:git@github.com:AtlasOfLivingAustralia/oztrack.git</developerConnection>
