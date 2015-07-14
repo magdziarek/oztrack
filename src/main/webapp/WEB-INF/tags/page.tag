@@ -45,29 +45,22 @@
             *display: inline; /* ie7 fix */
             *zoom: 1; /* hasLayout ie7 trigger */
             margin: 0 auto;
+            vertical-align:middle;
         }
 
         .navbar-brand {
             padding-right:120px;
         }
-        .navbar-brand img {
-            vertical-align:unset;
-            padding: 3px 20px;
-        }
 
-        .navbar .nav > li > a {
-            font-size: 1.2em;
-            padding-bottom: 18px;
+        .navbar-brand img {
+           padding: 3px 20px;
         }
 
         #login {
             float: right;
-            padding-top: 8px;
+            padding-top:8px;
         }
 
-        #main {
-            margin: 55px 0px;
-        }
         .icon-user {
             margin-top:3px;
         }
@@ -88,7 +81,6 @@
         .dropdown-menu .divider {
             height: auto;
         }
-
 
     </style>
     <jsp:invoke fragment="head"/>
@@ -119,8 +111,9 @@
                     </ul>
                 </li>
                 <li id="navContact"><a href="${pageContext.request.contextPath}/contact">Contact Us</a></li>
-            </ul>
-            <ul class="nav" id="login" >
+           </ul>
+            <ul id="login" class="nav"  >
+
                 <c:choose>
                     <c:when test="${currentUser != null}">
                         <li id="navLogin" class="dropdown">
