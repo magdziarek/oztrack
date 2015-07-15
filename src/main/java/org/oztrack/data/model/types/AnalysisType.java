@@ -9,7 +9,7 @@ public enum AnalysisType {
         "<p>Otherwise known as a convex hull, this approach uses the smallest area " +
         "convex set that contains the location data (Worton 1998). This calculation " +
         "is undertaken within R using the adehabitatHR package (Calenge 2008). " +
-        "OzTrack will return the MCP calculation in the Analysis Results window. " +
+        "ZoaTrack will return the MCP calculation in the Analysis Results window. " +
         "An image of the MCP will be produced for visualisation over the map image, " +
         "as well as a KML file for viewing in Google Earth.</p>\n" +
         "\n" +
@@ -26,7 +26,7 @@ public enum AnalysisType {
             new AnalysisParameterType(
                 "percent",
                 "Percent",
-                "<p>OzTrack offers the feature to strip the Minimum Convex Polygon (MCP) " +
+                "<p>ZoaTrack offers the feature to strip the Minimum Convex Polygon (MCP) " +
                 "to different levels based on percentage. At 100% the MCP will be the " +
                 "equivalent to the area covered by all locations within the dataset. " +
                 "Inserting a lower % value into the box will result in only this " +
@@ -103,7 +103,7 @@ public enum AnalysisType {
                 "h estimator",
                 "<p>There are a number of different smoothing parameters that have been " +
                 "adopted in kernel estimates, and no single parameter will perform " +
-                "well in all conditions. OzTrack offers three options for selecting the " +
+                "well in all conditions. ZoaTrack offers three options for selecting the " +
                 "kernel smoothing parameter. Two of these are automatically generated " +
                 "using either the ad hoc method for a bivariate normal kernel (reference " +
                 "bandwidth = ‘href’), or the least-squares cross-validation (‘LSCV’) " +
@@ -127,7 +127,7 @@ public enum AnalysisType {
             new AnalysisParameterType(
                 "hValue",
                 "h value",
-                "<p>OzTrack alternatively " +
+                "<p>ZoaTrack alternatively " +
                 "allows users to a set numerical value for h (in meters). This value " +
                 "depends on the scale and rate of the animal’s movement, and the " +
                 "frequency of location sampling. Users can gain a feel for what value " +
@@ -264,7 +264,7 @@ public enum AnalysisType {
             new AnalysisParameterType(
                 "sig1",
                 "sig1",
-                "<p>OzTrack offers two smoothing parameters for the Brownian Bridge method. " +
+                "<p>ZoaTrack offers two smoothing parameters for the Brownian Bridge method. " +
                 "Sig1 is related to the speed of the animal, describing how far from the line " +
                 "joining two successive locations the animal can go in one time step. This " +
                 "can be entered manually or can be estimated within R using the liker function " +
@@ -436,7 +436,7 @@ public enum AnalysisType {
             new AnalysisParameterType(
                 "k",
                 "Neighbours",
-                "<p>By entering a value in this field, OzTrack runs the fixed k-LoCoH (function " +
+                "<p>By entering a value in this field, ZoaTrack runs the fixed k-LoCoH (function " +
                 "LoCoH.k) contained within the adehabitatHR package in R. Here neighbours = the " +
                 "number of neighbours to include (k) – 1 with which to construct the convex hulls. " +
                 "See the adehabitatHR package notes for more information.<p>\n" +
@@ -453,7 +453,7 @@ public enum AnalysisType {
             new AnalysisParameterType(
                 "r",
                 "Radius",
-                "<p>By entering a value in this field, OzTrack runs the fixed r-LoCoH (function " +
+                "<p>By entering a value in this field, ZoaTrack runs the fixed r-LoCoH (function " +
                 "LoCoH.r) contained within the adehabitatHR package in R. Here radius = the distance " +
                 "(in meters) from the root point with which to include locations in convex hulls. " +
                 "See the adehabitatHR package notes for more information.</p>\n" +
@@ -475,7 +475,7 @@ public enum AnalysisType {
         "Heat Map (Point Intensity)",
         "<p>This generates a grid over the study area and uses a coloured gradient to visually identify " +
         "areas of high usage by the tagged animal. These can be applied to either points or connectivity " +
-        "lines between points. The size of the grid cells (in meters) can be specified. This OzTrack tool " +
+        "lines between points. The size of the grid cells (in meters) can be specified. This ZoaTrack tool " +
         "utilises the spatstat package in R (Baddeley & Turner, 2005)</p>\n" +
         "\n" +
         "<p style=\"font-weight: bold;\">References</p>" +
@@ -491,7 +491,7 @@ public enum AnalysisType {
         "Heat Map (Line Intensity)",
         "<p>This generates a grid over the study area and uses a coloured gradient to visually identify " +
         "areas of high usage by the tagged animal. These can be applied to either points or connectivity " +
-        "lines between points. The size of the grid cells (in meters) can be specified. This OzTrack tool " +
+        "lines between points. The size of the grid cells (in meters) can be specified. This ZoaTrack tool " +
         "utilises the spatstat package in R (Baddeley & Turner, 2005)</p>\n" +
         "\n" +
         "<p style=\"font-weight: bold;\">References</p>" +

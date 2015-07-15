@@ -38,7 +38,7 @@ public class EmailBuilder {
     }
 
     public EmailBuilder htmlMsgContent(String htmlMsgContent) throws EmailException, IOException {
-        String oztrackLogoImgSrc = embedImg("oztrack-logo.png");
+        String oztrackLogoImgSrc = embedImg("zoatrack-logo.png");
         StringBuilder htmlMsg = new StringBuilder();
         htmlMsg.append("<html>\n");
         htmlMsg.append("<head>\n");

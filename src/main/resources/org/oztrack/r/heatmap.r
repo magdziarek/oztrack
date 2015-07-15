@@ -86,12 +86,12 @@ fldens2kml <- function(sdata,igrid,ssrs,scol,labsent=FALSE)
 
 ###
 # Generates kml from polygon heatmap
-polykml <- function(sw, filename, namefield, kmldesc="Created using OzTrack" ) 
+polykml <- function(sw, filename, namefield, kmldesc="Created using ZoaTrack" )
 {
  # sw=Z_ppp_SPDF
 #  filename=paste(KMLdir,"pointpatternplay.kml",sep="")
 #  namefield=6
-#  kmldesc="Created using OzTrack"  
+#  kmldesc="Created using ZoaTrack"
   out <- sapply(slot(sw, "polygons"),
     function(x) 
     {

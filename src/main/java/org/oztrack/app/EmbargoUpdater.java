@@ -71,16 +71,16 @@ public class EmbargoUpdater implements Runnable {
 
                 EmailBuilder emailBuilder = emailBuilderFactory.getObject();
                 emailBuilder.to(project.getCreateUser());
-                emailBuilder.subject("OzTrack project embargo ended");
+                emailBuilder.subject("ZoaTrack project embargo ended");
                 String projectLink = configuration.getBaseUrl() + "/projects/" + project.getId();
                 StringBuilder htmlMsgContent = new StringBuilder();
                 htmlMsgContent.append("<p>\n");
-                htmlMsgContent.append("    Please note that your OzTrack project,\n");
+                htmlMsgContent.append("    Please note that your ZoaTrack project,\n");
                 htmlMsgContent.append("    <i>" + project.getTitle() + "</i>,\n");
                 htmlMsgContent.append("    has <b>ended its embargo period</b>.\n");
                 htmlMsgContent.append("</p>\n");
                 htmlMsgContent.append("<p>\n");
-                htmlMsgContent.append("    Data in this project are now publicly available in OzTrack.\n");
+                htmlMsgContent.append("    Data in this project are now publicly available in ZoaTrack.\n");
                 htmlMsgContent.append("</p>");
                 htmlMsgContent.append("<p>\n");
                 htmlMsgContent.append("    To view your project, click here:\n");
@@ -126,18 +126,18 @@ public class EmbargoUpdater implements Runnable {
             try {
                 EmailBuilder emailBuilder = emailBuilderFactory.getObject();
                 emailBuilder.to(project.getCreateUser());
-                emailBuilder.subject("OzTrack project embargo ending");
+                emailBuilder.subject("ZoaTrack project embargo ending");
                 String projectLink = configuration.getBaseUrl() + "/projects/" + project.getId();
                 String projectEditLink = projectLink + "/edit";
 
                 StringBuilder htmlMsgContent = new StringBuilder();
                 htmlMsgContent.append("<p>\n");
-                htmlMsgContent.append("    Please note that your OzTrack project,\n");
+                htmlMsgContent.append("    Please note that your ZoaTrack project,\n");
                 htmlMsgContent.append("    <i>" + project.getTitle() + "</i>,\n");
                 htmlMsgContent.append("    will <b>end its embargo period</b> on " + isoDateFormat.format(project.getEmbargoDate()) + ".\n");
                 htmlMsgContent.append("</p>\n");
                 htmlMsgContent.append("<p>\n");
-                htmlMsgContent.append("    Starting from this date, data in the project will be made publicly available in OzTrack.\n");
+                htmlMsgContent.append("    Starting from this date, data in the project will be made publicly available in ZoaTrack.\n");
                 htmlMsgContent.append("</p>");
                 EmbargoInfo embargoInfo = EmbargoUtils.getEmbargoInfo(project.getCreateDate(), project.getEmbargoDate());
                 if (project.getEmbargoDate().before(embargoInfo.getMaxEmbargoDate())) {
@@ -165,13 +165,13 @@ public class EmbargoUpdater implements Runnable {
                         htmlMsgContent.append("    " + isoDateFormat.format(embargoInfo.getMaxEmbargoDate()) + ".\n");
                         htmlMsgContent.append("</p>\n");
                         htmlMsgContent.append("<p>\n");
-                        htmlMsgContent.append("    This is the final renewal permitted by OzTrack, taking the embargo period up to 3 years.\n");
+                        htmlMsgContent.append("    This is the final renewal permitted by ZoaTrack, taking the embargo period up to 3 years.\n");
                         htmlMsgContent.append("</p>\n");
                     }
                 }
                 else {
                     htmlMsgContent.append("<p>\n");
-                    htmlMsgContent.append("    This embargo period has been the maximum permitted by OzTrack (3 years),");
+                    htmlMsgContent.append("    This embargo period has been the maximum permitted by ZoaTrack (3 years),");
                     htmlMsgContent.append("    so cannot be renewed.\n");
                     htmlMsgContent.append("</p>\n");
                 }

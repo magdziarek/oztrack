@@ -5,14 +5,14 @@ public enum MapLayerType {
         "Trajectory",
         "<p>The trajectory is the animal movement path created from the location " +
         "fixes in chronological order. Unless the date range has been specified, " +
-        "OzTrack plots the trajectory from the first to the last location fix in " +
+        "ZoaTrack plots the trajectory from the first to the last location fix in " +
         "the uploaded file.</p>"
     ),
     POINTS(
         "Detections",
         "<p>Detections are a collection of data points containing temporal (i.e. " +
         "the time and date of collection) and spatial data (i.e. the geographical " +
-        "coordinates). Unless the date range has been specified, OzTrack plots " +
+        "coordinates). Unless the date range has been specified, ZoaTrack plots " +
         "all the detections in the uploaded file.</p>"
     ),
     START_END(

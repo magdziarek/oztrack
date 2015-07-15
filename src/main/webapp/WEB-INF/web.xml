@@ -5,8 +5,8 @@
     xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
     version="2.5">
 
-    <display-name>OzTrack</display-name>
-    <description>OzTrack</description>
+    <display-name>ZoaTrack</display-name>
+    <description>ZoaTrack</description>
 
     <context-param>
         <param-name>contextConfigLocation</param-name>

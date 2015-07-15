@@ -310,13 +310,13 @@ public class ProjectController {
             try {
                 EmailBuilder emailBuilder = emailBuilderFactory.getObject();
                 emailBuilder.to(notifiedContributor);
-                emailBuilder.subject("OzTrack project contributor change");
+                emailBuilder.subject("ZoaTrack project contributor change");
 
                 StringBuilder htmlMsgContent = new StringBuilder();
 
                 if (addedContributors.contains(notifiedContributor)) {
                     htmlMsgContent.append("<p>\n");
-                    htmlMsgContent.append("    You have been listed as a contributor to OzTrack project\n");
+                    htmlMsgContent.append("    You have been listed as a contributor to ZoaTrack project\n");
                     htmlMsgContent.append("    <i>" + project.getTitle() + "</i>.\n");
                     htmlMsgContent.append("</p>\n");
                     htmlMsgContent.append("<p>The full list of contributors is:</p>\n");
@@ -325,13 +325,13 @@ public class ProjectController {
                 else {
                     if (removedContributors.contains(notifiedContributor)) {
                         htmlMsgContent.append("<p>\n");
-                        htmlMsgContent.append("    You have been removed as a contributor to OzTrack project\n");
+                        htmlMsgContent.append("    You have been removed as a contributor to ZoaTrack project\n");
                         htmlMsgContent.append("    <i>" + project.getTitle() + "</i>.\n");
                         htmlMsgContent.append("</p>\n");
                     }
                     else {
                         htmlMsgContent.append("<p>\n");
-                        htmlMsgContent.append("    The list of contributors to OzTrack project\n");
+                        htmlMsgContent.append("    The list of contributors to ZoaTrack project\n");
                         htmlMsgContent.append("    <i>" + project.getTitle() + "</i>\n");
                         htmlMsgContent.append("    has been updated.\n");
                         htmlMsgContent.append("</p>\n");
@@ -352,11 +352,11 @@ public class ProjectController {
 
                 if (notifiedContributor.getUser() == null) {
                     htmlMsgContent.append("<p style=\"color: #333333;\">\n");
-                    htmlMsgContent.append("    <b>What is OzTrack?</b>\n");
+                    htmlMsgContent.append("    <b>What is ZoaTrack?</b>\n");
                     htmlMsgContent.append("</p>\n");
                     String websiteLink = configuration.getBaseUrl() + "/";
                     htmlMsgContent.append("<p>\n");
-                    htmlMsgContent.append("    OzTrack is a free-to-use web-based platform for analysing and visualising\n");
+                    htmlMsgContent.append("    ZoaTrack is a free-to-use web-based platform for analysing and visualising\n");
                     htmlMsgContent.append("    individual-based animal location data. It was primarily developed for the\n");
                     htmlMsgContent.append("    Australian animal telemetry community but can be used to assess animal\n");
                     htmlMsgContent.append("    movement and estimate space-use for individually-marked animals anywhere\n");
@@ -364,12 +364,12 @@ public class ProjectController {
                     htmlMsgContent.append("    <a href=\"" + websiteLink + "\">" + websiteLink + "</a>.");
                     htmlMsgContent.append("</p>\n");
                     htmlMsgContent.append("<p style=\"color: #333333;\">\n");
-                    htmlMsgContent.append("    <b>Register an OzTrack account</b>\n");
+                    htmlMsgContent.append("    <b>Register an ZoaTrack account</b>\n");
                     htmlMsgContent.append("</p>\n");
                     htmlMsgContent.append("<p>\n");
-                    htmlMsgContent.append("    The project owner entered your details into OzTrack,\n");
+                    htmlMsgContent.append("    The project owner entered your details into ZoaTrack,\n");
                     htmlMsgContent.append("    creating a record consisting of your name and email address.\n");
-                    htmlMsgContent.append("    To register an OzTrack user account based on this record, click the following link:\n");
+                    htmlMsgContent.append("    To register an ZoaTrack user account based on this record, click the following link:\n");
                     htmlMsgContent.append("</p>\n");
                     String registrationLink = configuration.getBaseUrl() + "/users/new?person=" + notifiedContributor.getUuid();
                     htmlMsgContent.append("</p>\n");
@@ -377,7 +377,7 @@ public class ProjectController {
                     htmlMsgContent.append("<p>\n");
                     htmlMsgContent.append("<p>\n");
                     htmlMsgContent.append("    <span style=\"color: #ff9900;\"><b>Why register?</b></span>\n");
-                    htmlMsgContent.append("    Having an account in OzTrack allows you to update your profile and create new projects.\n");
+                    htmlMsgContent.append("    Having an account in ZoaTrack allows you to update your profile and create new projects.\n");
                     htmlMsgContent.append("</p>\n");
                 }
                 if (addedContributors.contains(notifiedContributor)) {
@@ -385,7 +385,7 @@ public class ProjectController {
                     htmlMsgContent.append("    <b>Remove your listing as a contributor</b>\n");
                     htmlMsgContent.append("</p>\n");
                     htmlMsgContent.append("<p>\n");
-                    htmlMsgContent.append("    If you believe you were added in error or would prefer not to be listed in OzTrack,\n");
+                    htmlMsgContent.append("    If you believe you were added in error or would prefer not to be listed in ZoaTrack,\n");
                     htmlMsgContent.append("    you can automatically remove your record by clicking the following link:\n");
                     htmlMsgContent.append("</p>\n");
                     String rejectionLink = configuration.getBaseUrl() + "/projects/" + project.getId() + "/reject?person=" + notifiedContributor.getUuid();
