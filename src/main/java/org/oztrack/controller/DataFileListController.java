@@ -150,13 +150,14 @@ public class DataFileListController {
             }
         }
         catch (Exception e) {
-            errorMessage = "Error uploading file. Please check file and try again.";
+            errorMessage = "Error uploading file. Please check file and try again." + e.toString();
         }
 
         if (errorMessage != null) {
             model.addAttribute("errorMessage", errorMessage);
             dataFile.setStatus(DataFileStatus.INACTIVE);
             dataFile.setStatusMessage("There was a problem with this file upload and it has been discarded.");
+            dataFileDao.update(dataFile);
             return "datafile-form";
         }
 

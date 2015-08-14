@@ -33,8 +33,9 @@ public class ExcelToCsvConverter {
                 if (row == null) {
                     continue;
                 }
-                String[] csvValues = new String[row.getLastCellNum()];
-                for (int cellNum = 0; cellNum < row.getLastCellNum(); cellNum++) {
+                int lastCellNum = ((row.getLastCellNum() < 0) ? 0 : row.getLastCellNum());
+                String[] csvValues = new String[lastCellNum];
+                for (int cellNum = 0; cellNum < lastCellNum; cellNum++) {
                     Cell cell = row.getCell(cellNum);
                     if (cell == null) {
                         csvValues[cellNum] = "";
@@ -53,6 +54,7 @@ public class ExcelToCsvConverter {
                 csvWriter.writeNext(csvValues);
             }
         }
+
         finally {
             try {csvWriter.close();} catch (Exception e) {}
         }
