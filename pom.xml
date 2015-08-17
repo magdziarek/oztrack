@@ -138,6 +138,13 @@
                         <connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">
                             <port>8181</port>
                         </connector>
+                        <connector implementation="org.eclipse.jetty.server.ssl.SslSocketConnector">
+                            <port>9443</port>
+                            <keystore>keystore</keystore>
+                            <keyPassword>123456</keyPassword>
+                            <password>123456</password>
+                            <!-- keystore produced by JDK keytool: keytool -keystore keystore -alias jetty -genkey -keyalg RSA -->
+                        </connector>
                     </connectors>
                     <stopKey>STOP</stopKey>
                     <stopPort>8005</stopPort>
@@ -480,17 +487,6 @@
         <repository>
             <id>JBoss Releases</id>
             <url>https://repository.jboss.org/nexus/content/repositories/releases</url>
-        </repository>
-        <repository>
-            <!-- Needed for net.rforge.rserve:REngine:jar:1.7-0 -->
-            <id>eresearch</id>
-            <name>libs-releases</name>
-            <url>http://maven.metadata.net/artifactory/libs-releases</url>
-        </repository>
-        <repository>
-            <id>sonatype-nexus-staging</id>
-            <name>Nexus Release Repository</name>
-            <url>https://oss.sonatype.org/content/repositories/releases</url>
         </repository>
     </repositories>
 </project>
