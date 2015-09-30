@@ -499,7 +499,7 @@
                 </div>
             </fieldset>
             <fieldset>
-                <div class="legend">Publications</div>
+                <div class="legend">Research Metadata</div>
                 <div class="control-group">
                     <label class="control-label" for="publicationReference">Publication list</label>
                     <div class="controls">
@@ -511,9 +511,6 @@
                         </div>
                     </div>
                 </div>
-            </fieldset>
-            <fieldset>
-                <div class="legend">Project Contributors</div>
                 <div class="control-group">
                     <label class="control-label" for="new-contributor">Contributors</label>
                     <div class="controls">
@@ -524,10 +521,11 @@
                                 <select id="new-contributor" style="width: 284px;">
                                     <option value="">Select contributor</option>
                                     <c:forEach var="person" items="${people}">
-                                    <option value="${person.id}">${person.fullName}<c:if test="${not empty person.email}"> (${person.email})</c:if></option>
+                                        <option value="${person.id}">${person.fullName}<c:if test="${not empty person.email}"> (${person.email})</c:if></option>
                                     </c:forEach>
                                 </select>
-                                <button id="add-contributor-btn" class="btn">Add contributor</button>
+                                <button id="add-contributor-btn" class="btn">Add contributor</button>&nbsp;
+                                <!--<a id="new-person-toggle" class="btn" href="#new-person-form">Can't find a contributor?</a>-->
                             </li>
                         </ul>
                         <div style="margin-top: 18px;">
@@ -556,6 +554,44 @@
                         <form:errors path="projectContributions" element="div" cssClass="help-block formErrors" cssStyle="margin: 1em 0;"/>
                     </div>
                 </div>
+                <div class="control-group">
+                    <label class="control-label" for="dataManipulation">Data Quality and Manipulation</label>
+                    <div class="controls">
+                        <form:textarea path="dataManipulation" id="dataManipulation" cssStyle="width: 400px; height: 100px;"/>
+                        <form:errors path="dataManipulation" element="div" cssClass="help-block formErrors"/>
+                        <div class="help-inline">
+                            <div class="help-popover" title="Data Manipulation Techniques">
+                                A description of any data manipulation, algorithms or filters that have been applied to raw data to derive location, such as least squares or Kalman filters. Also describe any data quality and cleansing measures applied to the data you're uploading to ZoaTrack.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="locationAccuracyComments">Location Accuracy Comments</label>
+                    <div class="controls">
+                        <form:textarea path="locationAccuracyComments" id="locationAccuracyComments" cssStyle="width: 400px; height: 100px;"/>
+                        <form:errors path="locationAccuracyComments" element="div" cssClass="help-block formErrors"/>
+                        <div class="help-inline">
+                            <div class="help-popover" title="Location Accuracy">
+                                Provide any details about the location accuracy of the data in this project, and any error handling methodologies used.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="licencingAndEthics">Related Licences and Ethics Clearance</label>
+                    <div class="controls">
+                        <form:textarea path="licencingAndEthics" id="licencingAndEthics" cssStyle="width: 400px; height: 100px;"/>
+                        <form:errors path="licencingAndEthics" element="div" cssClass="help-block formErrors"/>
+                        <div class="help-inline">
+                            <div class="help-popover" title="Related Licences and Ethics Clearance">
+                                Provide licencing and ethics details including the issuing authorities and identifiers.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
             </fieldset>
             <fieldset>
                 <div class="legend">Data Availability</div>

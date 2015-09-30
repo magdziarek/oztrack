@@ -1,11 +1,14 @@
 package org.oztrack.controller;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.oztrack.data.access.AnimalDao;
 import org.oztrack.data.access.Page;
 import org.oztrack.data.access.PositionFixDao;
@@ -16,21 +19,21 @@ import org.oztrack.data.model.SearchQuery;
 import org.oztrack.data.model.User;
 import org.oztrack.validator.AnimalFormValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class AnimalController {
+    private final Logger logger = Logger.getLogger(getClass());
+    private final SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
     @Autowired
     private AnimalDao animalDao;
 
@@ -46,11 +49,30 @@ public class AnimalController {
     @InitBinder("animal")
     public void initAnimalBinder(WebDataBinder binder) {
         binder.setAllowedFields(
-            "projectAnimalId",
-            "animalName",
-            "animalDescription",
-            "colour"
+             "projectAnimalId"
+            ,"animalName"
+            ,"animalDescription"
+            ,"colour"
+            ,"speciesScientificName"
+            ,"speciesCommonName"
+            ,"sex"
+            ,"mass"
+            ,"dimensions"
+            ,"lifePhase"
+            ,"experimentalContext "
+            ,"captureLocation"
+            ,"captureDate"
+            ,"releaseDate"
+            ,"tagDeployStartDate"
+            ,"tagDeployEndDate"
+            ,"tagManufacturerModel"
+            ,"tagIdentifier"
+            ,"tagDimensions"
+            ,"tagAttachmentTechnique"
+            ,"tagDeploymentComments"
+            ,"dataRetrievalMethod"
         );
+        binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("yyyy-MM-dd"), true));
     }
 
     @ModelAttribute("animal")
@@ -90,6 +112,7 @@ public class AnimalController {
     ) throws Exception {
         User currentUser = permissionEvaluator.getAuthenticatedUser(authentication);
         new AnimalFormValidator().validate(animal, bindingResult);
+
         if (bindingResult.hasErrors()) {
             model.addAttribute("project", animal.getProject());
             return "animal-form";

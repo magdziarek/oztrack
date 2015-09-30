@@ -120,6 +120,15 @@ public class Project extends OzTrackBaseEntity {
     @Sort(type=SortType.NATURAL)
     private SortedSet<String> oaiPmhSetSpecs;
 
+    @Column(columnDefinition="TEXT")
+    private String dataManipulation;
+
+    @Column(columnDefinition="TEXT")
+    private String locationAccuracyComments;
+
+    @Column(columnDefinition="TEXT")
+    private String licencingAndEthics;
+
     public Project() {
     }
 
@@ -322,6 +331,18 @@ public class Project extends OzTrackBaseEntity {
     public void setOaiPmhSetSpecs(SortedSet<String> oaiPmhSetSpecs) {
         this.oaiPmhSetSpecs = oaiPmhSetSpecs;
     }
+
+    public String getDataManipulation() {return dataManipulation;}
+
+    public void setDataManipulation(String dataManipulation) {this.dataManipulation = dataManipulation;    }
+
+    public String getLocationAccuracyComments() {return locationAccuracyComments;    }
+
+    public void setLocationAccuracyComments(String locationAccuracyComments) {this.locationAccuracyComments = locationAccuracyComments;    }
+
+    public String getLicencingAndEthics() {return licencingAndEthics; }
+
+    public void setLicencingAndEthics(String licencingAndEthics) {this.licencingAndEthics = licencingAndEthics;}
 
     @Override
     public boolean equals(Object obj) {

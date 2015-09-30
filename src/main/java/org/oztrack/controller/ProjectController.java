@@ -126,7 +126,10 @@ public class ProjectController {
             "speciesScientificName",
             "srsIdentifier",
             "access",
-            "rightsStatement"
+            "rightsStatement",
+            "dataManipulation",
+            "locationAccuracyComments",
+            "licencingAndEthics"
         );
         binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("yyyy-MM-dd"), true));
     }
@@ -184,7 +187,7 @@ public class ProjectController {
         // Note that two or more values is handled correctly (e.g. ["a, b", "c"]).
         String[] publicationReferenceParam = request.getParameterValues("publicationReference");
         String[] publicationUrlParam = request.getParameterValues("publicationUrl");
-        String[] conbtributorIdParam = request.getParameterValues("contributor");
+        String[] contributorIdParam = request.getParameterValues("contributor");
 
         Date prevEmbargoDate = project.getEmbargoDate();
         if (project.getAccess().equals(ProjectAccess.EMBARGO) && StringUtils.isNotBlank(embargoDateString)) {
@@ -212,7 +215,7 @@ public class ProjectController {
         setProjectPublications(project, bindingResult, publicationReferenceParam, publicationUrlParam);
 
         List<ProjectContribution> previousContributions = new ArrayList<ProjectContribution>(project.getProjectContributions());
-        setProjectContributions(project, bindingResult, conbtributorIdParam, personDao);
+        setProjectContributions(project, bindingResult, contributorIdParam, personDao);
 
         new ProjectFormValidator(projectDao, prevEmbargoDate).validate(project, bindingResult);
 
