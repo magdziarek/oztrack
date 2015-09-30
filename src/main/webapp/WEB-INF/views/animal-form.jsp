@@ -205,16 +205,7 @@
                     </div>
                     <form:errors path="captureDate" element="div" cssClass="help-block formErrors"/>
                 </div>
-                <div class="control-group">
-                    <label class="control-label" for="releaseDate">Capture Date</label>
-                    <div class="controls">
-                        <form:hidden path="captureDate" id="captureDate"/>
-                        <input type="text" id="captureDateVisible" class="datepicker" style="width: 80px;" placeholder=""
-                               value="<fmt:formatDate pattern="${dateFormatPattern}" value="${animal.captureDate}"/>" />
-                    </div>
-                    <form:errors path="captureDate" element="div" cssClass="help-block formErrors"/>
-                </div>
-                <div class="control-group">
+                 <div class="control-group">
                     <label class="control-label" for="captureLocation">Capture Location</label>
                     <div class="controls">
                         <form:input path="captureLocation" id="captureLocation" cssClass="input-xxlarge" placeholder=""/>
