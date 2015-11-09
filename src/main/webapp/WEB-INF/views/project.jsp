@@ -534,6 +534,24 @@
         </div> <!-- .row -->
         </c:if>
 
+        <c:if test="${not empty project.licencingAndEthics}">
+        <div class="row">
+        <div class="span9">
+        <dl>
+            <dt>Licencing and Ethics</dt>
+            <dd>
+            <ul>
+                <c:set var="licenceList" value="${fn:split(project.licencingAndEthics,';')}"/>
+                <c:forEach var="licenceDetails" items="${licenceList}">
+                    <li><c:out value="${licenceDetails}"/></li>
+                </c:forEach>
+            </ul>
+            </dd>
+        </dl>
+        </div>
+        </div>
+        </c:if>
+
         <c:if test="${fn:length(project.projectContributions) > 0}">
         <h2>Project Contributors</h2>
         <ul class="icons">

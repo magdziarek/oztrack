@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.vividsolutions.jts.geom.Point;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.oztrack.data.access.AnimalDao;
@@ -17,6 +18,7 @@ import org.oztrack.data.model.Animal;
 import org.oztrack.data.model.PositionFix;
 import org.oztrack.data.model.SearchQuery;
 import org.oztrack.data.model.User;
+import org.oztrack.util.GeometryUtils;
 import org.oztrack.validator.AnimalFormValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -53,23 +55,29 @@ public class AnimalController {
             ,"animalName"
             ,"animalDescription"
             ,"colour"
-            ,"speciesScientificName"
-            ,"speciesCommonName"
             ,"sex"
-            ,"mass"
+            ,"weight"
             ,"dimensions"
             ,"lifePhase"
-            ,"experimentalContext "
-            ,"captureLocation"
+            ,"tagIdentifier"
+            ,"tagManufacturerModel"
             ,"captureDate"
             ,"releaseDate"
+            ,"captureGeometry"
+            ,"captureLatitude"
+            ,"captureLongitude"
+            ,"releaseGeometry"
+            ,"releaseLatitude"
+            ,"releaseLongitude"
             ,"tagDeployStartDate"
             ,"tagDeployEndDate"
-            ,"tagManufacturerModel"
-            ,"tagIdentifier"
-            ,"tagDimensions"
+            ,"stateOnDetachment"
+            ,"experimentalContext"
             ,"tagAttachmentTechnique"
+            ,"tagDimensions"
+            ,"tagDutyCycleComments"
             ,"tagDeploymentComments"
+            ,"dataManipulation"
             ,"dataRetrievalMethod"
         );
         binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("yyyy-MM-dd"), true));
@@ -117,6 +125,23 @@ public class AnimalController {
             model.addAttribute("project", animal.getProject());
             return "animal-form";
         }
+
+        try {
+            animal.setCaptureGeometry(GeometryUtils.findLocationGeometry(animal.getCaptureLatitude().trim(), animal.getCaptureLongitude().trim()));
+        } catch (Exception e) {
+            animal.setCaptureLongitude(null);
+            animal.setCaptureLatitude(null);
+            animal.setCaptureGeometry(null);
+        }
+
+        try {
+            animal.setReleaseGeometry(GeometryUtils.findLocationGeometry(animal.getReleaseLatitude().trim(), animal.getReleaseLongitude().trim()));
+        } catch (Exception e) {
+            animal.setReleaseLatitude(null);
+            animal.setReleaseLongitude(null);
+            animal.setReleaseGeometry(null);
+        }
+
         animal.setUpdateDate(new Date());
         animal.setUpdateUser(currentUser);
         animalDao.update(animal);

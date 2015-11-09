@@ -127,8 +127,6 @@ public class ProjectController {
             "srsIdentifier",
             "access",
             "rightsStatement",
-            "dataManipulation",
-            "locationAccuracyComments",
             "licencingAndEthics"
         );
         binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("yyyy-MM-dd"), true));

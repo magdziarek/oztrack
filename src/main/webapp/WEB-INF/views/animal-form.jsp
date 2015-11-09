@@ -19,53 +19,6 @@
                 $('#navTrack').addClass('active');
                 $('#animalActionsEdit').addClass('active');
                 $('#colorpicker').farbtastic('#colour');
-
-                $('#searchSpeciesName').autocomplete({
-                    source: function(request, response) {
-                        $.ajax({
-                            url: '${pageContext.request.contextPath}/proxy/bie.ala.org.au/search/auto.json',
-                            data: {
-                                q: request.term,
-                                idxType: 'TAXON',
-                                limit: 10
-                            },
-                            dataType: "jsonp",
-                            success: function(data, textStatus, jqXHR) {
-                                response($.map(data.autoCompleteList, function(item) {
-                                    // The label property is displayed in the suggestion menu.
-                                    var label = $.trim(item.scientificNameMatches[0] || item.name || '');
-                                    if (item.commonNameMatches && item.commonNameMatches.length > 0) {
-                                        label += ' (' + item.commonNameMatches.join(', ') + ')';
-                                    }
-                                    else if (item.commonName) {
-                                        label += ' (' + $.trim(item.commonName) + ')';
-                                    }
-                                    // The value will be inserted into the input element when a user selects an item.
-                                    var value = $.trim(item.name || '');
-                                    if (item.commonName) {
-                                        value += ' (' + $.trim(item.commonName) + ')';
-                                    }
-                                    return {
-                                        label: label.replace(/\s+/g, ' '),
-                                        value: value.replace(/\s+/g, ' '),
-                                        speciesScientificName: $.trim((item.name || '').replace(/\s+/g, ' ')),
-                                        speciesCommonName: $.trim((item.commonName || '').replace(/\s+/g, ' '))
-                                    };
-                                }));
-                            }
-                        });
-                    },
-                    minLength: 2,
-                    select: function(event, ui) {
-                        jQuery('#speciesScientificName').val(ui.item ? ui.item.speciesScientificName : '');
-                        jQuery('#speciesCommonName').val(ui.item ? ui.item.speciesCommonName : '');
-                    }
-                });
-                $('#overrideSpeciesCheckbox').change(function(e) {
-                    var readonly = !e.target.checked;
-                    $('#speciesScientificName').prop('readonly', readonly);
-                    $('#speciesCommonName').prop('readonly', readonly);
-                });
                 $('#captureDateVisible').datepicker({
                     altField: "#captureDate",
                     defaultDate: new Date(${projectDetectionDateRange.minimum.time})
@@ -146,15 +99,15 @@
                 </div>
             </div>
             <div class="control-group">
-                <label class="control-label" for="mass">Mass</label>
+                <label class="control-label" for="weight">Body Weight</label>
                 <div class="controls">
-                    <form:input path="mass" id="mass" cssClass="input-xxlarge" placeholder="Enter mass with units"/>
+                    <form:input path="weight" id="weight" cssClass="input-xxlarge" placeholder="Enter weight with units"/>
                     <div class="help-inline">
-                        <div class="help-popover" title="Mass">
-                            The mass of the animal. Please specify the units of measurement.
+                        <div class="help-popover" title="Body Weight">
+                            The weight of the animal. Please specify the units of measurement.
                         </div>
                     </div>
-                    <form:errors path="mass" element="div" cssClass="help-block formErrors"/>
+                    <form:errors path="weight" element="div" cssClass="help-block formErrors"/>
                 </div>
             </div>
             <div class="control-group">
@@ -182,89 +135,12 @@
                 </div>
             </div>
                 <div class="control-group">
-                    <label class="control-label" for="experimentalContext">Experimental Context</label>
-                    <div class="controls">
-                        <form:input path="experimentalContext" id="experimentalContext" cssClass="input-xxlarge" placeholder="e.g. translocation, manipulation, or re-introduction."/>
-                        <div class="help-inline">
-                            <div class="help-popover" title="Experimental Context">
-                                Describe the nature of the tagging program, e.g. translocation, namipulation, or re-introduction.
-                            </div>
-                        </div>
-                        <form:errors path="experimentalContext" element="div" cssClass="help-block formErrors"/>
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label" for="captureDate">Capture and Release Dates</label>
-                    <div class="controls">
-                        <form:hidden path="captureDate" id="captureDate"/>
-                        <form:hidden path="releaseDate" id="releaseDate"/>
-                        <input type="text" id="captureDateVisible" class="datepicker" style="width: 80px;" placeholder="Capture Date"
-                               value="<fmt:formatDate pattern="${dateFormatPattern}" value="${animal.captureDate}"/>" />
-                        <input type="text" id="releaseDateVisible" class="datepicker" style="width: 80px;" placeholder="Release Date"
-                               value="<fmt:formatDate pattern="${dateFormatPattern}" value="${animal.releaseDate}"/>" />
-                    </div>
-                    <form:errors path="captureDate" element="div" cssClass="help-block formErrors"/>
-                </div>
-                 <div class="control-group">
-                    <label class="control-label" for="captureLocation">Capture Location</label>
-                    <div class="controls">
-                        <form:input path="captureLocation" id="captureLocation" cssClass="input-xxlarge" placeholder=""/>
-                        <div class="help-inline">
-                            <div class="help-popover" title="Capture Location">
-                                Plain text description of the location.
-                            </div>
-                        </div>
-                        <form:errors path="captureLocation" element="div" cssClass="help-block formErrors"/>
-                    </div>
-                </div>
-                <div class="control-group">
                     <label class="control-label" for="animalDescription">Comments</label>
                     <div class="controls">
-                        <form:textarea style="width: 400px; height: 100px;" path="animalDescription" id="animalDescription" placeholder="Any other useful details about the animal"/>
+                        <form:textarea style="width: 400px; height: 50px;" path="animalDescription" id="animalDescription" placeholder="Any other useful details about the animal"/>
                     <span class="help-inline">
                         <form:errors path="animalDescription" cssClass="formErrors"/>
                     </span>
-                    </div>
-                </div>
-            </fieldset>
-            <fieldset>
-                <div class="legend">Species</div>
-                <div class="control-group">
-                    <label class="control-label" for="searchSpeciesName">Search species name</label>
-                    <div class="controls">
-                        <input id="searchSpeciesName" class="input-xxlarge" type="text" placeholder="Search Atlas of Living Australia"/>
-                        <div class="help-inline">
-                            <div class="help-popover" title="Search species name">
-                                <p>
-                                    Start typing a species name to search the
-                                    <a href="http://www.ala.org.au/australias-species/">Atlas of Living Australia</a>
-                                    species database.
-                                </p>
-                                <p>If your desired species name isn't returned, it can be manually entered below.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="control-group" style="margin-bottom: 9px;">
-                    <div class="controls">
-                        <label class="checkbox">
-                            <input type="checkbox" id="overrideSpeciesCheckbox" />
-                            Manually enter or override species name
-                        </label>
-                    </div>
-                </div>
-                <div class="control-group required" style="margin-bottom: 9px;">
-                    <label class="control-label" for="speciesScientificName">Scientific Name</label>
-                    <div class="controls">
-                        <form:input path="speciesScientificName" id="speciesScientificName" cssClass="input-xxlarge" readonly="true"/>
-                    </div>
-                </div>
-                <div class="control-group required">
-                    <label class="control-label" for="speciesCommonName">Common Name</label>
-                    <div class="controls">
-                        <form:input path="speciesCommonName" id="speciesCommonName" cssClass="input-xxlarge" readonly="true"/>
-                        <form:errors path="speciesScientificName" element="div" cssClass="help-block formErrors"/>
-                        <form:errors path="speciesCommonName" element="div" cssClass="help-block formErrors"/>
                     </div>
                 </div>
             </fieldset>
@@ -278,7 +154,49 @@
                     </div>
                 </div>
                 <div class="control-group">
-                <label class="control-label" for="">Tag Deployment Dates</label>
+                    <label class="control-label" for="tagManufacturerModel">Tag Manufacturer/Model</label>
+                    <div class="controls">
+                        <form:input path="tagManufacturerModel" id="tagManufacturerModel" cssClass="input-xxlarge" placeholder=""/>
+                        <form:errors path="tagManufacturerModel" element="div" cssClass="help-block formErrors"/>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="captureDate">Capture Date and Location</label>
+                    <div class="controls">
+                        <form:hidden path="captureDate" id="captureDate"/>
+                        <input type="text" id="captureDateVisible" class="input-small" class="datepicker" placeholder="Capture Date"
+                               value="<fmt:formatDate pattern="${dateFormatPattern}" value="${animal.captureDate}"/>" />
+                        &nbsp; Lat. <form:input path="captureLatitude" id="captureLatitude" class="input-small"/>
+                        &nbsp; Long. <form:input path="captureLongitude" id="captureLongitude" class="input-small" />
+                        <div class="help-inline">
+                            <div class="help-popover" title="Capture Date and Location">
+                                Location should be provided in WGS84/decimal degrees.
+                            </div>
+                        </div>
+                    </div>
+                    <form:errors path="captureLongitude" element="div" cssClass="help-block formErrors"/>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="captureDate">Release Date and Location</label>
+                    <div class="controls">
+                        <form:hidden path="releaseDate" id="releaseDate"/>
+                        <input type="text" id="releaseDateVisible" class="input-small" class="datepicker" placeholder="Release Date"
+                               value="<fmt:formatDate pattern="${dateFormatPattern}" value="${animal.releaseDate}"/>" />
+                        &nbsp; Lat. <form:input path="releaseLatitude" id="releaseLatitude" class="input-small"/>
+                        &nbsp; Long. <form:input path="releaseLongitude" id="releaseLongitude" class="input-small"/>
+                        <div class="help-inline">
+                            <div class="help-popover" title="Release Date and Location">
+                                Location should be provided in WGS84/decimal degrees.
+                            </div>
+                        </div>
+                    </div>
+                    <form:errors path="releaseLongitude" element="div" cssClass="help-block formErrors"/>
+                </div>
+
+
+                <div class="control-group">
+                <label class="control-label">Tag Deployment Dates</label>
                 <div class="controls">
                     <form:hidden path="tagDeployStartDate" id="tagDeployStartDate"/>
                     <form:hidden path="tagDeployEndDate" id="tagDeployEndDate"/>
@@ -295,18 +213,37 @@
                     </div>
                 </div>
                 </div>
-            <div class="control-group">
-                <label class="control-label" for="tagManufacturerModel">Tag Manufacturer/Model</label>
-                <div class="controls">
-                    <form:input path="tagManufacturerModel" id="tagManufacturerModel" cssClass="input-xxlarge" placeholder=""/>
-                    <form:errors path="tagManufacturerModel" element="div" cssClass="help-block formErrors"/>
+                <div class="control-group">
+                    <label class="control-label" for="stateOnDetachment">Animal state on tag detachment</label>
+                    <div class="controls">
+                        <label class="radio inline"><form:radiobutton path="stateOnDetachment" value="Alive"/> Alive </label>
+                        <label class="radio inline"><form:radiobutton path="stateOnDetachment" value="Dead"/> Dead </label>
+                        <label class="radio inline"><form:radiobutton path="stateOnDetachment" value="Unknown"/> Unknown </label>
+                        <form:errors path="stateOnDetachment" element="div" cssClass="help-block formErrors"/>
+                    </div>
                 </div>
-            </div>
+                <div class="control-group">
+                    <label class="control-label" for="experimentalContext">Experimental Context</label>
+                    <div class="controls">
+                        <form:input path="experimentalContext" id="experimentalContext" cssClass="input-xxlarge" placeholder="e.g. translocation, manipulation, or re-introduction."/>
+                        <div class="help-inline">
+                            <div class="help-popover" title="Experimental Context">
+                                Describe the nature of the tagging program, e.g. translocation, namipulation, or re-introduction.
+                            </div>
+                        </div>
+                        <form:errors path="experimentalContext" element="div" cssClass="help-block formErrors"/>
+                    </div>
+                </div>
                 <div class="control-group">
                     <label class="control-label" for="tagDimensions">Tag Dimensions</label>
                     <div class="controls">
                         <form:input path="tagDimensions" id="tagDimensions" cssClass="input-xxlarge" placeholder="e.g. tag size and weight"/>
                         <form:errors path="tagDimensions" element="div" cssClass="help-block formErrors"/>
+                        <div class="help-inline">
+                            <div class="help-popover" title="Tag Dimensions">
+                                Specify the size and/or weight of the tag. Be sure to include the units of measurement.
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="control-group">
@@ -314,6 +251,11 @@
                     <div class="controls">
                         <form:input path="tagDutyCycleComments" id="tagDutyCycleComments" cssClass="input-xxlarge" placeholder="Describe intervals or the number of location fixes attempted per day"/>
                         <form:errors path="tagDutyCycleComments" element="div" cssClass="help-block formErrors"/>
+                        <div class="help-inline">
+                            <div class="help-popover" title="Tag Duty Cycle">
+                                Describe intervals or the number of location fixes attempted per day.
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="control-group">
@@ -321,6 +263,11 @@
                     <div class="controls">
                         <form:input path="tagAttachmentTechnique" id="tagAttachmentTechnique" cssClass="input-xxlarge" placeholder="Where and how was the tag attached?"/>
                         <form:errors path="tagAttachmentTechnique" element="div" cssClass="help-block formErrors"/>
+                        <div class="help-inline">
+                            <div class="help-popover" title="Tag Attachment Technique">
+                                Describe where and how the tag was attached.
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="control-group">
@@ -328,12 +275,29 @@
                     <div class="controls">
                         <form:input path="dataRetrievalMethod" id="dataRetrievalMethod" cssClass="input-xxlarge" placeholder="e.g. Argos, Globestar, Iridium, Bluetooth, VFH, Other"/>
                         <form:errors path="dataRetrievalMethod" element="div" cssClass="help-block formErrors"/>
+                        <div class="help-inline">
+                            <div class="help-popover" title="Data Retrieval Methods">
+                                Describe how the data for this tag was retrieved e.g. via Argos, Globestar, Iridium, Bluetooth, VFH, Other
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="dataManipulation">Data Quality and Manipulation</label>
+                    <div class="controls">
+                        <form:textarea path="dataManipulation" id="dataManipulation" cssStyle="width: 400px; height: 50px;"/>
+                        <form:errors path="dataManipulation" element="div" cssClass="help-block formErrors"/>
+                        <div class="help-inline">
+                            <div class="help-popover" title="Data Manipulation Techniques">
+                                A description of any data manipulation, algorithms or filters that have been applied to raw data to derive location, such as least squares or Kalman filters. Also describe any data quality and cleansing measures applied to the data you're uploading to ZoaTrack.
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="control-group">
                     <label class="control-label" for="tagDeploymentComments">Other Comments</label>
                     <div class="controls">
-                        <form:textarea style="width: 400px; height: 100px;" path="tagDeploymentComments" id="tagDeploymentComments" placeholder="Any other information about the tag deployment"/>
+                        <form:textarea style="width: 400px; height: 50px;" path="tagDeploymentComments" id="tagDeploymentComments" placeholder="Any other information about the tag deployment"/>
                     <span class="help-inline">
                         <form:errors path="tagDeploymentComments" cssClass="formErrors"/>
                     </span>

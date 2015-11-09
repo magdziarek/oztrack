@@ -1,5 +1,8 @@
 package org.oztrack.data.model;
 
+import com.vividsolutions.jts.geom.Point;
+import org.hibernate.annotations.Type;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Date;
@@ -22,92 +25,100 @@ import javax.persistence.TemporalType;
 @Entity(name="Animal")
 public class Animal extends OzTrackBaseEntity {
     @Id
-    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="animalid_seq")
-    @SequenceGenerator(name="animalid_seq", sequenceName="animalid_seq",allocationSize=1)
-    @Column(nullable=false)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "animalid_seq")
+    @SequenceGenerator(name = "animalid_seq", sequenceName = "animalid_seq", allocationSize = 1)
+    @Column(nullable = false)
     private Long id;
 
-    @Column(nullable=true)
+    @Column(nullable = true)
     private String projectAnimalId;
 
-    @Column(nullable=true)
+    @Column(nullable = true)
     private String animalName;
 
     private String animalDescription;
 
     private String createDescription;
 
-    @Column(name="colour", nullable=true)
+    @Column(name = "colour", nullable = true)
     private String colour;
 
     @ManyToOne
-    @JoinColumn(nullable=false)
+    @JoinColumn(nullable = false)
     private Project project;
 
-    @OneToMany(fetch=FetchType.LAZY, mappedBy="animal", cascade=CascadeType.ALL, orphanRemoval=true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "animal", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PositionFix> positionFixes = new LinkedList<PositionFix>();
 
-    @Column(columnDefinition="TEXT")
-    private String speciesScientificName;
+    @Column(columnDefinition = "TEXT")
+    private String sex;
 
-    @Column(columnDefinition="TEXT")
-    private String speciesCommonName    ;
+    @Column(columnDefinition = "TEXT")
+    private String weight;
 
-    @Column(columnDefinition="TEXT")
-    private String sex                  ;
+    @Column(columnDefinition = "TEXT")
+    private String dimensions;
 
-    @Column(columnDefinition="TEXT")
-    private String mass                 ;
+    @Column(columnDefinition = "TEXT")
+    private String lifePhase;
 
-    @Column(columnDefinition="TEXT")
-    private String dimensions           ;
+    @Column(columnDefinition = "TEXT")
+    private String tagIdentifier;
 
-    @Column(columnDefinition="TEXT")
-    private String lifePhase       ;
-
-    @Column(columnDefinition="TEXT")
-    private String experimentalContext  ;
+    @Column(columnDefinition = "TEXT")
+    private String tagManufacturerModel;
 
     @Temporal(TemporalType.DATE)
-    @Column(name="capturedate")
-    private Date captureDate          ;
+    @Column(name = "capturedate")
+    private Date captureDate;
 
     @Temporal(TemporalType.DATE)
-    @Column(name="releasedate")
-    private Date releaseDate          ;
+    @Column(name = "releasedate")
+    private Date releaseDate;
 
-    @Column(columnDefinition="TEXT")
-    private String captureLocation      ;
+    @Column(name = "captureGeometry", columnDefinition = "GEOMETRY")
+    @Type(type = "org.hibernatespatial.GeometryUserType")
+    private Point captureGeometry;
+
+    @Column(name = "releaseGeometry", columnDefinition = "GEOMETRY")
+    @Type(type = "org.hibernatespatial.GeometryUserType")
+    private Point releaseGeometry;
+
+    private String captureLatitude;
+    private String captureLongitude;
+    private String releaseLatitude;
+    private String releaseLongitude;
 
     @Temporal(TemporalType.DATE)
-    @Column(name="tagdeploystartdate")
-    private Date tagDeployStartDate   ;
+    @Column(name = "tagdeploystartdate")
+    private Date tagDeployStartDate;
 
     @Temporal(TemporalType.DATE)
-    @Column(name="tagdeployenddate")
-    private Date tagDeployEndDate     ;
+    @Column(name = "tagdeployenddate")
+    private Date tagDeployEndDate;
 
-    @Column(columnDefinition="TEXT")
-    private String tagManufacturerModel ;
+    @Column(columnDefinition = "TEXT")
+    private String experimentalContext;
 
-    @Column(columnDefinition="TEXT")
-    private String tagIdentifier        ;
-
-    @Column(columnDefinition="TEXT")
-    private String tagDimensions        ;
-
-    @Column(columnDefinition="TEXT")
+    @Column(columnDefinition = "TEXT")
     private String tagAttachmentTechnique;
 
-    @Column(columnDefinition="TEXT")
+    @Column(columnDefinition = "TEXT")
+    private String tagDimensions;
+
+    @Column(columnDefinition = "TEXT")
+    private String tagDutyCycleComments;
+
+    private String stateOnDetachment;
+
+    @Column(columnDefinition = "TEXT")
+    private String dataRetrievalMethod;
+
+    @Column(columnDefinition = "TEXT")
+    private String dataManipulation;
+
+    @Column(columnDefinition = "TEXT")
     private String tagDeploymentComments;
-
-    @Column(columnDefinition="TEXT")
-    private String dataRetrievalMethod  ;
-
-    @Column(columnDefinition="TEXT")
-    private String tagDutyCycleComments ;
-
 
     public Long getId() {
         return id;
@@ -173,22 +184,6 @@ public class Animal extends OzTrackBaseEntity {
         this.positionFixes = positionFixes;
     }
 
-    public String getSpeciesScientificName() {
-        return speciesScientificName;
-    }
-
-    public void setSpeciesScientificName(String speciesScientificName) {
-        this.speciesScientificName = speciesScientificName;
-    }
-
-    public String getSpeciesCommonName() {
-        return speciesCommonName;
-    }
-
-    public void setSpeciesCommonName(String speciesCommonName) {
-        this.speciesCommonName = speciesCommonName;
-    }
-
     public String getSex() {
         return sex;
     }
@@ -197,12 +192,12 @@ public class Animal extends OzTrackBaseEntity {
         this.sex = sex;
     }
 
-    public String getMass() {
-        return mass;
+    public String getWeight() {
+        return weight;
     }
 
-    public void setMass(String mass) {
-        this.mass = mass;
+    public void setWeight(String weight) {
+        this.weight = weight;
     }
 
     public String getDimensions() {
@@ -221,12 +216,20 @@ public class Animal extends OzTrackBaseEntity {
         this.lifePhase = lifePhase;
     }
 
-    public String getExperimentalContext() {
-        return experimentalContext;
+    public String getTagIdentifier() {
+        return tagIdentifier;
     }
 
-    public void setExperimentalContext(String experimentalContext) {
-        this.experimentalContext = experimentalContext;
+    public void setTagIdentifier(String tagIdentifier) {
+        this.tagIdentifier = tagIdentifier;
+    }
+
+    public String getTagManufacturerModel() {
+        return tagManufacturerModel;
+    }
+
+    public void setTagManufacturerModel(String tagManufacturerModel) {
+        this.tagManufacturerModel = tagManufacturerModel;
     }
 
     public Date getCaptureDate() {
@@ -237,16 +240,60 @@ public class Animal extends OzTrackBaseEntity {
         this.captureDate = captureDate;
     }
 
-    public Date getReleaseDate() {  return releaseDate;    }
-
-    public void setReleaseDate(Date releaseDate) { this.releaseDate = releaseDate;  }
-
-    public String getCaptureLocation() {
-        return captureLocation;
+    public Date getReleaseDate() {
+        return releaseDate;
     }
 
-    public void setCaptureLocation(String captureLocation) {
-        this.captureLocation = captureLocation;
+    public void setReleaseDate(Date releaseDate) {
+        this.releaseDate = releaseDate;
+    }
+
+    public Point getCaptureGeometry() {
+        return captureGeometry;
+    }
+
+    public void setCaptureGeometry(Point captureGeometry) {
+        this.captureGeometry = captureGeometry;
+    }
+
+    public Point getReleaseGeometry() {
+        return releaseGeometry;
+    }
+
+    public void setReleaseGeometry(Point releaseGeometry) {
+        this.releaseGeometry = releaseGeometry;
+    }
+
+    public String getCaptureLatitude() {
+        return captureLatitude;
+    }
+
+    public void setCaptureLatitude(String captureLatitude) {
+        this.captureLatitude = captureLatitude;
+    }
+
+    public String getCaptureLongitude() {
+        return captureLongitude;
+    }
+
+    public void setCaptureLongitude(String captureLongitude) {
+        this.captureLongitude = captureLongitude;
+    }
+
+    public String getReleaseLatitude() {
+        return releaseLatitude;
+    }
+
+    public void setReleaseLatitude(String releaseLatitude) {
+        this.releaseLatitude = releaseLatitude;
+    }
+
+    public String getReleaseLongitude() {
+        return releaseLongitude;
+    }
+
+    public void setReleaseLongitude(String releaseLongitude) {
+        this.releaseLongitude = releaseLongitude;
     }
 
     public Date getTagDeployStartDate() {
@@ -265,20 +312,20 @@ public class Animal extends OzTrackBaseEntity {
         this.tagDeployEndDate = tagDeployEndDate;
     }
 
-    public String getTagManufacturerModel() {
-        return tagManufacturerModel;
+    public String getExperimentalContext() {
+        return experimentalContext;
     }
 
-    public void setTagManufacturerModel(String tagManufacturerModel) {
-        this.tagManufacturerModel = tagManufacturerModel;
+    public void setExperimentalContext(String experimentalContext) {
+        this.experimentalContext = experimentalContext;
     }
 
-    public String getTagIdentifier() {
-        return tagIdentifier;
+    public String getTagAttachmentTechnique() {
+        return tagAttachmentTechnique;
     }
 
-    public void setTagIdentifier(String tagIdentifier) {
-        this.tagIdentifier = tagIdentifier;
+    public void setTagAttachmentTechnique(String tagAttachmentTechnique) {
+        this.tagAttachmentTechnique = tagAttachmentTechnique;
     }
 
     public String getTagDimensions() {
@@ -289,20 +336,20 @@ public class Animal extends OzTrackBaseEntity {
         this.tagDimensions = tagDimensions;
     }
 
-    public String getTagAttachmentTechnique() {
-        return tagAttachmentTechnique;
+    public String getTagDutyCycleComments() {
+        return tagDutyCycleComments;
     }
 
-    public void setTagAttachmentTechnique(String tagAttachmentTechniqut) {
-        this.tagAttachmentTechnique = tagAttachmentTechnique;
+    public void setTagDutyCycleComments(String tagDutyCycleComments) {
+        this.tagDutyCycleComments = tagDutyCycleComments;
     }
 
-    public String getTagDeploymentComments() {
-        return tagDeploymentComments;
+    public String getStateOnDetachment() {
+        return stateOnDetachment;
     }
 
-    public void setTagDeploymentComments(String tagDeploymentComments) {
-        this.tagDeploymentComments = tagDeploymentComments;
+    public void setStateOnDetachment(String stateOnDetachment) {
+        this.stateOnDetachment = stateOnDetachment;
     }
 
     public String getDataRetrievalMethod() {
@@ -313,15 +360,20 @@ public class Animal extends OzTrackBaseEntity {
         this.dataRetrievalMethod = dataRetrievalMethod;
     }
 
-    public String getTagDutyCycleComments() {
-        return tagDutyCycleComments;
+    public String getDataManipulation() {
+        return dataManipulation;
     }
 
-    public void setTagDutyCycleComments(String tagDutyCycleComments) {
-        this.tagDutyCycleComments = tagDutyCycleComments;
+    public void setDataManipulation(String dataManipulation) {
+        this.dataManipulation = dataManipulation;
     }
 
+    public String getTagDeploymentComments() {
+        return tagDeploymentComments;
+    }
 
-
+    public void setTagDeploymentComments(String tagDeploymentComments) {
+        this.tagDeploymentComments = tagDeploymentComments;
+    }
 
 }
