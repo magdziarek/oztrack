@@ -16,6 +16,9 @@
         <li id="projectActionsCleanse" class="edit-track"><a href="${pageContext.request.contextPath}/projects/${project.id}/cleanse">Edit tracks</a></li>
         </c:if>
         <li class="edit-project"><a href="${pageContext.request.contextPath}/projects/${project.id}/edit">Edit project</a></li>
+        <sec:authorize access="hasPermission(#project, 'manage')">
+        <li id="project-doi"><a href="${pageContext.request.contextPath}/projects/${project.id}/doi-manage">Request DOI</a></li>
+        </sec:authorize>
         <sec:authorize access="hasPermission(#project, 'delete')">
         <li class="delete-project">
             <a href="javascript:void(OzTrack.deleteEntity(<%--

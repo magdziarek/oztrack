@@ -4,7 +4,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="tags" %>
-<tags:page title="Contacts">
+<tags:page title="Toolkit">
     <jsp:attribute name="description">
         ZoaTrack is a free-to-use web-based platform
         for analysing and visualising individual-based animal location data.
@@ -38,6 +38,7 @@
                 <li class="active"><a href="#getstarted" data-toggle="tab">Getting Started</a></li>
                 <li><a href="#analysis" data-toggle="tab">The Analysis Toolkit</a></li>
                 <li><a href="#datamgt" data-toggle="tab">Data Management</a></li>
+                <li><a href="#doi" data-toggle="tab">Digital Object Identifiers</a></li>
             </ul>
 
             <div class="tab-content">
@@ -290,6 +291,38 @@
 
 
             </div>
+
+                <div class="tab-pane" id="doi">
+                    <ul style="list-style-type:none">
+                        <li><a href="#doi-1">Overview</a></li>
+                        <li><a href="#doi-2">What's a DOI?</a></li>
+                    </ul>
+                    <div class="media" id="doi-1">
+                        <h4>Overview</h4>
+                        <div class="media-body">
+                            <p>ZoaTrack provides a DOI minting service via ANDS and DataCite. A user with 'manage' access to a ZoaTrack project, the manager, can create a package eligible for a DOI
+                            from the DOI Request page within the 'Manage Project' menu. If the project satisfies the minimum criteria, the manager will be able to click a button to create
+                            a package containing plain text files of project metadata and data, and a landing page that the DOI will resolve to. </p>
+                            <p>The manager can edit the package by editing the project and rebuilding it as many times as they like.</p>
+                                <ul>
+                                    <c:forEach items="${doiChecklist}" var="check">
+                                        <li><c:out value="${check.title - check.description}"/><p><c:out value = "${check.requirements}"/></p></li>
+                                    </c:forEach>
+                                </ul>
+                        </div>
+                    </div>
+                    <hr/>
+
+                    <div class="media" id="doi-2">
+                        <h4>What's a DOI?</h4>
+                        <div class="media-body">
+                            <p>A DOI is a Digital Object Identifier.
+                            </p>
+                        </div>
+                    </div>
+                    <hr/>
+
+                </div>
             </div>
         </div>
 
