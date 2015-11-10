@@ -18,7 +18,7 @@
                     $('#status').text(dataFile.status || 'UNKNOWN');
                     $('#statusMessage').text(dataFile.statusMessage || '');
                     if ((dataFile.status == 'NEW') || (dataFile.status == 'PROCESSING')) {
-                        $('#status')
+                        $('#statusMessage')
                             .append(' ')
                             .append($('<img>').attr('src', '${pageContext.request.contextPath}/img/ui-anim_basic_16x16.gif'));
                         setTimeout(pollDataFile, 1000);
@@ -86,17 +86,18 @@
             <td><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${dataFile.createDate}"/> by <c:out value="${dataFile.createUser.fullName}"/></td>
         </tr>
         <tr>
-            <th>Processing Status:</th>
+                <th>Detection Count:</th>
+                <td id="numPositionFixes"></td>
+        </tr>
+        <tr>
+            <th>Status:</th>
             <td id="status"></td>
         </tr>
         <tr>
             <th>Processing Messages:</th>
             <td id="statusMessage"></td>
         </tr>
-        <tr>
-            <th>Detection Count:</th>
-            <td id="numPositionFixes"></td>
-        </tr>
+
         </table>
     </jsp:body>
 </tags:page>
