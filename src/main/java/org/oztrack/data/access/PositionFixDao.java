@@ -36,6 +36,7 @@ public interface PositionFixDao {
         boolean deleted
     );
     void applyKalmanFilter(Analysis analysis);
+    void updateAnimalColour(Project project, List<Long> animalIds);
     void renumberPositionFixes(Project project, List<Long> animalIds);
     Map<Long, PositionFixStats> getAnimalPositionFixStats(Project project, Date fromDate, Date toDate);
     Map<Long, TrajectoryStats> getAnimalTrajectoryStats(Project project, Date fromDate, Date toDate);

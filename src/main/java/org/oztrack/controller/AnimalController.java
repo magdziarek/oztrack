@@ -116,8 +116,10 @@ public class AnimalController {
         RedirectAttributes redirectAttributes,
         Model model,
         @ModelAttribute(value="animal") Animal animal,
+        @RequestParam(value="oldColour", required=false) String oldColour,
         BindingResult bindingResult
     ) throws Exception {
+
         User currentUser = permissionEvaluator.getAuthenticatedUser(authentication);
         new AnimalFormValidator().validate(animal, bindingResult);
 
@@ -145,7 +147,11 @@ public class AnimalController {
         animal.setUpdateDate(new Date());
         animal.setUpdateUser(currentUser);
         animalDao.update(animal);
-        positionFixDao.renumberPositionFixes(animal.getProject(), Arrays.asList(animal.getId()));
+
+        if (!animal.getColour().equals(oldColour)) {
+            logger.debug("Updating the colour in the geoserver tables");
+            positionFixDao.updateAnimalColour(animal.getProject(), Arrays.asList(animal.getId()));
+        }
         return "redirect:/projects/" + animal.getProject().getId() + "/animals/" + animal.getId();
     }
 
