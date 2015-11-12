@@ -300,7 +300,7 @@
                 <div class="control-group">
                     <label class="control-label" for="description">Short Bio:</label>
                     <div class="controls">
-                        <form:textarea path="description" id="description" cssStyle="width: 400px; height: 100px;"/>
+                        <form:textarea path="description" id="description" maxLength="250" cssStyle="width: 400px; height: 75px;"/>
                         <div class="help-inline">
                             <div class="help-popover" title="Short Bio">
                                 <p>Briefly describe yourself and your research interests.</p>

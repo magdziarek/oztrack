@@ -84,6 +84,7 @@
                         onblur="$('#colorpicker').fadeOut();"
                         style="background-color: ${animal.colour};"/>
                     <div id="colorpicker" style="display: none; position: absolute; padding: 10px 13px 0 13px;"></div>
+                    <input type="hidden" id="oldColour" name="oldColour" value="${animal.colour}"/>
                     <span class="help-inline">
                         <form:errors path="colour" cssClass="formErrors"/>
                     </span>

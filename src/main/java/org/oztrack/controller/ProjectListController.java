@@ -78,7 +78,8 @@ public class ProjectListController {
             "crosses180",
             "access",
             "embargoDate",
-            "rightsStatement"
+            "rightsStatement",
+            "licencingAndEthics"
         );
         binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("yyyy-MM-dd"), true));
     }

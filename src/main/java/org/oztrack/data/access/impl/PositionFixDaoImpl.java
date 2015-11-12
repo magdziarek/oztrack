@@ -47,6 +47,7 @@ public class PositionFixDaoImpl implements PositionFixDao {
     private EntityManager em;
 
     private ProjectAnimalsMutexExecutor renumberPositionFixesExecutor;
+    private ProjectAnimalsMutexExecutor updateAnimalColourExecutor;
 
     @PersistenceContext
     public void setEntityManger(EntityManager em) {
@@ -57,6 +58,12 @@ public class PositionFixDaoImpl implements PositionFixDao {
     public void setRenumberPositionFixesExecutor(ProjectAnimalsMutexExecutor renumberPositionFixesExecutor) {
         this.renumberPositionFixesExecutor = renumberPositionFixesExecutor;
     }
+
+    @Autowired
+    public void setUpdateAnimalColour(ProjectAnimalsMutexExecutor updateAnimalColourExecutor) {
+        this.updateAnimalColourExecutor = updateAnimalColourExecutor;
+    }
+
 
     @Override
     @Transactional
@@ -310,6 +317,49 @@ public class PositionFixDaoImpl implements PositionFixDao {
             positionFix.setProbable(true);
             save(positionFix);
         }
+    }
+
+    @Override
+    @Transactional
+    public void updateAnimalColour(final Project project, final List<Long> animalIds) {
+
+        updateAnimalColourExecutor.execute(new ProjectAnimalsMutexExecutor.ProjectAnimalsRunnable(project, animalIds) {
+            @Override
+            public void run() {
+                // there should only be one animal - needed to put it in an array to use the mutexExecutor
+                Long id = animalIds.get(0);
+
+                em.createNativeQuery(
+                        "update positionfixlayer\n" +
+                        "set colour = (select colour from animal where id = :id)\n" +
+                        "where project_id = :projectId\n" +
+                        "and animal_id = :id"
+                )
+                .setParameter("projectId", project.getId())
+                .setParameter("id", animalIds.get(0))
+                .executeUpdate();
+
+                em.createNativeQuery(
+                        "update positionfixnumbered\n" +
+                        "set colour = (select colour from animal where id = :id)\n" +
+                        "where project_id = :projectId\n" +
+                        "and animal_id = :id"
+                )
+                .setParameter("projectId", project.getId())
+                .setParameter("id", animalIds.get(0))
+                .executeUpdate();
+
+                em.createNativeQuery(
+                        "update trajectorylayer\n" +
+                        "set colour = (select colour from animal where id = :id)\n" +
+                        "where project_id = :projectId\n" +
+                        "and animal_id = :id"
+                )
+                .setParameter("projectId", project.getId())
+                .setParameter("id", animalIds.get(0))
+                .executeUpdate();
+            }
+        });
     }
 
     @Override
