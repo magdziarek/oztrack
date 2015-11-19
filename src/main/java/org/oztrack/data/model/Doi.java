@@ -8,7 +8,7 @@ import java.util.Date;
 
 import static javax.persistence.EnumType.STRING;
 
-@Entity(name="doi")
+@Entity(name="Doi")
 public class Doi extends OzTrackBaseEntity {
 
     @Id
@@ -30,9 +30,9 @@ public class Doi extends OzTrackBaseEntity {
     private String url;
     private String filename;
     private String citation;
-
-
     private boolean published;
+    private String title;
+    private String creators;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date draftDate;
@@ -121,6 +121,22 @@ public class Doi extends OzTrackBaseEntity {
     public boolean isPublished() { return published; }
 
     public void setPublished(boolean published) { this.published = published; }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getCreators() {
+        return creators;
+    }
+
+    public void setCreators(String creators) {
+        this.creators = creators;
+    }
 
     public void setDraftDate(Date draftDate) { this.draftDate = draftDate; }
 

@@ -6,6 +6,8 @@ CREATE TABLE doi (
     filename text,
     citation text,
     published boolean,
+    title text,
+    creators text,
     status character varying(255),
     draftdate timestamp without time zone,
     submitdate timestamp without time zone,

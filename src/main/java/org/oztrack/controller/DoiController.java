@@ -3,12 +3,15 @@ package org.oztrack.controller;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.log4j.Logger;
+import org.oztrack.app.OzTrackConfiguration;
 import org.oztrack.data.access.DoiDao;
 import org.oztrack.data.access.PositionFixDao;
 import org.oztrack.data.access.ProjectDao;
 import org.oztrack.data.model.*;
 import org.oztrack.data.model.types.DoiChecklist;
 import org.oztrack.data.model.types.DoiStatus;
+import org.oztrack.util.EmailBuilder;
+import org.oztrack.util.EmailBuilderFactory;
 import org.oztrack.view.DoiPackageBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,15 +20,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-
 import javax.servlet.http.HttpServletResponse;
 
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.*;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
 
 @Controller
 public class DoiController {
@@ -43,6 +43,9 @@ public class DoiController {
 
     @Autowired
     private OzTrackPermissionEvaluator permissionEvaluator;
+
+    @Autowired
+    private OzTrackConfiguration configuration;
 
     @ModelAttribute("project")
     public Project getProject(@PathVariable(value="projectId") Long projectId) {
@@ -96,15 +99,26 @@ public class DoiController {
         User currentUser = permissionEvaluator.getAuthenticatedUser(authentication);
         Doi doiInProgress = doiDao.getInProgressDoi(project);   // is there one in progress?
         Doi doi = (doiInProgress != null) ? doiInProgress : new Doi();
+
+        Calendar createDate = Calendar.getInstance();
+        createDate.setTime(new java.util.Date());
+
         doi.setProject(project);
         doi.setStatus(DoiStatus.DRAFT);
-        doi.setDraftDate(new java.util.Date());
-        doi.setCreateDate(new java.util.Date());
-        doi.setUpdateDate(new java.util.Date());
+        doi.setDraftDate(createDate.getTime());
+        doi.setCreateDate(createDate.getTime());
+        doi.setUpdateDate(createDate.getTime());
         doi.setCreateUser(currentUser);
         doi.setUpdateUser(currentUser);
         doi.setPublished(false);
-        doi.setCitation(buildCitation(doi));
+        // e.g
+        //Campbell, H, Dwyer, R, Franklin, C (2014) Data from: 'Tracking estuarine crocodiles on
+        // Cape York Peninsula using GPS-based telemetry'. ZoaTrack.org.
+        // doi: http://dx.doi.org/10.4225/01/XXXXXXXXXXXXXXXX
+        doi.setCitation(getAuthorList(project, "citation") + "(" + createDate.get(Calendar.YEAR) + ") Data from: '"
+                + project.getTitle() + "'. ZoaTrack.org. doi: http://dx.doi.org/10.4225/01/TBA");
+        doi.setTitle(project.getTitle());
+        doi.setCreators(this.getAuthorList(project, "fullNames"));
         SearchQuery searchQuery = new SearchQuery();
         searchQuery.setProject(project);
         searchQuery.setIncludeDeleted(true);
@@ -120,7 +134,8 @@ public class DoiController {
             model.addAttribute("errorMessage","There was an error generating the package. Please contact the administrator.");
         }
 
-        return "doi-manage";
+        //redirect so the URL doesn't keep the /new suffix;
+        return "redirect:/projects/" + project.getId() + "/doi-manage";
     }
 
     @RequestMapping(value="/projects/{projectId}/doi-manage/delete", method= RequestMethod.GET)
@@ -145,6 +160,57 @@ public class DoiController {
         return view;
     }
 
+    @RequestMapping(value="/projects/{projectId}/doi-manage/request", method= RequestMethod.GET)
+    @PreAuthorize("hasPermission(#project, 'manage')")
+    public String requestDOI(
+            Authentication authentication,
+            Model model,
+            @ModelAttribute(value="project") Project project
+    ) {
+        Doi doiInProgress = doiDao.getInProgressDoi(project);
+        User currentUser = permissionEvaluator.getAuthenticatedUser(authentication);
+        doiInProgress.setStatus(DoiStatus.REQUESTED);
+        doiInProgress.setUpdateUser(currentUser);
+        doiInProgress.setUpdateDate(new java.util.Date());
+        doiInProgress.setSubmitDate(new java.util.Date());
+        doiDao.update(doiInProgress);
+        String feedbackMessage;
+        try {
+            emailMintRequestToAdmin(doiInProgress, currentUser);
+            feedbackMessage = "An email has been sent to the Administrator to request that the DOI be minted.";
+        } catch (Exception e) {
+            logger.error("Mint request email to admin failed" + e.getLocalizedMessage());
+            feedbackMessage = "There was a problem notifying the admin via email. It would be helpful if you could email admin@zoatrack.org and let them know.";
+        }
+        model.addAttribute("feedbackMessage", feedbackMessage);
+        return  "doi-manage";
+    }
+
+    private void emailMintRequestToAdmin(Doi doi, User currentUser) throws Exception {
+
+        EmailBuilderFactory emailBuilderFactory = new EmailBuilderFactory();
+        EmailBuilder emailBuilder = emailBuilderFactory.getObject();
+        emailBuilder.to(doiDao.getAdminUsers().get(0));
+        emailBuilder.subject("Request to Mint DOI");
+
+        StringBuilder htmlMsgContent = new StringBuilder();
+        htmlMsgContent.append("<p>\n");
+        htmlMsgContent.append("    " + currentUser.getFullName() + " has requested a DOI for the project \n");
+        htmlMsgContent.append("    <i>" + doi.getProject().getTitle() + "</i></p>\n");
+
+        String projectLink = configuration.getBaseUrl() + "/projects/" + doi.getProject().getId();
+        htmlMsgContent.append("<p>\n");
+        htmlMsgContent.append("    To view the project, click here:\n");
+        htmlMsgContent.append("    <a href=\"" + projectLink + "\">" + projectLink + "</a>\n");
+        htmlMsgContent.append("</p>\n");
+
+        htmlMsgContent.append("<p>\n");
+        htmlMsgContent.append("    To mint the DOI, go to the Admin screen:\n");
+        htmlMsgContent.append("    <a href=\"" + configuration.getBaseUrl() + "\">doi-admin</a>\n");
+        htmlMsgContent.append("</p>\n");
+        emailBuilder.htmlMsgContent(htmlMsgContent.toString());
+        emailBuilder.build().send();
+    }
 
 
     private HashMap<DoiChecklist, Boolean> checkDoiChecklist(Project project) {
@@ -175,31 +241,27 @@ public class DoiController {
 
     }
 
-    private String buildCitation(Doi doi) {
+    private String getAuthorList(Project project, String listType) {
 
-        // e.g
-        //Campbell, H, Dwyer, R, Franklin, C (2014) Data from: 'Tracking estuarine crocodiles on
-        // Cape York Peninsula using GPS-based telemetry'. ZoaTrack.org.
-        // doi: http://dx.doi.org/10.4225/01/XXXXXXXXXXXXXXXX
+        // listType = "fullNames" or "citation"
 
         // author list
-        List<ProjectContribution> projectContributionsList =  doi.getProject().getProjectContributions();
+        List<ProjectContribution> projectContributionsList =  project.getProjectContributions();
         Iterator iterator = projectContributionsList.iterator();
         String authorList = "";
         while (iterator.hasNext()) {
             ProjectContribution projectContribution = (ProjectContribution) iterator.next();
             Person person = projectContribution.getContributor();
-            authorList = authorList + person.getLastName() + ", " + person.getFirstName().charAt(0);
-            if (iterator.hasNext()) authorList = authorList + ", ";
+            if (listType.equals("citation")) {
+                authorList = authorList + person.getLastName() + ", " + person.getFirstName().charAt(0);
+            } else if (listType.equals("fullNames")){
+                authorList = authorList + person.getFullName();
+            }
+                if (iterator.hasNext()) authorList = authorList + ", ";
             else authorList = authorList + " ";
         }
 
-        // year
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(doi.getCreateDate());
-
-        return authorList + "(" + calendar.get(Calendar.YEAR) + ") Data from: '"
-                + doi.getProject().getTitle() + "'. ZoaTrack.org. doi: " + doi.getUrl();
+        return authorList;
     }
 
 }
