@@ -26,6 +26,10 @@ public class OzTrackConfigurationImpl implements OzTrackConfiguration {
     private String rserveLogFile;
     private Integer rserveOomAdj;
     private OzTrackOaiPmhConfiguration oaiPmhConfiguration;
+    private String doiBaseUrl;
+    private String doiAppId;
+    private String doiKey;
+    private String doiClientId;
 
     @Override
     public String getBaseUrl() {
@@ -205,4 +209,43 @@ public class OzTrackConfigurationImpl implements OzTrackConfiguration {
     public void setOaiPmhConfiguration(OzTrackOaiPmhConfiguration oaiPmhConfiguration) {
         this.oaiPmhConfiguration = oaiPmhConfiguration;
     }
+
+    @Override
+    public String getDoiBaseUrl() {
+        return doiBaseUrl;
+    }
+
+    public void setDoiBaseUrl(String doiBaseUrl) {
+        this.doiBaseUrl = doiBaseUrl;
+    }
+
+    @Override
+    public String getDoiAppId() {
+        return doiAppId;
+    }
+
+    public void setDoiAppId(String doiAppId) {
+        this.doiAppId = doiAppId;
+    }
+
+    @Override
+    public String getDoiKey() {
+        return doiKey;
+    }
+
+    public void setDoiKey(String doiKey) {
+        this.doiKey = doiKey;
+    }
+
+    @Override
+    public String getDoiClientId() {
+        return doiClientId;
+    }
+
+    public void setDoiClientId(String doiClientId) {
+        this.doiClientId = doiClientId;
+    }
+
+
+
 }

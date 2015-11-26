@@ -22,4 +22,9 @@ public interface OzTrackConfiguration {
     String getRserveLogFile();
     Integer getRserveOomAdj();
     OzTrackOaiPmhConfiguration getOaiPmhConfiguration();
+    String getDoiBaseUrl();
+    String getDoiAppId();
+    String getDoiKey();
+    String getDoiClientId();
+
 }
