@@ -14,6 +14,12 @@
         <script type="text/javascript">
             $(document).ready(function() {
                 $('#navTrack').addClass('active');
+
+                $('#doi-build-btn').click(function() {
+                    $('#doi-build-div').hide();
+                    $('#doi-loading').show();
+                });
+
             });
         </script>
     </jsp:attribute>
@@ -61,9 +67,11 @@
                         <div class="span6">
                             <p>By requesting a DOI package, you agree that the project metadata will be shared with <a href="https://researchdata.ands.org.au/search/#!/group=OzTrack/">Research Data Australia</a>.</p>
                         </div>
-                        <div class="span3">
-                            <a class="btn btn-primary" href="${pageContext.request.contextPath}/projects/${project.id}/doi-manage/new">Build a DOI data package</a>
+                        <div class="span3" id="doi-build-div">
+                            <a id="doi-build-btn" class="btn btn-primary" href="${pageContext.request.contextPath}/projects/${project.id}/doi-manage/new">Build a DOI data package</a>
                         </div>
+                        <div class="span3" id="doi-loading" style="display:none;text-align:center"><img src="${pageContext.request.contextPath}/img/ui-anim_basic_16x16.gif"></div>
+
                     </c:when>
                     <c:otherwise>
                         <div class="span3 offset6">
