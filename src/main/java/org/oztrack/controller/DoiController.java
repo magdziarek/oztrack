@@ -160,6 +160,22 @@ public class DoiController {
         return view;
     }
 
+    @RequestMapping(value="/projects/{projectId}/doi-manage/cancel", method= RequestMethod.GET)
+    @PreAuthorize("hasPermission(#project, 'manage')")
+    public String cancelRequest(
+            Authentication authentication,
+            Model model,
+            @ModelAttribute(value="project") Project project
+    ) {
+        Doi doiInProgress = doiDao.getInProgressDoi(project);
+        doiInProgress.setStatus(DoiStatus.DRAFT);
+        doiInProgress.setCancelDate(new java.util.Date());
+        doiInProgress.setUpdateDate(new java.util.Date());
+        doiInProgress.setUpdateUser(this.permissionEvaluator.getAuthenticatedUser(authentication));
+        doiDao.update(doiInProgress);
+        return "redirect:/projects/" + project.getId() + "/doi-manage";
+    }
+
     @RequestMapping(value="/projects/{projectId}/doi-manage/request", method= RequestMethod.GET)
     @PreAuthorize("hasPermission(#project, 'manage')")
     public String requestDOI(
@@ -174,16 +190,13 @@ public class DoiController {
         doiInProgress.setUpdateDate(new java.util.Date());
         doiInProgress.setSubmitDate(new java.util.Date());
         doiDao.update(doiInProgress);
-        String feedbackMessage;
         try {
             emailMintRequestToAdmin(doiInProgress, currentUser);
-            feedbackMessage = "An email has been sent to the Administrator to request that the DOI be minted.";
+            logger.info("DOI Request submitted for project " + project.getId());
         } catch (Exception e) {
-            logger.error("Mint request email to admin failed" + e.getLocalizedMessage());
-            feedbackMessage = "There was a problem notifying the admin via email. It would be helpful if you could email admin@zoatrack.org and let them know.";
+            logger.error("Mint request email to admin failed " + e.getLocalizedMessage());
         }
-        model.addAttribute("feedbackMessage", feedbackMessage);
-        return  "doi-manage";
+        return "redirect:/projects/" + project.getId() + "/doi-manage";
     }
 
     private void emailMintRequestToAdmin(Doi doi, User currentUser) throws Exception {

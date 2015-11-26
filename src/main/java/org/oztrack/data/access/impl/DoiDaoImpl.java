@@ -2,10 +2,7 @@ package org.oztrack.data.access.impl;
 
 
 import org.oztrack.data.access.DoiDao;
-import org.oztrack.data.model.DataFile;
-import org.oztrack.data.model.Doi;
-import org.oztrack.data.model.Person;
-import org.oztrack.data.model.Project;
+import org.oztrack.data.model.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +24,7 @@ public class DoiDaoImpl implements DoiDao {
 
     @Override
     public Doi getInProgressDoi(Project project){
-        Query query = em.createQuery("SELECT o FROM doi o where o.project = :project and o.published = false");
+        Query query = em.createQuery("SELECT o FROM Doi o where o.project = :project and o.published = false");
         query.setParameter("project", project);
         try {
             return (Doi) query.getSingleResult();
@@ -38,7 +35,7 @@ public class DoiDaoImpl implements DoiDao {
 
     @Override
     public Doi getDoiById(Long id) {
-        Query query = em.createQuery("SELECT o FROM doi o WHERE o.id = :id");
+        Query query = em.createQuery("SELECT o FROM Doi o WHERE o.id = :id");
         query.setParameter("id", id);
         try {
             return (Doi) query.getSingleResult();
@@ -48,30 +45,25 @@ public class DoiDaoImpl implements DoiDao {
     }
 
     @Override
-    public List<Doi> getDoisByProject(Project project) {
-        Query query = em.createQuery("SELECT o from doi o where o.project = :project order by o.createDate");
-        query.setParameter("project", project);
+    public List<User> getAdminUsers() {
+        Query query = em.createQuery("SELECT o from User o where o.admin");
         try {
-            @SuppressWarnings("unchecked")
-            List <Doi> resultList = query.getResultList();
+            List <User> resultList = query.getResultList();
             return resultList;
-        }catch (NoResultException ex) {
+        } catch (NoResultException ex) {
             return null;
         }
     }
 
     @Override
-    public List<Doi> getCompletedDoisByProject(Project project) {
-        Query query = em.createQuery("SELECT o from doi o where o.project = :project and o.status = 'COMPLETED' order by o.createDate");
-        query.setParameter("project", project);
+    public List<Doi> getAll() {
+        Query query = em.createQuery("SELECT o from Doi o order by o.updateDate desc");
         try {
-            @SuppressWarnings("unchecked")
-            List <Doi> resultList = query.getResultList();
+            List<Doi> resultList = query.getResultList();
             return resultList;
-        }catch (NoResultException ex) {
+        } catch (NoResultException ex) {
             return null;
         }
-
     }
 
     @Override
