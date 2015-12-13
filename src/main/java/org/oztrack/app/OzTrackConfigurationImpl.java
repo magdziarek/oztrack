@@ -30,6 +30,8 @@ public class OzTrackConfigurationImpl implements OzTrackConfiguration {
     private String doiAppId;
     private String doiKey;
     private String doiClientId;
+    private String doiLandingBaseUrl;
+
 
     @Override
     public String getBaseUrl() {
@@ -246,6 +248,12 @@ public class OzTrackConfigurationImpl implements OzTrackConfiguration {
         this.doiClientId = doiClientId;
     }
 
+    @Override
+    public String getDoiLandingBaseUrl() {
+        return doiLandingBaseUrl;
+    }
 
-
+    public void setDoiLandingBaseUrl(String doiLandingBaseUrl) {
+        this.doiLandingBaseUrl = doiLandingBaseUrl;
+    }
 }

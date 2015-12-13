@@ -26,5 +26,5 @@ public interface OzTrackConfiguration {
     String getDoiAppId();
     String getDoiKey();
     String getDoiClientId();
-
+    String getDoiLandingBaseUrl();
 }
