@@ -48,23 +48,31 @@
                 padding-top:5px;
                 padding-bottom:5px;
             }
-            .label {
-                padding:5px;
-            }
 
             .well {
                 margin-bottom:5px;
             }
+
+            .doi-status-div {
+                padding: 10px 10px;
+            }
+
+            .label {
+
+                margin-right:10px;
+            }
+
+
         </style>
 
         <h1>DOI Request</h1>
 
         <c:choose>
-            <c:when test="${doi.status == 'DRAFT'}"><c:set var="labelclass" value="label-warning"/><c:set var="alertclass" value="alert-warning"/></c:when>
-            <c:when test="${doi.status == 'REQUESTED'}"><c:set var="labelclass" value="label-info"/><c:set var="alertclass" value="alert-info"/></c:when>
-            <c:when test="${doi.status == 'REJECTED'}"><c:set var="labelclass" value="label-important"/><c:set var="alertclass" value="alert-important"/></c:when>
-            <c:when test="${doi.status == 'FAILED'}"><c:set var="labelclass" value="label-important"/><c:set var="alertclass" value="alert-important"/></c:when>
-            <c:when test="${doi.status == 'COMPLETED'}"><c:set var="labelclass" value="label-success"/><c:set var="alertclass" value="alert-success"/></c:when>
+            <c:when test="${doi.status == 'DRAFT'}"><c:set var="style" value="warning"/></c:when>
+            <c:when test="${doi.status == 'REQUESTED'}"><c:set var="style" value="info"/></c:when>
+            <c:when test="${doi.status == 'REJECTED'}"><c:set var="style" value="important"/></c:when>
+            <c:when test="${doi.status == 'FAILED'}"><c:set var="style" value="important"/></c:when>
+            <c:when test="${doi.status == 'COMPLETED'}"><c:set var="style" value="success"/></c:when>
         </c:choose>
 
         <div class="span9" id="doi-loading" style="display:none; text-align:center">
@@ -76,66 +84,56 @@
 
         <div class="span9" id="doi-div">
             <div class="row">
-                <div class="well ${alertclass}">
-                    <div class="span2"><span class="label ${labelclass}"><c:out value="${doi.status}"/></span></div>
-                    <div class="span5" style="font-weight:bold; font-style:larger">http://dx.doi.org/10.4225/01/TBA</div>
+                <div class="sidebar-actions doi-status-div">
+                    <span class="label label-${style}"><c:out value="${doi.status}"/></span>
+                    <c:out value="${doi.status.shortMessage}"/>
                 </div>
             </div>
 
             <div class="row">
-                <div class="span6" font-size:larger"><img src="${pageContext.request.contextPath}/img/compress.png"/>
-                    <a href="${pageContext.request.contextPath}/projects/${project.id}/doi-manage/doi-zip">
-                        <c:out value="${doi.filename}"/></a></div>
-            </div>
-            <div class="row">
-                <p>The data files in this archive have been published by ZoaTrack within the Atlas of Living Australia on <fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.createDate}"/>.
-                    The data is available in the attached files and at the time of publication is available on ZoaTrack (http://zoatrack.org) in the project entitled
-                    '<c:out value="${doi.project.title}"/>' at the url <c:out value="${doi.url}"/>.</p>
-            </div>
-            <div class="row">
-                <div class="span2 labelName">Created Date:</div><div class="span6"><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.createDate}"/></div>
                 <div class="span2 labelName">Title:</div><div class="span6"><c:out value="${doi.title} - ZoaTrack Dataset"/></div>
                 <div class="span2 labelName">Creators:</div><div class="span6">
-                <c:set var="authors" value="${fn:split(doi.creators,',')}"/>
-                <c:forEach var="author" items="${authors}">
-                    <c:out value="${author}"/></br>
-                </c:forEach>
+                    <c:set var="authors" value="${fn:split(doi.creators,',')}"/>
+                    <c:forEach var="author" items="${authors}">
+                        <c:out value="${author}"/><br/>
+                    </c:forEach>
             </div>
+                <div class="span2 labelName">Created Date:</div><div class="span6"><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.createDate}"/></div>
                 <div class="span2 labelName">Publisher:</div><div class="span6">Atlas of Living Australia</div>
-                <div class="span2 labelName">Publication Year:</div><div class="span6"><fmt:formatDate pattern="yyyy" value="${doi.createDate}"/></div>
-                <br/>
+                <div class="span2 labelName">Publication Date:</div><div class="span6">
+                        <c:choose>
+                            <c:when test="${doi.status != 'COMPLETED'}">TBA </c:when>
+                            <c:when test="${doi.status == 'COMPLETED'}"><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.mintDate}"/></c:when>
+                        </c:choose>
+                     </div>
+                <div class="span2 labelName">Citation:</div><div class="span6"><c:out value="${doi.citation}"/><c:if test="${doi.status != 'COMPLETED'}"> TBA </c:if></div>
+                <div class="span6 offset2" style="margin-top:10px"><a class="btn btn-${style}" href="${pageContext.request.contextPath}/projects/${project.id}/doi/file">
+                    <i class="icon-download icon-white"></i> Download ZIP</a></div>
             </div>
             <div class="row">
-                <p>The Citation to be used for this dataset is:<br/>
-                    <span style="font-weight: bold"><c:out value="${doi.citation}"/></span></p>
-            </div>
-            <div class="row">
-                <p>The archive, <c:out value="${doi.filename}"/>, contains 3 files:
+                <p>The archive contains 3 files:
                 <ul>
-                    <li><span style="font-weight: bold"><c:out value="${fn:replace(doi.filename, 'zoatrack.zip', 'metadata.txt')}"/></span>: overall project
-                        metadata and ZoaTrack data definitions</li>
-                    <li><span style="font-weight: bold"><c:out value="${fn:replace(doi.filename, 'zoatrack.zip', 'reference.txt')}"/></span>: metadata for each animal
-                        and tag deployment in the project</li>
-                    <li><span style="font-weight: bold"><c:out value="${fn:replace(doi.filename, 'zoatrack.zip', 'zoatrack-data.csv')}"/></span>: project data exported
-                        from the ZoaTrack database</li>
+                    <li><span style="font-weight: bold">metadata.txt</span>: overall project metadata and ZoaTrack data definitions</li>
+                    <li><span style="font-weight: bold">reference.txt</span>: metadata for each animal and tag deployment in the project</li>
+                    <li><span style="font-weight: bold">zoatrack-data.csv</span>: detections data exported from the ZoaTrack database</li>
                 </ul></p>
-                <!-- <img src="${pageContext.request.contextPath}/img/compress.png"/>
-        <a href="${pageContext.request.contextPath}/projects/${project.id}/doi-manage/doi-zip">Download</a>-->
             </div>
 
             <div class="row">
-                <div class="well ${alertclass}">
-                    <p style="font-weight:bold">${fn:toUpperCase(fn:substring(doi.status,0 ,1 ))}${fn:toLowerCase(fn:substring(doi.status,1,-1))}
-                        Status - What happens next?</p>
-                    <p><c:out value="${doi.status.explanation}"/></p>
-                    <c:choose>
-                        <c:when test="${doi.status == 'REJECTED'}">
-                            <p>Rejected on <fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.rejectDate}"/><br/>
-                                Reason: <c:out value="${doi.rejectMessage}"/></p></c:when>
-                        <c:when test="${doi.status == 'COMPLETED'}"><p>Minted on <fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.mintDate}"/></p></c:when>
-                    </c:choose>
+                <div class="sidebar-actions doi-status-div">
+                    <span class="label label-${style}"><c:out value="${doi.status}"/></span>
+                    <p style="margin-top:10px"><c:out value="${doi.status.explanation}"/></p>
+                        <c:choose>
+                            <c:when test="${doi.status == 'REJECTED'}">
+                                <p>Rejected on <fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.rejectDate}"/><br/>
+                                    Reason: <c:out value="${doi.rejectMessage}"/></p></c:when>
+                            <c:when test="${doi.status == 'COMPLETED'}"><p>Minted on <fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.mintDate}"/></p></c:when>
+                        </c:choose>
+
                 </div>
             </div>
+
+
 
         </div>
 
@@ -145,16 +143,16 @@
                 <c:choose>
                     <c:when test="${doi.status == 'DRAFT' || doi.status == 'REJECTED'}">
                         <div class="span3">
-                            <a class="btn" href="${pageContext.request.contextPath}/projects/${project.id}/doi-manage/delete">Delete Archive</a>
+                            <a class="btn" href="${pageContext.request.contextPath}/projects/${project.id}/doi/delete">Delete Archive</a>
                         </div>
                         <div class="span3 offset3" style="text-align:right">
-                            <a id="rebuild-btn" class="btn" href="${pageContext.request.contextPath}/projects/${project.id}/doi-manage/new" >Rebuild Archive</a>
-                            <a class="btn btn-primary" href="${pageContext.request.contextPath}/projects/${project.id}/doi-manage/request" > Mint DOI </a>
+                            <a id="rebuild-btn" class="btn" href="${pageContext.request.contextPath}/projects/${project.id}/doi/new" >Rebuild Archive</a>
+                            <c:if test="${doi.status == 'DRAFT'}"><a class="btn btn-primary" href="${pageContext.request.contextPath}/projects/${project.id}/doi/request"> Mint DOI </a></c:if>
                         </div>
                     </c:when>
                     <c:when test="${doi.status == 'REQUESTED'}">
                         <div class="span5 offset4" style="text-align:right;">
-                            <a class="btn" href="${pageContext.request.contextPath}/projects/${project.id}/doi-manage/cancel" >Cancel this DOI Request</a>&nbsp;&nbsp;
+                            <a class="btn" href="${pageContext.request.contextPath}/projects/${project.id}/doi/cancel" >Cancel this DOI Request</a>&nbsp;&nbsp;
                             <a class="btn btn-primary" href="${pageContext.request.contextPath}/projects/${project.id}" > Return to Project </a>
                         </div>
                     </c:when>

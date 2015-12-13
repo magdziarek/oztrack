@@ -5,6 +5,7 @@ import org.oztrack.data.model.types.DoiStatus;
 import javax.persistence.*;
 
 import java.util.Date;
+import java.util.UUID;
 
 import static javax.persistence.EnumType.STRING;
 
@@ -28,6 +29,11 @@ public class Doi extends OzTrackBaseEntity {
     private String doi;
     private String xml;
     private String url;
+
+    @Column(name="uuid", unique=true, nullable=false)
+    @org.hibernate.annotations.Type(type="org.hibernate.type.PostgresUUIDType")
+    private UUID uuid;
+
     private String filename;
     private String citation;
     private boolean published;
@@ -96,6 +102,14 @@ public class Doi extends OzTrackBaseEntity {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public String getFilename() {

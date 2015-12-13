@@ -20,7 +20,7 @@
         </c:if>
         <li class="edit-project"><a href="${pageContext.request.contextPath}/projects/${project.id}/edit">Edit project</a></li>
         <sec:authorize access="hasPermission(#project, 'manage')">
-        <li id="project-doi" class="doi-manage"><a href="${pageContext.request.contextPath}/projects/${project.id}/doi-manage">Request DOI</a></li>
+        <li id="project-doi" class="doi-manage"><a href="${pageContext.request.contextPath}/projects/${project.id}/doi">Request DOI</a></li>
         </sec:authorize>
         <sec:authorize access="hasPermission(#project, 'delete')">
         <li class="delete-project">

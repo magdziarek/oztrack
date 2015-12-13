@@ -1,5 +1,9 @@
 package org.oztrack.view;
 
+import org.oztrack.data.model.Doi;
+import org.oztrack.data.model.PositionFix;
+import org.oztrack.data.model.SearchQuery;
+import org.oztrack.data.model.types.PositionFixFileHeader;
 import au.com.bytecode.opencsv.CSVWriter;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
@@ -8,17 +12,6 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.oztrack.data.access.PositionFixDao;
-import org.oztrack.data.access.impl.PositionFixDaoImpl;
-import org.oztrack.data.model.Animal;
-import org.oztrack.data.model.Doi;
-import org.oztrack.data.model.PositionFix;
-import org.oztrack.data.model.SearchQuery;
-import org.oztrack.data.model.types.PositionFixFileHeader;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceUnit;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,54 +25,55 @@ public class DoiPackageBuilder{
 
     private final Logger logger = Logger.getLogger(getClass());
     private Doi doi;
-    private String filePrefix;
+//    private String filePrefix;
     private String filePath;
     private List<PositionFix> positionFixes;
 
     public DoiPackageBuilder(Doi doi, List<PositionFix> positionFixes) {
         this.doi = doi;
-        this.filePrefix = doi.getProject().getTitle().replace(" ","-");
+       // this.filePrefix = doi.getProject().getTitle().replace(" ","-");
         this.filePath =  doi.getProject().getAbsoluteDataDirectoryPath() + File.separator;
         this.positionFixes = positionFixes;
     }
 
     public DoiPackageBuilder(Doi doi) {
         this.doi = doi;
-        this.filePrefix = doi.getProject().getTitle().replace(" ","-");
+//        this.filePrefix = "doi"; //doi.getProject().getTitle().replace(" ","-");
         this.filePath =  doi.getProject().getAbsoluteDataDirectoryPath() + File.separator;
     }
 
     public String buildZip() {
 
-        // get the short project name: first 3 words?
-        deleteFiles();
+        //deleteFiles();
+        File f = new File(filePath + "ZoaTrack.zip");
+        f.delete();
         writeMetadataFiles();
         writeCsvFile();
         zipAll();
-        return this.filePrefix + "-zoatrack.zip";
+        return "ZoaTrack.zip";
     }
 
-    public void deleteFiles() {
-
-        String[] fileList = new File(filePath).list(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.startsWith(filePrefix);
-            }
-        });
-
-        for (String s: fileList) {
-            File f = new File(filePath + s);
-            f.delete();
-        }
-
+    public void deletePackage() {
+        File f = new File(filePath + "ZoaTrack.zip");
+        f.delete();
     }
+
+//    public void deleteFiles() {
+//
+//        String[] fileList = new File(filePath).list(new FilenameFilter() {
+//            @Override
+//            public boolean accept(File dir, String name) {
+//                return name.startsWith(filePrefix);
+//            }
+//        });
+//        for (String s: fileList) {
+//            File f = new File(filePath + s);
+//            f.delete();
+//        }
+//    }
 
 
     private void writeMetadataFiles() {
-
-        // delete files if they exist
-
 
         Configuration freemarkerConfiguration = new Configuration();
         DefaultObjectWrapper objectWrapper = new DefaultObjectWrapper();
@@ -88,21 +82,18 @@ public class DoiPackageBuilder{
         freemarkerConfiguration.setTemplateLoader(new ClassTemplateLoader(this.getClass(), "/org/oztrack/view"));
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("doi", this.doi);
-        map.put("fileNamePrefix", this.filePrefix);
+        //map.put("fileNamePrefix", this.filePrefix);
         String fileOut = "metadata.txt";
         try {
             Template metadataTemplate = freemarkerConfiguration.getTemplate("doi-metadata.txt.ftl");
-            FileWriter metadataFileWriter = new FileWriter(filePath + filePrefix + "-" + fileOut);
+            FileWriter metadataFileWriter = new FileWriter(filePath + fileOut);
             metadataTemplate.process(map, metadataFileWriter);
-
             fileOut = "reference.txt";
             Template referenceTemplate = freemarkerConfiguration.getTemplate("doi-reference.txt.ftl");
-            FileWriter referenceFileWriter = new FileWriter(filePath + filePrefix + "-" + fileOut);
+            FileWriter referenceFileWriter = new FileWriter(filePath + fileOut);
             referenceTemplate.process(map, referenceFileWriter);
-
         } catch (IOException ioe) {
             logger.error("IO error writing to " + fileOut + ": " + ioe.getLocalizedMessage());
-
         } catch (TemplateException te) {
             logger.error("Template writing problem with " + fileOut + ": " + te.toString());
         }
@@ -112,16 +103,12 @@ public class DoiPackageBuilder{
     private void writeCsvFile() {
 
         CSVWriter writer;
-
         try {
-
-            FileWriter csvFileWriter = new FileWriter(filePath + filePrefix + "-zoatrack-data.csv");
+            FileWriter csvFileWriter = new FileWriter(filePath + "zoatrack-data.csv");
             writer = new CSVWriter(csvFileWriter);
-
             SearchQuery searchQuery = new SearchQuery();
             searchQuery.setProject(this.doi.getProject());
             searchQuery.setIncludeDeleted(true);
-
             boolean includeArgos = false;
             boolean includeDop = false;
             boolean includeSst = false;
@@ -175,7 +162,7 @@ public class DoiPackageBuilder{
 
 
     } catch (IOException ioe) {
-            logger.error("IO error writing -zoatrack-data.csv :" + ioe.getLocalizedMessage());
+            logger.error("IO error writing zoatrack-data.csv :" + ioe.getLocalizedMessage());
     }
 
     }
@@ -183,22 +170,23 @@ public class DoiPackageBuilder{
 
         private void zipAll() {
 
-        String fullPath = filePath + filePrefix;
+        String fullPath = filePath;
         try {
 
-            FileOutputStream fileOutputStream = new FileOutputStream(fullPath + "-zoatrack.zip");
+            FileOutputStream fileOutputStream = new FileOutputStream(fullPath + "ZoaTrack.zip");
             ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream);
 
-            String[] fileList = new File(filePath).list(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    return name.startsWith(filePrefix) && name.endsWith("zip") == false;
-                }
-            });
+//            String[] fileList = new File(filePath).list(new FilenameFilter() {
+//                @Override
+//                public boolean accept(File dir, String name) {
+//                    return name.startsWith(filePrefix) && name.endsWith("zip") == false;
+//                    }
+//            });
 
+            String[] fileList = {"metadata.txt", "reference.txt", "zoatrack-data.csv"};
             for (String s: fileList) {
                 File f = new File(filePath + s);
-                //logger.info("zipping file " + f.getName());
+                logger.info("zipping file " + f.getName());
                 ZipEntry zipEntry = new ZipEntry(f.getName());
                 zipOutputStream.putNextEntry(zipEntry);
                 IOUtils.copy(new FileInputStream(f), zipOutputStream);
@@ -211,10 +199,5 @@ public class DoiPackageBuilder{
         } catch (IOException ioe) {
             logger.error("IO error creating zip file: " + ioe.toString());
         }
-
-
-
     }
-
-
 }

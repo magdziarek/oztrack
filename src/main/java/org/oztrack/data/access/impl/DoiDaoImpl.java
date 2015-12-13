@@ -11,6 +11,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class DoiDaoImpl implements DoiDao {
@@ -61,6 +62,28 @@ public class DoiDaoImpl implements DoiDao {
         try {
             List<Doi> resultList = query.getResultList();
             return resultList;
+        } catch (NoResultException ex) {
+            return null;
+        }
+    }
+
+    @Override
+    public List<Doi> getAllPublished() {
+        Query query = em.createQuery("SELECT o from Doi o where o.published = true order by o.updateDate desc");
+        try {
+            List<Doi> resultList = query.getResultList();
+            return resultList;
+        } catch (NoResultException ex) {
+            return null;
+        }
+    }
+
+    @Override
+    public Doi getDoiByUuid(UUID uuid) {
+        Query query = em.createQuery("SELECT o FROM Doi o WHERE o.uuid = :uuid");
+        query.setParameter("uuid", uuid);
+        try {
+            return (Doi) query.getSingleResult();
         } catch (NoResultException ex) {
             return null;
         }

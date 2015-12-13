@@ -25,6 +25,19 @@
                     $('#admin-buttons').fadeToggle();
                 });
 
+                $('#mint-btn').click(function() {
+                    $('#admin-buttons').hide();
+                    $('#doi-loading').show();
+                    //show loading thingy
+                });
+                $('#reject-btn').click(function() {
+                    //hide stuff button
+                    //show loading thingy
+                });
+                $('#xml-btn').click(function(e){
+                    $('#doi-xml').fadeToggle();
+                })
+
             });
         </script>
     </jsp:attribute>
@@ -45,41 +58,72 @@
                 box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.08);
             }
 
-            #doi-admin-table td{
-                padding-left:10px;
+            .doi-status-div {
+                padding: 10px 10px;
             }
+
+            .label {
+
+                margin-right:10px;
+            }
+
+            .tag{
+                width:30%;
+                padding-right:10px;
+                font-weight:bold;
+                vertical-align:top;
+            }
+
         </style>
         <h1><c:out value="${fn:replace(doi.filename, '-zoatrack.zip', '')} Admin"/></h1>
 
         <c:choose>
-            <c:when test="${doi.status == 'DRAFT'}"><c:set var="labelclass" value="label-warning"/><c:set var="alertclass" value="alert-warning"/></c:when>
-            <c:when test="${doi.status == 'REQUESTED'}"><c:set var="labelclass" value="label-info"/><c:set var="alertclass" value="alert-info"/></c:when>
-            <c:when test="${doi.status == 'REJECTED'}"><c:set var="labelclass" value="label-important"/><c:set var="alertclass" value="alert-important"/></c:when>
-            <c:when test="${doi.status == 'FAILED'}"><c:set var="labelclass" value="label-important"/><c:set var="alertclass" value="alert-important"/></c:when>
-            <c:when test="${doi.status == 'COMPLETED'}"><c:set var="labelclass" value="label-success"/><c:set var="alertclass" value="alert-success"/></c:when>
+            <c:when test="${doi.status == 'DRAFT'}"><c:set var="style" value="warning"/></c:when>
+            <c:when test="${doi.status == 'REQUESTED'}"><c:set var="style" value="info"/></c:when>
+            <c:when test="${doi.status == 'REJECTED'}"><c:set var="style" value="important"/></c:when>
+            <c:when test="${doi.status == 'FAILED'}"><c:set var="style" value="important"/></c:when>
+            <c:when test="${doi.status == 'COMPLETED'}"><c:set var="style" value="success"/></c:when>
         </c:choose>
 
-        <div class="span8">
-            <div class="well well-large ${alertclass}">
+        <div class="span10">
+            <div class="sidebar-actions doi-status-div">
             <table id="doi-admin-table">
-                <tr><td>Status:</td><td><span class="label ${labelclass}"><c:out value="${doi.status}"/></span></td><td style="text-align:right"><a href="${pageContext.request.contextPath}/projects/${doi.project.id}/doi-manage/${doi.id}/>">Landing Page</a></td></tr>
-                <tr><td>Title:</td><td><c:out value="${doi.title}"/></td><td style="text-align:right"><a href="${pageContext.request.contextPath}/projects/${doi.project.id}/doi-manage/doi-zip>">Download Archive</a></td></tr>
-                <tr><td>Creators:</td><td><c:out value="${doi.creators}"/></td></tr>
-                <tr><td>Draft Created:</td><td><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.draftDate}"/></td></tr>
-                <tr><td>Request Submitted:</td><td><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.submitDate}"/></td></tr>
-                <tr><td>Request Cancelled:</td><td><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.cancelDate}"/></td></tr>
-                <tr><td>Request Rejected:</td><td><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.rejectDate}"/><br/>
-                                          <c:out value="${doi.rejectMessage}"/></td></tr>
-                <tr><td>DOI Minted:</td><td><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.mintDate}"/><br/>
+                <tr><td class="tag">Status:</td><td><span class="label label-${style}"><c:out value="${doi.status}"/></span>
+                    <a class="btn btn-${style}" style="float:right" href="${pageContext.request.contextPath}/projects/${doi.project.id}/doi/file">
+                         Download ZIP </a></td></tr>
+                <tr><td class="tag">Title:</td><td><a href="${pageContext.request.contextPath}/projects/${doi.project.id}/doi"><c:out value="${doi.title}"/></a>
+                    </td>
+                    </tr>
+                <tr><td class="tag">Creators:</td><td><c:out value="${doi.creators}"/></td></tr>
+                <tr><td class="tag">Landing URL:</td><td><c:out value="${doi.url}"/></td></tr>
+                <c:if test="${doi.status == 'COMPLETED'}">
+                    <tr><td class="tag">DOI URL:</td><td>http://dx.doi.org/<c:out value = "${doi.doi}"/></td></tr>
+                </c:if>
+                <tr><td class="tag">Draft Created:</td><td><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.draftDate}"/></td></tr>
+                <tr><td class="tag">Request Submitted:</td><td><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.submitDate}"/></td></tr>
+                <c:if test="${doi.cancelDate != null}">
+                    <tr><td class="tag">Request Cancelled:</td><td><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.cancelDate}"/></td></tr>
+                </c:if>
+                <c:if test="${doi.rejectDate != null}">
+                    <tr><td class="tag">Request Rejected:</td><td><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.rejectDate}"/> <br/>
+                                              Rejection Message: <c:out value="${doi.rejectMessage}"/></td></tr>
+                </c:if>
+                <c:if test="${doi.mintDate != null}">
+                <tr><td class="tag">DOI Minted:</td><td><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.mintDate}"/><br/>
                     <c:out value="${doi.mintResponse}"/></td></tr>
-                <tr><td>Created:</td><td><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.createDate}"/> by <c:out value="${doi.createUser.fullName}"/></td></tr>
-                <tr><td>Last Updated:</td><td><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.updateDate}"/> by <c:out value="${doi.updateUser.fullName}"/></td></tr>
-                <tr><td>Project Manager:</td><td><c:forEach items="${doi.project.projectUsers}" var="projectUser">
+                </c:if>
+                <tr><td class="tag">Created:</td><td><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.createDate}"/> by <c:out value="${doi.createUser.fullName}"/></td></tr>
+                <tr><td class="tag">Last Updated:</td><td><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.updateDate}"/> by <c:out value="${doi.updateUser.fullName}"/></td></tr>
+                <tr><td class="tag">Project Manager:</td><td><c:forEach items="${doi.project.projectUsers}" var="projectUser">
                                                     <c:if test="${projectUser.role == 'MANAGER'}">
                                                         <c:out value="${projectUser.user.fullName}"/>
-                                                        (last login <c:out value="${projectUser.user.lastLoginDate}"/>)
+                                                        (last login <c:out value="${projectUser.user.lastLoginDate}"/>)<br/>
                                                     </c:if>
                                                  </c:forEach>
+                <tr><td class="tag">XML:</td><td><a id="xml-btn">View XML ...</a>
+                            <div id="doi-xml" style="display:none"><c:out value="${doi.xml}"/></div></td></tr>
+
+
 
                 </td></tr>
 
@@ -91,24 +135,39 @@
 
         <c:choose>
         <c:when test="${doi.status == 'DRAFT'}">
-            <div class="row span6">
+            <div class="row span6 alert-${style}">
                 <p>A request to mint a DOI has not been submitted yet. No action is required.</p>
             </div>
         </c:when>
+            <c:when test="${doi.status == 'REJECTED'}">
+                <div class="row span6 alert-${style}">
+                    <p>This request has been rejected by the admin. No action is required until the project manager submits again.</p>
+                </div>
+            </c:when>
         <c:when test="${(doi.status == 'REQUESTED') || (doi.status == 'FAILED')}">
             <div class="row span6" id="admin-buttons">
                 <a id="reject-reason-toggle" class="btn" href="#reject-reason-form">Reject this Request</a>
-                &nbsp;&nbsp;<a class="btn btn-primary" href="${pageContext.request.contextPath}/settings/doi/${doi.id}/mint" > Mint DOI </a>
+                &nbsp;&nbsp;<a class="btn btn-primary" id="mint-btn" href="${pageContext.request.contextPath}/settings/doi/${doi.id}/mint" > Mint DOI </a>
             </div>
-
-            <div class="row span6" id="reject-reason-form" style="margin-top: 18px; display: none;">
+            <div class="span9" id="doi-loading" style="display:none; text-align:center">
+                <div class="row">
+                    <img src="${pageContext.request.contextPath}/img/ui-anim_basic_16x16.gif"><br/>
+                    <p>I'm doing it now ...</p>
+                </div>
+            </div>
+            <c:if test="${errorMessage != null}">
+                <div class="span6" style="color:red"><p><c:out value="${errorMessage}"/></p></div>
+            </c:if>
+            <div class="row span6" id="reject-reason-form" style="display: none;">
                 <div class="admin-action-div">
-                    <div style="margin-bottom: 5px;">
-                        <label for="reject-reason">Reason for rejection<i class="required-marker">*</i></label>
-                        <input type="text" id="reject-reason" class="input-xxlarge" placeholder="e.g. This does not seem to be an Australian research project">
-                    </div>
-                    <a id="reject-cancel-btn" class="btn">Cancel</a>
-                    <a class="btn" href="${pageContext.request.contextPath}/settings/doi/${doi.id}/reject">Reject this Request</a>
+                    <form:form method="PUT" action="/settings/doi/${doi.id}/reject" commandName="doi" name="doi" enctype="multipart/form-data">
+                        <div style="margin-bottom: 5px;">
+                            <label for="reject-reason">Reason for rejection<i class="required-marker">*</i></label>
+                            <form:input type="text" id="reject-reason" path="rejectMessage" cssClass="input-xxlarge" placeholder="e.g. This does not seem to be an Australian research project"/>
+                        </div>
+                        <a id="reject-cancel-btn" class="btn">Cancel</a>
+                        <input class="btn" type="submit" id="reject-btn" value="Reject this Request"/>
+                    </form:form>
                 </div>
             </div>
 

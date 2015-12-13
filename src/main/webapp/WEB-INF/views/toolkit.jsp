@@ -296,13 +296,16 @@
                     <ul style="list-style-type:none">
                         <li><a href="#doi-1">Overview</a></li>
                         <li><a href="#doi-2">What's a DOI?</a></li>
+                        <li><a href="#doi-3">What data does ZoaTrack publish?</a></li>
+                        <li><a href="#doi-4">What metadata does ZoaTrack publish?</a></li>
+
                     </ul>
                     <div class="media" id="doi-1">
                         <h4>Overview</h4>
                         <div class="media-body">
                             <p>ZoaTrack provides a DOI minting service via ANDS and DataCite. A user with 'manage' access to a ZoaTrack project, the manager, can create a package eligible for a DOI
                             from the DOI Request page within the 'Manage Project' menu. If the project satisfies the minimum criteria, the manager will be able to click a button to create
-                            a package containing plain text files of project metadata and data, and a landing page that the DOI will resolve to. </p>
+                            a zip file containing plain text files of project metadata and data.</p>
                             <p>The manager can edit the package by editing the project and rebuilding it as many times as they like.</p>
                                 <ul>
                                     <c:forEach items="${doiChecklist}" var="check">
@@ -318,6 +321,28 @@
                         <div class="media-body">
                             <p>A DOI is a Digital Object Identifier.
                             </p>
+                        </div>
+                    </div>
+                    <hr/>
+
+                    <div class="media" id="doi-3">
+                        <h4>What data does ZoaTrack publish?</h4>
+                        <div class="media-body">
+                            <p>When a project manager requests a DOI, the package will contain a snapshot of all data in that project as at that date.
+                               As yet ZoaTrack can't update a DOI, or refresh it to contain new data. The publication is based on the
+                                data in the zip file only.  If new data is uploaded to the project after the DOI is minted, it won't be included.</p>
+                            <p>The DOI includes detections that have been deleted from the project, flagged as deleted.</p>
+                        </div>
+                    </div>
+                    <hr/>
+
+                    <div class="media" id="doi-3">
+                        <h4>What metadata does ZoaTrack publish?</h4>
+                        <div class="media-body">
+                            <p>ZoaTrack will include all of the project metadata and animal/tag deployment metadata that is included in the project. The project
+                            metadata is the set of fields that are filled out when the project is created, although you can edit this by following an 'Edit Project'
+                                link. </p>
+                            <p>Animal/tag metadata can be populated by following the links in a project to 'View Animals' and finding an 'Edit' link.</p>
                         </div>
                     </div>
                     <hr/>

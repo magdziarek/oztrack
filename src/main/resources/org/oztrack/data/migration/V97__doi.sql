@@ -3,6 +3,7 @@ CREATE TABLE doi (
     doi text,
     xml text,
     url text,
+    uuid uuid unique not null,
     filename text,
     citation text,
     published boolean,
