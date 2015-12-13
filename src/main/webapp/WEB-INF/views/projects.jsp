@@ -88,11 +88,6 @@
                 padding-bottom:15px;
             }
 
-
-            #project-list-div {
-                margin:10px 0;
-            }
-
             a.morelink {
                 text-decoration:none;
                 outline: none;
@@ -102,8 +97,16 @@
                 display: none;
             }
 
+            #project-list-div {
+                margin:10px 0;
+            }
+
             #project-list-div{
                 font-size:11px;
+            }
+
+            #project-list-div select {
+                width: 50px;
             }
 
             #project-list-div label, input, button, select, textarea {
@@ -114,11 +117,6 @@
                 padding: 0px 8px;
                 vertical-align: middle;
             }
-
-            #project-list-div select {
-                width: 50px;
-            }
-
 
 
             tr.clickable-row { cursor: pointer; }
