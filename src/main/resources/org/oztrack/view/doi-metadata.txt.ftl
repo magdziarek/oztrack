@@ -1,16 +1,13 @@
-${doi.citation}
-
 ZOATRACK.ORG DATASET
-${fileNamePrefix}-zoatrack.zip
 
-The data files in this package have been published by ZoaTrack within the Atlas of Living Australia on 31/08/2015 13:34 (AEST).
+The data files in this package have been created by ZoaTrack within the Atlas of Living Australia on  ${doi.createDate?string("MMM d, yyyy HH:mm:ss a")}.
 The data is available in the attached files and at the time of publication is available on ZoaTrack (http://zoatrack.org) in the project entitled
-'${doi.project.title}' at the url https://zoatrack.org/projects/3.
+'${doi.project.title}'.
 
 The files included in this package are:
-${fileNamePrefix}-metadata.txt
-${fileNamePrefix}-reference.txt
-${fileNamePrefix}-zoatrack-data.csv
+metadata.txt (this file)
+reference.txt
+zoatrack-data.csv
 
 Terms of Use
 The data is licenced under ${doi.project.dataLicence.title} (${doi.project.dataLicence.identifier})
