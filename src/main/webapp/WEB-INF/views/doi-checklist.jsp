@@ -35,18 +35,20 @@
     </jsp:attribute>
     <jsp:body>
         <h1 id="projectTitle"><c:out value="${project.title}"/></h1>
-        <h2>Request a DOI</h2>
+        <h2>Request to mint a DOI</h2>
         <!-- need to add that the user agrees to oaipmh -->
 
         <c:if test="${not empty doiChecklistMap}">
             <c:set var="doiready" value="true"/>
-            <p>You can request to mint a DOI on the data in this project if the following criteria are satisfied:</p>
+            <p>If each of these criteria are met, you can build a package in ZoaTrack containing a snapshot of all your project data and metadata.</p>
+            <p>You'll have the opportunity to edit your project and rebuild the package. Once you're satisfied with the contents, you can send a
+                request to the administrators to mint a DOI on your package.</p>
 
             <c:forEach items="${doiChecklistMap}" var="check">
 
                 <div class="row" style="padding-top:15px">
                     <div class="span7">
-                        <c:out value="${check.key.description}"/><br/>
+                       <c:out value="${check.key.description}"/><br/>
                     </div>
                     <div class="span2">
                         <c:choose>
@@ -68,7 +70,7 @@
                             <p>By requesting a DOI package, you agree that the project metadata will be shared with <a href="https://researchdata.ands.org.au/search/#!/group=OzTrack/">Research Data Australia</a>.</p>
                         </div>
                         <div class="span3" id="doi-build-div">
-                            <a id="doi-build-btn" class="btn btn-primary" href="${pageContext.request.contextPath}/projects/${project.id}/doi-manage/new">Build a DOI data package</a>
+                            <a id="doi-build-btn" class="btn btn-primary" href="${pageContext.request.contextPath}/projects/${project.id}/doi/new">Build a DOI data package</a>
                         </div>
                         <div class="span3" id="doi-loading" style="display:none;text-align:center"><img src="${pageContext.request.contextPath}/img/ui-anim_basic_16x16.gif"></div>
 
