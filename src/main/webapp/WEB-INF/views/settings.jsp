@@ -23,6 +23,7 @@
             <li class="edit"><a href="${pageContext.request.contextPath}/settings/srs">Spatial Reference Systems</a></li>
             <li class="edit"><a href="${pageContext.request.contextPath}/settings/content">Website Content</a></li>
             <li class="edit"><a href="${pageContext.request.contextPath}/settings/usage">Usage Summary</a></li>
+            <li class="edit"><a href="${pageContext.request.contextPath}/settings/doi">DOI Admin</a></li>
         </ul>
     </jsp:body>
 </tags:page>

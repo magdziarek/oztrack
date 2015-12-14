@@ -66,6 +66,11 @@
         <property name="dataFileDeleteRestrictedAfterDays" value="${org.oztrack.conf.dataFileDeleteRestrictedAfterDays}"/>
         <property name="rserveLogFile" value="${org.oztrack.conf.rserveLogFile}"/>
         <property name="rserveOomAdj" value="${org.oztrack.conf.rserveOomAdj}"/>
+        <property name="doiBaseUrl" value="${org.oztrack.conf.doiBaseUrl}"/>
+        <property name="doiAppId" value="${org.oztrack.conf.doiAppId}"/>
+        <property name="doiKey" value="${org.oztrack.conf.doiKey}"/>
+        <property name="doiClientId" value="${org.oztrack.conf.doiClientId}"/>
+        <property name="doiLandingBaseUrl" value="${org.oztrack.conf.doiLandingBaseUrl}"/>
         <property name="oaiPmhConfiguration">
             <bean class="org.oztrack.app.OzTrackOaiPmhConfigurationImpl">
                 <property name="oaiPmhEnabled" value="${org.oztrack.conf.oaipmh.oaiPmhEnabled}"/>

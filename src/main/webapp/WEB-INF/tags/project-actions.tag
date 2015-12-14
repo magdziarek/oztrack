@@ -5,7 +5,10 @@
 <%@ attribute name="project" type="org.oztrack.data.model.Project" required="true" %>
 <%@ attribute name="itemsOnly" type="java.lang.Boolean" required="false" %>
 <sec:authorize access="hasPermission(#project, 'write')">
-<c:if test="${itemsOnly == null || itemsOnly == false}">
+<style type="text/css">
+    ul.icons li.doi-manage {background-image: url('${pageContext.request.contextPath}/img/table_link.png');}
+</style>
+    <c:if test="${itemsOnly == null || itemsOnly == false}">
 <div class="sidebar-actions">
     <div class="sidebar-actions-title">Manage Project</div>
     <ul class="icons sidebar-actions-list">
@@ -16,6 +19,9 @@
         <li id="projectActionsCleanse" class="edit-track"><a href="${pageContext.request.contextPath}/projects/${project.id}/cleanse">Edit tracks</a></li>
         </c:if>
         <li class="edit-project"><a href="${pageContext.request.contextPath}/projects/${project.id}/edit">Edit project</a></li>
+        <sec:authorize access="hasPermission(#project, 'manage')">
+        <li id="project-doi" class="doi-manage"><a href="${pageContext.request.contextPath}/projects/${project.id}/doi">Request DOI</a></li>
+        </sec:authorize>
         <sec:authorize access="hasPermission(#project, 'delete')">
         <li class="delete-project">
             <a href="javascript:void(OzTrack.deleteEntity(<%--
