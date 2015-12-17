@@ -82,6 +82,13 @@
             </div>
         </div>
 
+        <c:if test="${errorMessage != null}">
+            <div class="span9" style="text-align:center; color:red">
+                <div class="row">
+                    <p><c:out value="${errorMessage}"/></p>
+                </div>
+            </div>
+        </c:if>
         <div class="span9" id="doi-div">
             <div class="row">
                 <div class="sidebar-actions doi-status-div">
