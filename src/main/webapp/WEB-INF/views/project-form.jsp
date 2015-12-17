@@ -10,7 +10,7 @@
     <jsp:attribute name="title">
         <c:choose>
         <c:when test="${project.id != null}">
-            Update Project
+            Update Project Metadata
         </c:when>
         <c:otherwise>
             Create Project
@@ -20,7 +20,7 @@
     <jsp:attribute name="description">
         <c:choose>
         <c:when test="${project.id != null}">
-            Update details for the ${project.title} project.
+            Update metadata for the ${project.title} project.
         </c:when>
         <c:otherwise>
             Create a new ZoaTrack project.
@@ -348,7 +348,7 @@
         <c:choose>
         <c:when test="${project.id != null}">
         &rsaquo; <a href="${pageContext.request.contextPath}/projects/${project.id}">${project.title}</a>
-        &rsaquo; <span class="active">Update Project</span>
+        &rsaquo; <span class="active">Update Project Metadata</span>
         </c:when>
         <c:otherwise>
         &rsaquo; <span class="active">Create Project</span>
@@ -358,7 +358,7 @@
     <jsp:body>
         <c:choose>
         <c:when test="${project.id != null}">
-            <h1>Update Project</h1>
+            <h1>Update Project Metadata</h1>
         </c:when>
         <c:otherwise>
             <h1>Create a New Project</h1>
@@ -380,7 +380,7 @@
             method="${method}" action="${action}"
             commandName="project" name="project" enctype="multipart/form-data">
             <fieldset>
-                <div class="legend">Project Metadata</div>
+                <div class="legend">Project Description</div>
                 <div class="control-group required">
                     <label class="control-label" for="title">Title</label>
                     <div class="controls">

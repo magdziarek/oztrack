@@ -5,7 +5,33 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="tags" %>
+<c:set var="dateTimeFormatPattern" value="yyyy-MM-dd HH:mm"/>
 <tags:page title="${project.title}: Animals">
+    <jsp:attribute name="head">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/optimised/openlayers.css" type="text/css">
+        <style type="text/css">
+
+            #zoatrack-datatable-div {
+                margin:10px 0;
+                font-size:11px;
+            }
+
+            #zoatrack-datatable-div select {
+                width: 55px;
+            }
+
+            table.dataTable thead th, table.dataTable thead td {
+                padding: 8px;
+                vertical-align: middle;
+            }
+
+            table.dataTable thead th {
+                background-color: #f5ce7c;
+            }
+
+
+        </style>
+    </jsp:attribute>
     <jsp:attribute name="description">
         Listing of animals tracked in the ${project.title} project.
     </jsp:attribute>
@@ -14,6 +40,18 @@
             $(document).ready(function() {
                 $('#navTrack').addClass('active');
                 $('#projectMenuAnimals').addClass('active');
+
+                $('#animal-list-table').DataTable({
+                    "aLengthMenu": [[5, 10, 50, -1], [5, 10, 50, "All"]],
+                    "bProcessing": true,
+                    "bDeferRender": true,
+                    "aoColumnDefs": [
+                        { "bSortable": false, "aTargets": [ 0, 3, 4 ] }
+                    ]
+                });
+                $('#datatable-loading').hide();
+                $('#animal-list-table').show();
+
             });
         </script>
     </jsp:attribute>
@@ -41,51 +79,45 @@
         </p>
         </sec:authorize>
         </c:if>
-        <table>
-            <tbody>
+
+        <div class="span6 offset6" id="datatable-loading"><img src="${pageContext.request.contextPath}/img/ui-anim_basic_16x16.gif"></div>
+        <div id="zoatrack-datatable-div">
+        <table id="animal-list-table" class="table-condensed table-hover"
+                data-page-length='10'
+                data-order='[[2, "desc"], [1, "asc"]]'
+                style="display:none">
+        <thead>
+        <tr>
+            <th class="span1"></th>
+            <th class="span2">Identifier</th>
+            <th class="span2">Last Updated</th>
+            <th class="span2"></th>
+            <th class="span2"></th>
+        </tr>
+        </thead>
+        <tbody>
             <c:forEach items="${projectAnimalsList}" var="animal">
                 <tr>
-                    <td style="padding: 5px 5px 0 0; vertical-align: top;">
-                        <div style="width: 18px; height: 18px; background-color: ${animal.colour};"></div>
-                    </td>
-                    <td style="padding: 5px 5px 0 5px; vertical-align: top;">
-                        <p>
-                            <a href="${pageContext.request.contextPath}/projects/${project.id}/animals/${animal.id}" style="font-weight: bold;"><c:out value="${animal.animalName}"/></a>
-                            <sec:authorize access="hasPermission(#project, 'write')">
-                            <span style="padding-left: 10px; font-style: italic;">
-                                <a href="${pageContext.request.contextPath}/projects/${project.id}/animals/${animal.id}/edit"><img src="${pageContext.request.contextPath}/img/page_white_edit.png" /></a>
-                                <c:if test="${empty animal.positionFixes}">
-                                <a href="javascript:void(0);" onclick="OzTrack.deleteEntity(
+                    <td><div style="width: 18px; height: 18px; background-color: ${animal.colour};"></div></td>
+                    <td><c:out value="${animal.animalName}"/></td>
+                    <td><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${animal.updateDate}"/></td>
+                    <td><a href="${pageContext.request.contextPath}/projects/${project.id}/animals/${animal.id}">Summary & Detections</a></td>
+                    <td>
+                    <sec:authorize access="hasPermission(#project, 'write')">
+                        <a href="${pageContext.request.contextPath}/projects/${project.id}/animals/${animal.id}/edit">Edit Metadata</a>
+                        <c:if test="${empty animal.positionFixes}">
+                            <a href="javascript:void(0);" onclick="OzTrack.deleteEntity(
                                     '${pageContext.request.contextPath}/projects/${project.id}/animals/${animal.id}',
                                     '${pageContext.request.contextPath}/projects/${project.id}/animals',
                                     'Are you sure you want to delete this animal?'
                                     );"><img src="${pageContext.request.contextPath}/img/page_white_delete.png" /></a>
-                                </c:if>
-                            </span>
-                            </sec:authorize>
-                        </p>
-                        <c:if test="${not empty project.speciesScientificName || not empty project.speciesCommonName}">
-                        <p style="color: #666;">
-                            <c:if test="${not empty project.speciesScientificName}">
-                            <i><c:out value="${project.speciesScientificName}"/></i>
-                            <c:if test="${not empty project.speciesCommonName}">
-                            <br />
-                            </c:if>
-                            </c:if>
-                            <c:if test="${not empty project.speciesCommonName}">
-                            <c:out value="${project.speciesCommonName}"/>
-                            </c:if>
-                        </p>
                         </c:if>
-                        <c:if test="${not empty animal.animalDescription}">
-                        <p>
-                            <c:out value="${animal.animalDescription}"/>
-                        </p>
-                        </c:if>
+                    </sec:authorize>
                     </td>
                 </tr>
             </c:forEach>
             </tbody>
         </table>
+        </div>
     </jsp:body>
 </tags:page>

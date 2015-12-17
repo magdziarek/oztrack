@@ -44,7 +44,7 @@
         &rsaquo; <a href="${pageContext.request.contextPath}/projects/${project.id}">${project.title}</a>
         &rsaquo; <a href="${pageContext.request.contextPath}/projects/${project.id}/animals">Animals</a>
         &rsaquo; <a href="${pageContext.request.contextPath}/projects/${project.id}/animals/${animal.id}">${animal.animalName}</a>
-        &rsaquo; <span class="active">Edit</span>
+        &rsaquo; <span class="active">Update Animal & Tag Deployment Metadata</span>
     </jsp:attribute>
     <jsp:attribute name="sidebar">
         <tags:project-menu project="${project}"/>
@@ -52,7 +52,7 @@
         <tags:project-licence project="${project}"/>
     </jsp:attribute>
     <jsp:body>
-        <h1 id="projectTitle"><c:out value="${project.title}"/></h1>
+        <h1>Update Animal and Tag Deployment Metadata</h1>
         <form:form cssClass="form-horizontal form-bordered" action="/projects/${project.id}/animals/${animal.id}" commandName="animal" method="PUT">
             <fieldset>
             <div class="legend">Animal details</div>
@@ -278,7 +278,7 @@
                         <form:errors path="dataRetrievalMethod" element="div" cssClass="help-block formErrors"/>
                         <div class="help-inline">
                             <div class="help-popover" title="Data Retrieval Methods">
-                                Describe how the data for this tag was retrieved e.g. via Argos, Globestar, Iridium, Bluetooth, VFH, Other
+                                Describe how the data for this tag was retrieved e.g. via Argos, Globestar, Iridium, Bluetooth, VHFssh, Other
                             </div>
                         </div>
                     </div>
