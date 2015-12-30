@@ -8,7 +8,6 @@ import org.oztrack.data.access.DoiDao;
 import org.oztrack.data.access.PositionFixDao;
 import org.oztrack.data.access.ProjectDao;
 import org.oztrack.data.model.*;
-import org.oztrack.data.model.types.DoiChecklist;
 import org.oztrack.data.model.types.DoiStatus;
 import org.oztrack.data.model.types.ProjectAccess;
 import org.oztrack.view.DoiResourceManager;
@@ -65,7 +64,7 @@ public class DoiController {
             model.addAttribute("doi", doi);
         } else {
             view = "doi-checklist";
-            HashMap<DoiChecklist, Boolean> doiChecklistMap = checkDoiChecklist(project);
+            HashMap<String, Boolean> doiChecklistMap = createDoiChecklist(project);
             model.addAttribute("doiChecklistMap", doiChecklistMap);
         }
         return view;
@@ -95,9 +94,10 @@ public class DoiController {
 
         User currentUser = permissionEvaluator.getAuthenticatedUser(authentication);
         Doi projectDoi = doiDao.getDoiByProject(project);
-        if ((projectDoi != null) && (!projectDoi.isPublished())) {
+        Doi doi = (projectDoi != null) ? projectDoi : new Doi();
+
+        if (!doi.isPublished() && testDoiChecklist(project)) {
             logger.info("DOI Package Build request from project " + project.getId());
-            Doi doi = (projectDoi != null) ? projectDoi : new Doi();
             doi = buildDoiPackage(project, currentUser, doi);
             doiDao.save(doi);
             model.addAttribute("doi", doi);
@@ -240,10 +240,20 @@ public class DoiController {
         emailBuilder.build().send();
     }
 
+    private boolean testDoiChecklist(Project project) {
 
-    private HashMap<DoiChecklist, Boolean> checkDoiChecklist(Project project) {
+        Boolean passTest = true;
+        HashMap<String, Boolean> doiChecklistMap = createDoiChecklist(project);
+        for (Boolean value: doiChecklistMap.values()) {
+           if (!value) passTest = false;
+        }
+        return passTest;
+    }
 
-        HashMap<DoiChecklist, Boolean> doiChecklistMap = new HashMap<DoiChecklist, Boolean>();
+
+    private HashMap<String, Boolean> createDoiChecklist(Project project) {
+
+        HashMap<String, Boolean> doiChecklistMap = new HashMap<String, Boolean>();
         boolean australianResearchCheck = false;
         List<ProjectContribution> contributions = project.getProjectContributions();
         Iterator contributionsIterator = contributions.iterator();
@@ -267,10 +277,11 @@ public class DoiController {
             }
         }
 
-        doiChecklistMap.put(DoiChecklist.AUTHORS, project.getProjectContributions().size() > 0);
-        doiChecklistMap.put(DoiChecklist.DATA, project.getAnimals().size() > 0);
-        doiChecklistMap.put(DoiChecklist.LICENCE, (project.getDataLicence() != null && project.getAccess().equals(ProjectAccess.OPEN)));
-        doiChecklistMap.put(DoiChecklist.RESEARCH, australianResearchCheck);
+        doiChecklistMap.put("author_count", project.getProjectContributions().size() > 0);
+        doiChecklistMap.put("data", project.getAnimals().size() > 0);
+        doiChecklistMap.put("cc_licence", (project.getDataLicence() != null));
+        doiChecklistMap.put("australian_research", australianResearchCheck);
+        doiChecklistMap.put("access", project.getAccess().equals(ProjectAccess.OPEN));
         return doiChecklistMap;
 
     }

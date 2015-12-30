@@ -288,8 +288,6 @@
                     </div>
                 </div>
                 <hr/>
-
-
             </div>
 
                 <div class="tab-pane" id="doi">
@@ -307,11 +305,6 @@
                             from the DOI Request page within the 'Manage Project' menu. If the project satisfies the minimum criteria, the manager will be able to click a button to create
                             a zip file containing plain text files of project metadata and data.</p>
                             <p>The manager can edit the package by editing the project and rebuilding it as many times as they like.</p>
-                                <ul>
-                                    <c:forEach items="${doiChecklist}" var="check">
-                                        <li><c:out value="${check.title - check.description}"/><p><c:out value = "${check.requirements}"/></p></li>
-                                    </c:forEach>
-                                </ul>
                         </div>
                     </div>
                     <hr/>
@@ -336,7 +329,7 @@
                     </div>
                     <hr/>
 
-                    <div class="media" id="doi-3">
+                    <div class="media" id="doi-4">
                         <h4>What metadata does ZoaTrack publish?</h4>
                         <div class="media-body">
                             <p>ZoaTrack will include all of the project metadata and animal/tag deployment metadata that is included in the project. The project
