@@ -88,8 +88,8 @@
                 style="display:none">
         <thead>
         <tr>
-            <th class="span1"></th>
-            <th class="span2">Identifier</th>
+            <th class="span1">ZoaTrack Colour</th>
+            <th class="span2">Animal Identifier</th>
             <th class="span2">Last Updated</th>
             <th class="span2"></th>
             <th class="span2"></th>

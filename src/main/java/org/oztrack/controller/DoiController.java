@@ -123,11 +123,11 @@ public class DoiController {
         Doi doiInProgress = doiDao.getInProgressDoi(project);
         DoiPackageBuilder packageBuilder = new DoiPackageBuilder(doiInProgress);
         String view = "redirect:/projects/" + project.getId() + "/doi";
-        if (doiInProgress.getStatus() == DoiStatus.DRAFT) {
+        if (doiInProgress.getStatus() == DoiStatus.DRAFT || doiInProgress.getStatus() == DoiStatus.REJECTED) {
             packageBuilder.deletePackage();
             doiDao.delete(doiInProgress);
         } else {
-            model.addAttribute("errorMessage", "You can only delete a DOI Request in DRAFT phase.");
+            model.addAttribute("errorMessage", "You can only delete a DOI Request with a DRAFT or REJECTED status.");
             view = "doi-manage";
         }
         return view;

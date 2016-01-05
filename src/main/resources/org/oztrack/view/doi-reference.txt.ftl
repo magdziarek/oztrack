@@ -1,10 +1,12 @@
 reference.txt
 
 ***** Project Detail
+
+<#compress>
 Title: ${doi.project.title}
 Description: ${doi.project.description}
 Species Scientific Name: ${doi.project.speciesScientificName}
-Species Common Name: ${doi.project.speciesCommonName}
+<#if doi.project.speciesCommonName?has_content>Species Common Name: ${doi.project.speciesCommonName}</#if>
 <#if doi.project.licencingAndEthics?has_content>Licencing and Ethics Clearance: ${doi.project.licencingAndEthics}</#if>
 Spatial Coverage Description: ${doi.project.spatialCoverageDescr}
 SRS Identifier: ${doi.project.srsIdentifier}
@@ -14,9 +16,11 @@ ZoaTrack Data Access Type: ${doi.project.access}
 Data Licence Identifier: ${doi.project.dataLicence.identifier}
 Data Licence Title: ${doi.project.dataLicence.title}
 Data Licence URL: ${doi.project.dataLicence.infoUrl}
-<#compress>Project Contributors: <#list doi.project.projectContributions as projectContribution>
-    ${projectContribution.contributor.title} ${projectContribution.contributor.firstName} ${projectContribution.contributor.lastName}
-</#list></#compress>
+Data Creators: <#list doi.project.projectContributions as projectContribution>
+    <#if projectContribution.contributor.title?has_content>${projectContribution.contributor.title}</#if> ${projectContribution.contributor.firstName} ${projectContribution.contributor.lastName}
+</#list>
+</#compress>
+
 
 ***** Animal Detail
 
@@ -40,6 +44,8 @@ ZoaTrack Colour: ${animal.colour}
 <#if animal.tagDeploymentComments?has_content>Tag Deployment Comments: ${animal.tagDeploymentComments}</#if>
 <#if animal.tagDutyCycleComments?has_content>Tag Duty Cycle: ${animal.tagDutyCycleComments}</#if>
 <#if animal.dataRetrievalMethod?has_content>Tag Data Retrieval Method: ${animal.dataRetrievalMethod}</#if>
+*****
 </#compress>
+
 
 </#list>

@@ -120,7 +120,7 @@
 
         <p>You can request to mint a Digital Object Identifier (DOI) for the data and metadata included in this project.</p>
 
-        <p>If you have satisfied all the requirements below, ZoaTrack will allow you to build a zip package containing
+        <p>If you have satisfied all the requirements set out below, ZoaTrack will allow you to build a zip package containing
             all of the data and metadata in your project. This will form the published content of the DOI. You will be
             able to update your project and rebuild the file before you submit your request to mint the DOI.</p>
 
