@@ -30,10 +30,6 @@
                     $('#doi-loading').show();
                     //show loading thingy
                 });
-                $('#reject-btn').click(function() {
-                    //hide stuff button
-                    //show loading thingy
-                });
                 $('#xml-btn').click(function(e){
                     $('#doi-xml').fadeToggle();
                 })
@@ -122,16 +118,9 @@
                                                  </c:forEach>
                 <tr><td class="tag">XML:</td><td><a id="xml-btn">View XML ...</a>
                             <div id="doi-xml" style="display:none"><c:out value="${doi.xml}"/></div></td></tr>
-
-
-
-                </td></tr>
-
             </table>
-
             </div>
         </div>
-
 
         <c:choose>
         <c:when test="${doi.status == 'DRAFT'}">
@@ -173,12 +162,6 @@
 
         </c:when>
         </c:choose>
-
-
-
-
-
-
     </jsp:body>
 </tags:page>
 

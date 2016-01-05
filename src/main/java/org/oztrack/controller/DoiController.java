@@ -8,7 +8,6 @@ import org.oztrack.data.access.DoiDao;
 import org.oztrack.data.access.PositionFixDao;
 import org.oztrack.data.access.ProjectDao;
 import org.oztrack.data.model.*;
-import org.oztrack.data.model.types.DoiChecklist;
 import org.oztrack.data.model.types.DoiStatus;
 import org.oztrack.data.model.types.ProjectAccess;
 import org.oztrack.view.DoiResourceManager;
@@ -58,15 +57,15 @@ public class DoiController {
             @ModelAttribute(value="project") Project project
     ) {
         String view;
-        Doi doiInProgress = doiDao.getInProgressDoi(project);        // is there a draft doi?
+        Doi doi = doiDao.getDoiByProject(project);
 
-        if (doiInProgress == null) {
-            view = "doi-checklist";
-            HashMap<DoiChecklist, Boolean> doiChecklistMap = checkDoiChecklist(project);
-            model.addAttribute("doiChecklistMap", doiChecklistMap);
-        } else {
+        if (doi != null) {
             view = "doi-manage";
-            model.addAttribute("doi", doiInProgress);
+            model.addAttribute("doi", doi);
+        } else {
+            view = "doi-checklist";
+            HashMap<String, Boolean> doiChecklistMap = createDoiChecklist(project);
+            model.addAttribute("doiChecklistMap", doiChecklistMap);
         }
         return view;
     }
@@ -77,7 +76,6 @@ public class DoiController {
             @ModelAttribute(value="project") Project project,
             HttpServletResponse response
     ) throws Exception {
-        //Doi doiInProgress = doiDao.getInProgressDoi(project);
         response.setHeader("Content-Disposition", "attachment; filename=ZoaTrack.zip");
         response.setContentType("application/zip");
         response.setCharacterEncoding("UTF-8");
@@ -94,56 +92,25 @@ public class DoiController {
             @ModelAttribute(value="project") Project project
     ) {
 
-        logger.info("DOI Package Build request from project " + project.getId());
         User currentUser = permissionEvaluator.getAuthenticatedUser(authentication);
-        Doi doiInProgress = doiDao.getInProgressDoi(project);   // is there one in progress?
-        Doi doi = (doiInProgress != null) ? doiInProgress : new Doi();
+        Doi projectDoi = doiDao.getDoiByProject(project);
+        Doi doi = (projectDoi != null) ? projectDoi : new Doi();
 
-        OzTrackConfiguration configuration = OzTrackApplication.getApplicationContext();
-        UUID uuid = UUID.randomUUID();
-        doi.setUuid(uuid);
-        doi.setUrl(configuration.getDoiLandingBaseUrl() + "/" + uuid);
-        doi.setProject(project);
-        doi.setStatus(DoiStatus.DRAFT);
-        doi.setCreateUser(currentUser);
-        doi.setUpdateUser(currentUser);
-        doi.setPublished(false);
-        // Citation example e.g
-        //Campbell, H, Dwyer, R, Franklin, C (2014) Data from: 'Tracking estuarine crocodiles on
-        // Cape York Peninsula using GPS-based telemetry'. ZoaTrack.org.
-        // doi: http://dx.doi.org/10.4225/01/XXXXXXXXXXXXXXXX
-        doi.setCitation(getAuthorList(project, "citation") + "(" + Calendar.getInstance().get(Calendar.YEAR) + ") Data from: '"
-                + project.getTitle() + "'. ZoaTrack.org. doi: ");
-        doi.setTitle(project.getTitle());
-        doi.setCreators(this.getAuthorList(project, "fullNames"));
+        if (!doi.isPublished() && testDoiChecklist(project)) {
+            logger.info("DOI Package Build request from project " + project.getId());
+            doi = buildDoiPackage(project, currentUser, doi);
+            doiDao.save(doi);
+            model.addAttribute("doi", doi);
 
-        DoiResourceManager doiResourceManager = new DoiResourceManager(project);
-        doiResourceManager.buildDoiResource();
-        doi.setXml(doiResourceManager.marshallDoiResource());
-
-        SearchQuery searchQuery = new SearchQuery();
-        searchQuery.setProject(project);
-        searchQuery.setIncludeDeleted(true);
-        List<PositionFix> positionFixes = positionFixDao.getProjectPositionFixList(searchQuery);
-
-        Calendar createDate = Calendar.getInstance();
-        createDate.setTime(new java.util.Date());
-        doi.setDraftDate(createDate.getTime());
-        doi.setCreateDate(createDate.getTime());
-        doi.setUpdateDate(createDate.getTime());
-        DoiPackageBuilder packageBuilder = new DoiPackageBuilder(doi, positionFixes);
-        packageBuilder.buildZip();
-        //doi.setFilename(packageBuilder.buildZip());
-
-        doiDao.save(doi);
-        model.addAttribute("doi", doi);
-
-        // check this went well
-        File file = new File(project.getAbsoluteDataDirectoryPath() + File.separator + "ZoaTrack.zip");
-        if (!file.exists()) {
-            model.addAttribute("errorMessage","There was an error generating the package. Please contact the administrator.");
+            // check this went well
+            File file = new File(project.getAbsoluteDataDirectoryPath() + File.separator + "ZoaTrack.zip");
+            if (!file.exists()) {
+                model.addAttribute("errorMessage","There was an error generating the package. Please contact the administrator.");
+            }
+            return "doi-manage";
+        } else {
+            return "redirect:/projects/" + project.getId() + "/doi";
         }
-        return "redirect:/projects/" + project.getId() + "/doi";
     }
 
     @RequestMapping(value="/projects/{projectId}/doi/delete", method= RequestMethod.GET)
@@ -156,13 +123,11 @@ public class DoiController {
         Doi doiInProgress = doiDao.getInProgressDoi(project);
         DoiPackageBuilder packageBuilder = new DoiPackageBuilder(doiInProgress);
         String view = "redirect:/projects/" + project.getId() + "/doi";
-
-        if (doiInProgress.getStatus() == DoiStatus.DRAFT) {
-
+        if (doiInProgress.getStatus() == DoiStatus.DRAFT || doiInProgress.getStatus() == DoiStatus.REJECTED) {
             packageBuilder.deletePackage();
             doiDao.delete(doiInProgress);
         } else {
-            model.addAttribute("errorMessage", "You can only delete a DOI Request in DRAFT phase.");
+            model.addAttribute("errorMessage", "You can only delete a DOI Request with a DRAFT or REJECTED status.");
             view = "doi-manage";
         }
         return view;
@@ -207,6 +172,48 @@ public class DoiController {
         return "redirect:/projects/" + project.getId() + "/doi";
     }
 
+    private Doi buildDoiPackage(Project project, User currentUser, Doi doi) {
+
+        OzTrackConfiguration configuration = OzTrackApplication.getApplicationContext();
+        UUID uuid = UUID.randomUUID();
+        doi.setUuid(uuid);
+        doi.setUrl(configuration.getDoiLandingBaseUrl() + "/" + uuid);
+        doi.setProject(project);
+        doi.setStatus(DoiStatus.DRAFT);
+        doi.setCreateUser(currentUser);
+        doi.setUpdateUser(currentUser);
+        doi.setPublished(false);
+        // Citation example e.g
+        //Campbell, H, Dwyer, R, Franklin, C (2014) Data from: 'Tracking estuarine crocodiles on
+        // Cape York Peninsula using GPS-based telemetry'. ZoaTrack.org.
+        // doi: http://dx.doi.org/10.4225/01/XXXXXXXXXXXXXXXX
+        doi.setCitation(getAuthorList(project, "citation") + "(" + Calendar.getInstance().get(Calendar.YEAR) + ") Data from: '"
+                + project.getTitle() + "'. ZoaTrack.org. doi: ");
+        doi.setTitle(project.getTitle());
+        doi.setCreators(this.getAuthorList(project, "fullNames"));
+
+        DoiResourceManager doiResourceManager = new DoiResourceManager(project);
+        doiResourceManager.buildDoiResource();
+        doi.setXml(doiResourceManager.marshallDoiResource());
+
+        SearchQuery searchQuery = new SearchQuery();
+        searchQuery.setProject(project);
+        searchQuery.setIncludeDeleted(true);
+        List<PositionFix> positionFixes = positionFixDao.getProjectPositionFixList(searchQuery);
+
+        Calendar createDate = Calendar.getInstance();
+        createDate.setTime(new java.util.Date());
+        doi.setDraftDate(createDate.getTime());
+        doi.setCreateDate(createDate.getTime());
+        doi.setUpdateDate(createDate.getTime());
+        DoiPackageBuilder packageBuilder = new DoiPackageBuilder(doi, positionFixes);
+        packageBuilder.buildZip();
+        //doi.setFilename(packageBuilder.buildZip());
+
+
+        return doi;
+    }
+
     private void emailMintRequestToAdmin(Doi doi, User currentUser) throws Exception {
 
         EmailBuilderFactory emailBuilderFactory = new EmailBuilderFactory();
@@ -233,10 +240,20 @@ public class DoiController {
         emailBuilder.build().send();
     }
 
+    private boolean testDoiChecklist(Project project) {
 
-    private HashMap<DoiChecklist, Boolean> checkDoiChecklist(Project project) {
+        Boolean passTest = true;
+        HashMap<String, Boolean> doiChecklistMap = createDoiChecklist(project);
+        for (Boolean value: doiChecklistMap.values()) {
+           if (!value) passTest = false;
+        }
+        return passTest;
+    }
 
-        HashMap<DoiChecklist, Boolean> doiChecklistMap = new HashMap<DoiChecklist, Boolean>();
+
+    private HashMap<String, Boolean> createDoiChecklist(Project project) {
+
+        HashMap<String, Boolean> doiChecklistMap = new HashMap<String, Boolean>();
         boolean australianResearchCheck = false;
         List<ProjectContribution> contributions = project.getProjectContributions();
         Iterator contributionsIterator = contributions.iterator();
@@ -260,10 +277,11 @@ public class DoiController {
             }
         }
 
-        doiChecklistMap.put(DoiChecklist.AUTHORS, project.getProjectContributions().size() > 0);
-        doiChecklistMap.put(DoiChecklist.DATA, project.getAnimals().size() > 0);
-        doiChecklistMap.put(DoiChecklist.LICENCE, (project.getDataLicence() != null && project.getAccess().equals(ProjectAccess.OPEN)));
-        doiChecklistMap.put(DoiChecklist.RESEARCH, australianResearchCheck);
+        doiChecklistMap.put("author_count", project.getProjectContributions().size() > 0);
+        doiChecklistMap.put("data", project.getAnimals().size() > 0);
+        doiChecklistMap.put("cc_licence", (project.getDataLicence() != null));
+        doiChecklistMap.put("australian_research", australianResearchCheck);
+        doiChecklistMap.put("access", project.getAccess().equals(ProjectAccess.OPEN));
         return doiChecklistMap;
 
     }

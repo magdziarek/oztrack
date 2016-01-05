@@ -25,26 +25,24 @@ public class DoiPackageBuilder{
 
     private final Logger logger = Logger.getLogger(getClass());
     private Doi doi;
-//    private String filePrefix;
     private String filePath;
     private List<PositionFix> positionFixes;
 
     public DoiPackageBuilder(Doi doi, List<PositionFix> positionFixes) {
+
         this.doi = doi;
-       // this.filePrefix = doi.getProject().getTitle().replace(" ","-");
         this.filePath =  doi.getProject().getAbsoluteDataDirectoryPath() + File.separator;
         this.positionFixes = positionFixes;
     }
 
     public DoiPackageBuilder(Doi doi) {
+
         this.doi = doi;
-//        this.filePrefix = "doi"; //doi.getProject().getTitle().replace(" ","-");
         this.filePath =  doi.getProject().getAbsoluteDataDirectoryPath() + File.separator;
     }
 
     public String buildZip() {
 
-        //deleteFiles();
         File f = new File(filePath + "ZoaTrack.zip");
         f.delete();
         writeMetadataFiles();
@@ -54,24 +52,10 @@ public class DoiPackageBuilder{
     }
 
     public void deletePackage() {
+
         File f = new File(filePath + "ZoaTrack.zip");
         f.delete();
     }
-
-//    public void deleteFiles() {
-//
-//        String[] fileList = new File(filePath).list(new FilenameFilter() {
-//            @Override
-//            public boolean accept(File dir, String name) {
-//                return name.startsWith(filePrefix);
-//            }
-//        });
-//        for (String s: fileList) {
-//            File f = new File(filePath + s);
-//            f.delete();
-//        }
-//    }
-
 
     private void writeMetadataFiles() {
 
@@ -82,7 +66,6 @@ public class DoiPackageBuilder{
         freemarkerConfiguration.setTemplateLoader(new ClassTemplateLoader(this.getClass(), "/org/oztrack/view"));
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("doi", this.doi);
-        //map.put("fileNamePrefix", this.filePrefix);
         String fileOut = "metadata.txt";
         try {
             Template metadataTemplate = freemarkerConfiguration.getTemplate("doi-metadata.txt.ftl");
@@ -168,7 +151,7 @@ public class DoiPackageBuilder{
     }
 
 
-        private void zipAll() {
+    private void zipAll() {
 
         String fullPath = filePath;
         try {
@@ -176,17 +159,9 @@ public class DoiPackageBuilder{
             FileOutputStream fileOutputStream = new FileOutputStream(fullPath + "ZoaTrack.zip");
             ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream);
 
-//            String[] fileList = new File(filePath).list(new FilenameFilter() {
-//                @Override
-//                public boolean accept(File dir, String name) {
-//                    return name.startsWith(filePrefix) && name.endsWith("zip") == false;
-//                    }
-//            });
-
             String[] fileList = {"metadata.txt", "reference.txt", "zoatrack-data.csv"};
             for (String s: fileList) {
                 File f = new File(filePath + s);
-                logger.info("zipping file " + f.getName());
                 ZipEntry zipEntry = new ZipEntry(f.getName());
                 zipOutputStream.putNextEntry(zipEntry);
                 IOUtils.copy(new FileInputStream(f), zipOutputStream);

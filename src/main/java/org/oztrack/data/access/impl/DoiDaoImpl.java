@@ -35,6 +35,17 @@ public class DoiDaoImpl implements DoiDao {
     }
 
     @Override
+    public Doi getDoiByProject(Project project){
+        Query query = em.createQuery("SELECT o FROM Doi o where o.project = :project");
+        query.setParameter("project", project);
+        try {
+            return (Doi) query.getSingleResult();
+        } catch (NoResultException ex) {
+            return null;
+        }
+    }
+
+    @Override
     public Doi getDoiById(Long id) {
         Query query = em.createQuery("SELECT o FROM Doi o WHERE o.id = :id");
         query.setParameter("id", id);

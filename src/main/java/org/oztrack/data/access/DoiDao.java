@@ -12,6 +12,7 @@ import java.util.UUID;
 public interface DoiDao  {
 
     Doi getInProgressDoi(Project project);
+    Doi getDoiByProject(Project project);
     Doi getDoiById(Long id);
     List<Doi> getAll();
     List<Doi> getAllPublished();

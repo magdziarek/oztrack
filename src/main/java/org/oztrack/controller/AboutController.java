@@ -1,10 +1,8 @@
 package org.oztrack.controller;
 
-import org.oztrack.data.access.AnalysisDao;
 import org.oztrack.data.access.SettingsDao;
 import org.oztrack.data.model.Settings;
 import org.oztrack.data.model.types.AnalysisType;
-import org.oztrack.data.model.types.DoiChecklist;
 import org.springframework.ui.Model;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -54,13 +52,6 @@ public class AboutController {
             analysisTypeList.add(analysisType);
         }
         model.addAttribute("analysisTypeList", analysisTypeList);
-
-        ArrayList<DoiChecklist> doiChecklist = new ArrayList<DoiChecklist>();
-        for (DoiChecklist ch : DoiChecklist.values()) {
-            doiChecklist.add(ch);
-        }
-        model.addAttribute("doiChecklist", doiChecklist);
-
         return "toolkit";
     }
 

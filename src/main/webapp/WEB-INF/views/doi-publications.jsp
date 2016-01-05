@@ -38,7 +38,7 @@
                 $('#navTrack').addClass('active');
 
                 $('#published-doi-table').DataTable({
-                    "aLengthMenu": [[5, 10, 50, -1], [5, 10, 50, "All"]],
+                    "aLengthMenu": [[5, 10, -1], [5, 10, "All"]],
                     "bProcessing": true,
                     "bDeferRender": true
                 });
@@ -62,37 +62,29 @@
         <div class="span6 offset6" id="doi-admin-table-loading"><img src="${pageContext.request.contextPath}/img/ui-anim_basic_16x16.gif"></div>
         <table id="published-doi-table" class="table table-condensed table-hover"
                data-page-length='10'
-               data-order='[[0, "asc"], [4, "desc"]]'
+               data-order='[[0, "asc"], [3, "desc"]]'
                style="display:none">
             <thead>
             <tr>
-                <th class="span1">Status</th>
                 <th class="span2">DOI</th>
-                <th class="span3">Project Title</th>
-                <th class="span2">Requested By</th>
-                <th class="span2">Created Date</th>
-                <th class="span2">Last Updated Date</th>
+                <th class="span4">Project Title</th>
+                <th class="span3">Dataset Creators</th>
+                <th class="span2">Publication Date</th>
             </tr>
             </thead>
             <tbody>
             <c:forEach items="${doiList}" var="doi">
                 <c:if test="${not empty doiList}">
                     <c:set var="doiUrl" value="${pageContext.request.contextPath}/publication/${doi.uuid}"/>
-                    <c:choose>
-                        <c:when test="${doi.status == 'DRAFT'}"><c:set var="labelclass" value="label-warning"/></c:when>
-                        <c:when test="${doi.status == 'REQUESTED'}"><c:set var="labelclass" value="label-info"/></c:when>
-                        <c:when test="${doi.status == 'REJECTED'}"><c:set var="labelclass" value="label-important"/></c:when>
-                        <c:when test="${doi.status == 'FAILED'}"><c:set var="labelclass" value="label-important"/></c:when>
-                        <c:when test="${doi.status == 'COMPLETED'}"><c:set var="labelclass" value="label-success"/></c:when>
-                    </c:choose>
-
                     <tr class="clickable-row" data-url="${doiUrl}">
-                        <td><span class="label ${labelclass}"><c:out value="${doi.status}"/></span></td>
-                        <td><c:out value="${doi.doi}"/></td>
+                        <td style="font-weight:bold"><c:out value="${doi.doi}"/></td>
                         <td><c:out value="${doi.project.title}"/></td>
-                        <td><c:out value="${doi.updateUser.fullName}"/></td>
-                        <td><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.createDate}"/></td>
-                        <td><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.updateDate}"/></td>
+                        <td><c:set var="authors" value="${fn:split(doi.creators,',')}"/>
+                            <c:forEach var="author" items="${authors}">
+                                <c:out value="${author}"/><br/>
+                            </c:forEach>
+                        </td>
+                        <td><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.mintDate}"/></td>
                     </tr>
                 </c:if>
             </c:forEach>

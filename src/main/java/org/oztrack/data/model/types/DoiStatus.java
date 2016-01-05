@@ -2,17 +2,18 @@ package org.oztrack.data.model.types;
 
 public enum DoiStatus {
 
-    DRAFT("This is a Draft. Please review the file and metadata before requesting to mint.",
-            "ZoaTrack has automatically generated a zipped archive containing the data and metadata for this project. " +
-            "While the request is a Draft, you can edit the project and rebuild the archive. " +
-            "When you are satisfied that the archive and metadata are ready to be published, click on Mint DOI. The Administrators " +
-            "will be notified and will review and manage the request."),
+    DRAFT("This is a Draft. Please review the zip file and metadata before requesting to mint the DOI.",
+            "You have created a zip file containing the raw animal detection data and associated metadata " +
+            "that will form the content of your DOI. " +
+            "Please download the file and review it carefully before submitting. "),
     REQUESTED("The request to mint a DOI has been submitted.",
-            "The metadata and archive have been submitted to the Administrators who will review it and mint the DOI. " +
-            "You will be contacted via email if there are any problems with the request. You can cancel the request and it will go back to Draft status."),
-    REJECTED("The request has been rejected by the admin. Review and submit it again.",
-            "The Administrators have determined that this dataset and metadata is not appropriate to publish. You can update your project, rebuild " +
-            "the archive and resubmit the request."),
+            "The data and metadata have been submitted and will be manually reviewed and minted. " +
+                "You will be contacted via email if there are any problems with the request. " +
+                "You can cancel the request and it will go back to Draft status. However, once the DOI has been minted you won't be able" +
+                    " to make any changes."),
+    REJECTED("The request to mint a DOI has been rejected. Review and submit it again.",
+            "The request to mint a DOI has been rejected by ZoaTrack. " +
+                    "You can delete the request, update your project and resubmit the request."),
     FAILED("The DOI has failed to mint",
             "The DOI failed to mint. The Administrators are investigating the problem and will take action."),
     COMPLETED("This DOI has been minted"
