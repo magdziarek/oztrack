@@ -83,14 +83,10 @@
         </c:when>
         <c:otherwise>
         <div id="doi-div">
-                <p><c:out value="${doi.status.explanation}"/></p>
-                <c:if test="${doi.status == 'DRAFT' || doi.status == 'REJECTED'}">
-                  <p>You can <a href="${pageContext.request.contextPath}/projects/${project.id}/edit" target="_blank">update your project metadata</a>
-                   or
-                    <a href="${pageContext.request.contextPath}/projects/${project.id}/animals" target="_blank">update animal metadata</a> and
-                      rebuild the request.</p>
-                </c:if>
-
+            <p><c:out value="${doi.status.explanation}"/></p>
+            <c:if test="${doi.status == 'DRAFT'}">
+              <p>View and edit the project using the links to the left. Once completed, click the Create DOI Request link to rebuild.</p>
+            </c:if>
             <div class="span9 sidebar-actions">
                 <h2>ZoaTrack Dataset</h2>
                 <dl>
@@ -152,7 +148,7 @@
                             <a class="btn" href="${pageContext.request.contextPath}/projects/${project.id}/doi/delete">Delete Request</a>
                         </div>
                         <div style="float:right">
-                            <a id="rebuild-btn" class="btn" href="${pageContext.request.contextPath}/projects/${project.id}/doi/new" >Rebuild Request</a>
+                            <c:if test="${doi.status == 'REJECTED'}"><a id="rebuild-btn" class="btn" href="${pageContext.request.contextPath}/projects/${project.id}/doi/new" >Rebuild Request</a></c:if>
                             <c:if test="${doi.status == 'DRAFT'}"><a class="btn btn-primary" href="${pageContext.request.contextPath}/projects/${project.id}/doi/request"> Submit request to mint DOI </a></c:if>
                         </div>
                     </c:when>

@@ -21,7 +21,17 @@
         <li class="edit-project"><a href="${pageContext.request.contextPath}/projects/${project.id}/edit">Edit project metadata</a></li>
         <li class="edit-project"><a href="${pageContext.request.contextPath}/projects/${project.id}/animals">Edit animal metadata</a></li>
         <sec:authorize access="hasPermission(#project, 'manage')">
-        <li id="project-doi" class="doi-manage"><a href="${pageContext.request.contextPath}/projects/${project.id}/doi">Manage DOI request</a></li>
+        <li id="project-doi" class="doi-manage">
+            <c:set var="doi" value="${project.dois[0]}"/>
+            <c:choose>
+                <c:when test="${empty doi || doi.status == 'DRAFT'}">
+                    <a href="${pageContext.request.contextPath}/projects/${project.id}/doi/create">Create a DOI request</a>
+                </c:when>
+                <c:otherwise>
+                    <a href="${pageContext.request.contextPath}/projects/${project.id}/doi">Manage DOI request</a>
+                </c:otherwise>
+            </c:choose>
+        </li>
         </sec:authorize>
         <sec:authorize access="hasPermission(#project, 'delete')">
         <li class="delete-project">
