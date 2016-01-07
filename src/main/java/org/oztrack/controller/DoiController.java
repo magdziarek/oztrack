@@ -63,14 +63,24 @@ public class DoiController {
             view = "doi-manage";
             model.addAttribute("doi", doi);
         } else {
-            view = "doi-checklist";
-            HashMap<String, Boolean> doiChecklistMap = createDoiChecklist(project);
-            model.addAttribute("doiChecklistMap", doiChecklistMap);
+            view = "redirect:/projects/" + project.getId() + "/doi/create";
         }
         return view;
     }
 
-    @RequestMapping(value="/projects/{projectId}/doi/file", method=RequestMethod.GET, produces={ "application/zip"})
+    @RequestMapping(value="/projects/{projectId}/doi/create", method= RequestMethod.GET)
+    @PreAuthorize("hasPermission(#project, 'manage')")
+    public String getCreateView(
+            Model model,
+            @ModelAttribute(value="project") Project project
+    ) {
+        HashMap<String, Boolean> doiChecklistMap = createDoiChecklist(project);
+        model.addAttribute("doiChecklistMap", doiChecklistMap);
+        return "doi-checklist";
+    }
+
+
+        @RequestMapping(value="/projects/{projectId}/doi/file", method=RequestMethod.GET, produces={ "application/zip"})
     @PreAuthorize("hasPermission(#project, 'manage')")
     public void getDoiZip(
             @ModelAttribute(value="project") Project project,
@@ -122,7 +132,7 @@ public class DoiController {
     ) {
         Doi doiInProgress = doiDao.getInProgressDoi(project);
         DoiPackageBuilder packageBuilder = new DoiPackageBuilder(doiInProgress);
-        String view = "redirect:/projects/" + project.getId() + "/doi";
+        String view = "redirect:/projects/" + project.getId();
         if (doiInProgress.getStatus() == DoiStatus.DRAFT || doiInProgress.getStatus() == DoiStatus.REJECTED) {
             packageBuilder.deletePackage();
             doiDao.delete(doiInProgress);

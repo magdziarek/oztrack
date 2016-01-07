@@ -97,7 +97,7 @@
                     <jsp:invoke fragment="navExtra"/>
                 </c:if>
                 <li id="navBrowse"><a href="${pageContext.request.contextPath}/projects">Browse the repository</a></li>
-                <li id="navPub"><a href="${pageContext.request.contextPath}/publication">Publications</a></li>
+                <li id="navPub"><a href="${pageContext.request.contextPath}/publication">Published Data</a></li>
                 <li id="navToolkit" class="dropdown">
                     <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Toolkit <b class="caret"></b></a>
                     <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">

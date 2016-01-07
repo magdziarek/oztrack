@@ -116,13 +116,11 @@
     </jsp:attribute>
     <jsp:body>
         <h1 id="projectTitle"><c:out value="${project.title}"/></h1>
-        <h2>Request to mint a DOI</h2>
+        <h2>You have requested to mint a DOI for this project</h2>
 
-        <p>You can request to mint a Digital Object Identifier (DOI) for the data and metadata included in this project.</p>
-
-        <p>If you have satisfied all the requirements set out below, ZoaTrack will allow you to build a zip package containing
-            all of the data and metadata in your project. This will form the published content of the DOI. You will be
-            able to update your project and rebuild the file before you submit your request to mint the DOI.</p>
+        <p>This will only occur if the data collection satisfies the necessary criteria as set by the Australian National Data
+        Service. See the <a href="${pageContext.request.contextPath}/toolkit/doi" target="_blank">Toolkit pages</a> for more
+            information about minting DOIs.</p>
 
         <div class="span6">
         <p style="font-weight:bold">Click 'Yes' to confirm that you agree with each of the statements below.</p>

@@ -29,16 +29,13 @@
     </jsp:attribute>
     <jsp:body>
         <style type="text/css">
-
             .row {
                 padding-top:5px;
                 padding-bottom:5px;
             }
-
             .label {
                 margin-right:10px;
             }
-
             dd {
                 margin-bottom:15px;
                 margin-left:5px;
@@ -74,8 +71,7 @@
                     <c:when test="${doi.status == 'COMPLETED'}"><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.mintDate}"/></c:when>
                 </c:choose></dd>
             </dl>
-            <a style="margin-bottom:10px" class="btn btn-${style}"
-               href="${pageContext.request.contextPath}/projects/${project.id}/doi/file">
+            <a style="margin-bottom:10px" class="btn btn-success" href="${pageContext.request.contextPath}/publication/${doi.uuid}/file">
                 <i class="icon-download icon-white"></i> Download zip</a>
             <div class="help-inline" style="margin-bottom: 5px;">
                 <div class="help-popover" title="DOI Zip Package">

@@ -35,7 +35,7 @@
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/doi-admin.js"></script>
         <script type="text/javascript">
             $(document).ready(function() {
-                $('#navTrack').addClass('active');
+                $('#navPub').addClass('active');
 
                 $('#published-doi-table').DataTable({
                     "aLengthMenu": [[5, 10, -1], [5, 10, "All"]],
