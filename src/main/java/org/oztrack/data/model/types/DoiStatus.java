@@ -17,7 +17,7 @@ public enum DoiStatus {
     FAILED("The DOI has failed to mint.",
             "The DOI failed to mint. The Administrators are investigating the problem and will take action."),
     COMPLETED("A DOI has been minted for this project."
-            ,"The DOI has been successfully minted.");
+            ,"The DOI has been successfully minted. You can no longer make changes to this dataset.");
 
     private final String shortMessage;
     private final String explanation;

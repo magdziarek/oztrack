@@ -5,6 +5,8 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="tags" %>
+<%@ page import="org.oztrack.app.OzTrackApplication" %>
+<c:set var="baseUrl"><%= OzTrackApplication.getApplicationContext().getBaseUrl() %></c:set>
 <c:set var="dateTimeFormatPattern" value="dd/MM/yyyy HH:mm:ss"/>
 <tags:page title="${project.title}: DOI Request">
         <jsp:attribute name="description">
@@ -14,10 +16,6 @@
         <script type="text/javascript">
             $(document).ready(function() {
                 $('#navTrack').addClass('active');
-            //    $('#doi-loading').hide();
-             //   $('#doi-div').show();
-             //   $('#doi-actions').show();
-
                 $('#rebuild-btn').click(function() {
                     $('#doi-div').hide();
                     $('#doi-actions').hide();
@@ -117,13 +115,25 @@
                     <dt>Publisher</dt>
                     <dd>Atlas of Living Australia</dd>
                     <dt>Publication Date</dt>
-                    <dd><c:choose>
-                        <c:when test="${doi.status != 'COMPLETED'}">TBA </c:when>
-                        <c:when test="${doi.status == 'COMPLETED'}"><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.mintDate}"/></c:when>
-                    </c:choose></dd>
+                    <c:choose>
+                        <c:when test="${doi.status != 'COMPLETED'}">
+                            <c:set var="fileUrl" value="${pageContext.request.contextPath}/projects/${project.id}/doi/file"/>
+                            <dd>TBA</dd>
+                        </c:when>
+                        <c:when test="${doi.status == 'COMPLETED'}">
+                            <c:set var="landingUrl" value="${baseUrl}/publication/${doi.uuid}"/>
+                            <c:set var="fileUrl" value="${landingUrl}/file"/>
+                            <c:set var="doiUrl" value="http://dx.doi.org/${doi.doi}"/>
+                            <dd><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.mintDate}"/></dd>
+                            <dt>Landing Page Url</dt>
+                            <dd><a href="${landingUrl}" target="_blank">${landingUrl}</a></dd>
+                            <dt>Doi Url</dt>
+                            <dd><a href="${doiUrl}" target="_blank">${doiUrl}</a></dd>
+                        </c:when>
+                    </c:choose>
+
                 </dl>
-                <a style="margin-bottom:10px" class="btn btn-${style}"
-                   href="${pageContext.request.contextPath}/projects/${project.id}/doi/file">
+                <a style="margin-bottom:10px" class="btn btn-${style}" href="${fileUrl}">
                     <i class="icon-download icon-white"></i> Download zip</a>
                 <div class="help-inline" style="margin-bottom: 5px;">
                     <div class="help-popover" title="DOI Zip Package">

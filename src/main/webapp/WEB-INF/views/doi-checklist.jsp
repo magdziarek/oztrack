@@ -6,9 +6,9 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="tags" %>
 <c:set var="datePattern" value="dd/MM/yyyy"/>
-<tags:page title="${project.title}: DOI Requests">
+<tags:page title="${project.title}: DOI Request">
     <jsp:attribute name="description">
-        Request a DOI on the dataset in the ${project.title} project.
+        DOI on the dataset in the ${project.title} project.
     </jsp:attribute>
     <jsp:attribute name="head">
         <style type="text/css">
@@ -228,7 +228,9 @@
                         <tr>
                             <td class="doi-check-icon-td"><img src="${pageContext.request.contextPath}/img/cross.png"/></td>
                             <td>No data creators have been specified.
-                                <a href="${pageContext.request.contextPath}/projects/${project.id}/edit#contributorslist" target="_blank">Add project contributors</a></td>
+                                You need to add <a href="${pageContext.request.contextPath}/projects/${project.id}/edit#contributorslist" target="_blank">project contributors</a>
+                                to your project. Note that this is a different list of people to the ZoaTrack users who have read or write
+                                access to your project.</td>
                         </tr>
                     </c:if>
                     <c:if test="${doiChecklistMap['australian_research'] eq true}">
