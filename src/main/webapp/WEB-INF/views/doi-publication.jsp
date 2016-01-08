@@ -6,9 +6,9 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="tags" %>
 <c:set var="dateTimeFormatPattern" value="dd/MM/yyyy HH:mm:ss"/>
-<tags:page title="${project.title}: DOI Request">
+<tags:page title="${project.title}: Published Data">
         <jsp:attribute name="description">
-        Request a DOI on the dataset in the ${project.title} project.
+        Dataset published from the ZoaTrack project ${project.title}.
     </jsp:attribute>
     <jsp:attribute name="tail">
         <script type="text/javascript">
@@ -70,6 +70,8 @@
                     <c:when test="${doi.status != 'COMPLETED'}">TBA </c:when>
                     <c:when test="${doi.status == 'COMPLETED'}"><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.mintDate}"/></c:when>
                 </c:choose></dd>
+                <dt>ZoaTrack Project</dt>
+                <dd><a href="${pageContext.request.contextPath}/projects/${doi.project.id}" target="_blank"><c:out value="${doi.project.title}"/></a></dd>
             </dl>
             <a style="margin-bottom:10px" class="btn btn-success" href="${pageContext.request.contextPath}/publication/${doi.uuid}/file">
                 <i class="icon-download icon-white"></i> Download zip</a>
