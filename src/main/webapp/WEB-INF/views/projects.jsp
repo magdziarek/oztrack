@@ -198,8 +198,13 @@
                         {"aTargets":[5],"bVisible": false},
                         {"aTargets":[0],"bVisible": false}
                     ],
-                    "sDom": '<"H"f<"#createprojectbuttonarea">lr>t<"F"ip>'
+                    "sDom": '<"H"f<"#createprojectbuttonarea">lr>t<"F"ip>',
+                    "bProcessing": true,
+                    "bDeferRender": true
                 } );
+                $('#table-loading').hide();
+                $('#projects-table').show();
+
                 $( "#createprojectbuttonarea" ).html('<button id="createprojectbutton">Create a new ZoaTrack Project</button>');
                 $("#createprojectbutton").click( function () {
                     window.document.location = "${pageContext.request.contextPath}/projects/new"
@@ -212,9 +217,7 @@
     <jsp:body>
         <div class="row">
         <div class="span12" id="welcome">
-
             <div class="span12" id="homeMap">
-
                 <div id="map-instructions-container">
                     <div id="map-instructions">
                         Click markers to view project details
@@ -223,9 +226,11 @@
             </div>
 
             <div class="span12" id="project-list-div">
+                <div class="span6 offset6" id="table-loading"><img src="${pageContext.request.contextPath}/img/ui-anim_basic_16x16.gif"></div>
                 <table id="projects-table" class="table table-condensed table-hover"
                        data-page-length='5'
-                       data-order='[[0, "desc"], [4, "desc"],[ 1, "desc" ]]'>
+                       data-order='[[0, "desc"], [4, "desc"],[ 1, "desc" ]]'
+                       style="display:none" >
                     <thead>
                     <tr>
                         <th></th>
@@ -244,7 +249,6 @@
                         <c:set var="userAccessToTracks" value='false'/>
                         <c:set var="projectUrl" value="${pageContext.request.contextPath}/projects/${project.id}"/>
                         <c:set var="userRole" value=""/>
-
                         <c:forEach items="${project.projectUsers}" var="projectUser">
                             <c:if test="${(currentUser != null && projectUser.user == currentUser) || project.access == 'OPEN'}">
                                 <c:set var="userAccessToTracks" value="true"/>
@@ -254,7 +258,6 @@
                                 </c:if>
                             </c:if>
                         </c:forEach>
-
                         <tr class="clickable-row" data-url="${projectUrl}">
                             <td>
                                 <c:choose>
