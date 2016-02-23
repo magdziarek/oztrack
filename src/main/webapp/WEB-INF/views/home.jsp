@@ -14,25 +14,7 @@
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/optimised/openlayers.css" type="text/css">
         <style type="text/css">
 
-            #welcome-table h1 {
-                margin: 4px 0px;
-            }
 
-            #blog-table td a {
-                text-decoration: none;
-            }
-
-            #blog-table td {
-                padding-top:15px;
-                padding-bottom:15px;
-                background-color:#ffffff;
-            }
-
-            #blog-table th {
-                background-color: #e6e6c0;
-                text-align:left;
-                font-size: 1.1em;
-            }
 
             #caro {
                 width:900px;
@@ -86,6 +68,40 @@
                 font-size: 1.5em;
             }
 
+            #blog-table th {
+                text-align:left;
+                font-size: 1.5em;
+                background-color:#FBFEEE;
+                color:#f5ce7c;
+            }
+            .heading {
+                font-size:1.5em;
+                font-weight:normal;
+            }
+
+            .blogdate {
+                font-size:0.9em;
+                color:#aaaaaa;
+            }
+
+            #blog-table td a {
+                text-decoration: none;
+            }
+
+            #blog-table td {
+                padding-top:15px;
+                padding-bottom:10px;
+                border-top:none;
+                border-bottom: 1px solid #aaaaaa;
+                color: #746E4D;
+            }
+
+
+            #tutorials-table td a {
+                text-decoration: none;
+            }
+
+
         </style>
     </jsp:attribute>
 
@@ -110,9 +126,47 @@
                                 var title = $(this).children('title').text();
                                 var url = $(this).find('link').text();
                                 var pubDate = $(this).find('pubDate').text();
-                                $('#blog-table > tbody:last').append('<tr><td><a href="' + url + '" target="_blank">' + title + '</a></td></tr>');
+//                                $('#blog-table > tbody:last').append('<tr><td><a href="' + url + '" target="_blank">' + title + '</a></td></tr>');
+                                  $('#blog-table > tbody:last').append('<tr><td><a href="' + url + '" class="heading" target="_blank">' + title + '</a>' +
+                                  '<p class="blogdate">' + pubDate.split(' ', 4).join(' ') + '</p>' +
+                                  '<p>' + $(this).find('description').text().replace('>Continue reading',' target="_blank">Continue reading') + '</p>' +
+                                  '</td></tr>');
+
                             }
                         });//end each
+                    }
+                });
+            }
+
+            function getYouTubeFeed(div) {
+                $.ajax({
+                    type: "GET",
+                    url: '${pageContext.request.contextPath}/proxy/youtubesearch',
+                    data: {
+                        part: 'snippet',
+                        channelId: 'UCCjp-sEpmfwLhf_0DXvEdGg',
+                        type: 'video'
+                    },
+                    dataType: "json",
+                    success: function (data) {
+
+                        console.log(data.items[0].snippet.title);
+
+                        $.each(data.items, function(i) {
+
+                            var title = this.snippet.title.replace("ZoaTrack","").replace("Zoatrack","");
+                            var videoUrl = '"http://www.youtube.com/watch?v=' + this.id.videoId + '"';
+                            $('#tutorials-table > tbody:last').append(
+                                    '<tr><td><img src="' + this.snippet.thumbnails.default.url
+                                    + '" width = "60" height = "45"/></td>'
+                                    + '<td><a href=' + videoUrl + ' target="_blank">'
+                                    + '' + title + '</a></td></tr>');
+                        });
+
+                        $('#tutorials-table > tbody:last').append('<tr><td></td>' +
+                          '<td><a target="_blank" style="float:right" href="https://www.youtube.com/channel/UCCjp-sEpmfwLhf_0DXvEdGg">More ...</a></td></tr>');
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
                     }
                 });
             }
@@ -120,12 +174,13 @@
             $(document).ready(function() {
                 $('#navHome').addClass('active');
                 getBlogFeed($('#blog-list'));
+                getYouTubeFeed($('#tutorials-div'));
                 $('.carousel').carousel({interval: 20000});
+
             });
 
         </script>
     </jsp:attribute>
-
 
     <jsp:body>
         <div class="row">
@@ -173,58 +228,34 @@
             </div>
         </div>
 
+        <span id="by-line">Calculate movement metrics and space use for individually marked animals anywhere in the world.</span>
+        <hr/>
         <div class="row">
 
-            <div id="welcome-div" class="span9">
-                <span id="by-line">Calculate movement metrics and space use for individually marked animals anywhere in the world.</span>
-                <hr/>
-                <ul class="thumbnails">
-                    <li> <a href="${pageContext.request.contextPath}/toolkit/getstarted">
-                    <div class="thumbnail">
-                            <img src="img/thb_upload.jpg" alt="">
-                            <h3>Get Started</h3>
-                            1. Register/Login<br/>
-                            2. Create project metadata<br/>
-                            3. Upload data<br/>
-                            4. Analyse tracks<br/>
-                            more...
-                        </div></a>
-
-                    </li>
-                    <li><a href="${pageContext.request.contextPath}/toolkit/analysis">
-                        <div class="thumbnail">
-                            <img src="img/thb_analysis.jpg" alt="">
-                            <h3>Analysis Toolkit</h3>
-                            Kalman filter <br/>
-                            Kernel Utilisation Distribution <br/>
-                            Alpha Hull / Local Convex Hull<br/>
-                            Heat maps<br/>
-                             more...
-                        </div></a>
-                    </li>
-                    <li><a href="${pageContext.request.contextPath}/about/layers">
-                        <div class="thumbnail">
-                            <img src="img/thb_env_layers.jpg" alt="">
-                            <h3>Environmental Layers</h3>
-                            Bathymetry<br/>
-                            Sea surface temperature<br/>
-                            NVIS <br/>
-                            Land Cover<br/>
-                             more...
-                        </div> </a>
-                    </li>
-                </ul>
-            </div>
-            <div id="blog-div" class="span3">
-                <table class="table table-bordered table-hover" id="blog-table">
+            <div id="blog-div" class="span8">
+                <table class="table" id="blog-table">
                     <thead>
-                    <tr>
-                        <th>Blog and Updates</th>
-                    </tr>
+                    <tr><th>Updates</th></tr>
                     </thead>
-                    <tbody>
-                    </tbody>
+                    <tbody></tbody>
                 </table>
+            </div>
+
+            <div id="right-panel" class="span3 offset1">
+                <div id="stats-div">
+                    <h2>ZoaTrack Stats</h2>
+                    <ul>
+                    <c:forEach items="${summaryStats}" var="stat">
+                        <li>${stat.value} &nbsp;${stat.key}</li>
+                    </c:forEach>
+                    </ul>
+                </div>
+                <div id="tutorials-div" style="padding-top:10px">
+                    <h2>Links to Video Tutorials</h2>
+                    <table class="table"    id="tutorials-table">
+                        <tbody></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </jsp:body>
