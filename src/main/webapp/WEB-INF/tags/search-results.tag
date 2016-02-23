@@ -76,6 +76,11 @@
     <p style="margin-top: 18px;">
         By downloading these data, you agree to the licence terms.
     </p>
+    <p>
+    If you use these data in any type of publication then you must cite the project DOI (if available) or any
+    published peer-reviewed papers associated with the study. We strongly encourage you to contact the data custodians
+    to discuss data usage and appropriate accreditation.
+    </p>
     <div class="form-actions">
         <a class="exportButton btn btn-primary" href="${pageContext.request.contextPath}/projects/${searchQuery.project.id}/export?${urlParamsPrefix}format=csv">Export CSV</a>
         <button class="btn" onclick="$(this).closest('.exportConfirmation').slideUp();">Cancel</button>

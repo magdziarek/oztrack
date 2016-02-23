@@ -44,6 +44,7 @@
         <div class="span9 sidebar-actions">
             <h2>ZoaTrack Dataset</h2>
             <dl>
+                <!--
                 <dt>Status</dt>
                 <dd><span class="label label-success"><c:out value="${doi.status}"/></span>
                     <div class="help-inline">
@@ -51,6 +52,14 @@
                             <p><c:out value="${doi.status.shortMessage}"/></p>
                         </div>
                     </div>
+                </dd>
+    -->
+                <dt>Data Usage</dt>
+                <dd>
+                    The data in this project is publicly available under a <a target="_blank" href="${doi.project.dataLicence.infoUrl}">${doi.project.dataLicence.title}</a>.
+                    If you use these data in any type of publication then you must cite the project DOI (if available) or any
+                    published peer-reviewed papers associated with the study. We strongly encourage you to contact the data providers
+                    to discuss data usage and appropriate accreditation.
                 </dd>
                 <dt>Citation</dt>
                 <dd><c:out value="${doi.citation}"/><c:if test="${doi.status != 'COMPLETED'}"> TBA </c:if></dd>

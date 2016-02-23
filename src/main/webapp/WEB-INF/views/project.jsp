@@ -592,7 +592,10 @@
         <c:when test="${project.access == 'OPEN'}">
         <p class="project-access-open-title">Open Access</p>
         <p>
-            The data in this project are available for public use.
+            The data in this project is publicly available under a <a target="_blank" href="${project.dataLicence.infoUrl}">${project.dataLicence.title}</a>.
+            If you use these data in any type of publication then you must cite the project DOI (if available) or any
+            published peer-reviewed papers associated with the study. We strongly encourage you to contact the data custodians
+            to discuss data usage and appropriate accreditation.
         </p>
         </c:when>
         <c:when test="${project.access == 'EMBARGO'}">
@@ -610,7 +613,8 @@
         </c:otherwise>
         </c:choose>
         <c:if test="${not empty project.rightsStatement}">
-        <p><c:out value="${project.rightsStatement}"/></p>
+            <p><span style="font-weight:bold">Rights Statement</span><br/>
+            <c:out value="${project.rightsStatement}"/></p>
         </c:if>
         </div> <!--  .span6 -->
         <div class="span3" style="width: 209px; margin: 7px 8px 0px 20px;">

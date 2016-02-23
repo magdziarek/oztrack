@@ -10,16 +10,22 @@
         for analysing and visualising individual-based animal location data.
     </jsp:attribute>
     <jsp:attribute name="tail">
+        <style type="text/css">
+            .nav-tabs > li > a {
+                text-decoration:none;
+                font-weight:bold
+
+            }
+            .nav > li > a:hover {
+                background-color:#f0f0da;
+            }
+        </style>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/home.js"></script>
         <script type="text/javascript">
-
-
             $(document).ready(function() {
                 $('#navToolkit').addClass('active');
                 $('#toolkit-tabs a[href="#${section}"]').tab('show');
             });
-
-
         </script>
     </jsp:attribute>
     <jsp:attribute name="breadcrumbs">
@@ -38,7 +44,7 @@
                 <li class="active"><a href="#getstarted" data-toggle="tab">Getting Started</a></li>
                 <li><a href="#analysis" data-toggle="tab">The Analysis Toolkit</a></li>
                 <li><a href="#datamgt" data-toggle="tab">Data Management</a></li>
-                <li><a href="#doi" data-toggle="tab">Digital Object Identifiers</a></li>
+                <li><a href="#doi" data-toggle="tab">Publication & Citation</a></li>
             </ul>
 
             <div class="tab-content">
@@ -53,7 +59,6 @@
                         <li><a href="#mov-metrics">Extracting movement metrics</a></li>
                     </ul>
                     <hr/>
-
 
                     <div class="media" id="user-reg">
                         <h4 class="media-heading">Registering an account with ZoaTrack</h4>
@@ -292,16 +297,59 @@
 
                 <div class="tab-pane" id="doi">
                     <ul style="list-style-type:none">
-                        <li><a href="#doi-1">Overview</a></li>
-                        <li><a href="#doi-2">What's a DOI?</a></li>
-                        <li><a href="#doi-3">What do I have to do in ZoaTrack to mint a DOI?</a></li>
-                        <li><a href="#doi-4">What data does ZoaTrack publish?</a></li>
-                        <li><a href="#doi-5">What metadata does ZoaTrack publish?</a></li>
+
+                        <li><a href="#cite-1">Getting your animal tracking data cited</a></li>
+                        <li><a href="#cite-2">Using and Citing data from the ZoaTrack data repository</a></li>
+                        <li><a href="#cite-3">Cite the ZoaTrack platform</a></li>
+                        <li><a href="#doi-1">About ZoaTrack DOIs</a></li>
+                        <li><a href="#doi-3">Getting a DOI minted for a ZoaTrack project</a></li>
+                        <li><a href="#doi-4">Datasets included in a DOI Publication</a></li>
+                        <li><a href="#doi-5">Metadata included in a DOI Publication</a></li>
                     </ul>
-                    <div class="media" id="doi-1">
-                        <h4>Overview</h4>
+
+                    <div class="media" id="cite-1">
+                        <h4>Getting your animal tracking data cited</h4>
                         <div class="media-body">
-                            <p>ZoaTrack uses the <a href="http://ands.org.au/services/cite-my-data">ANDS Cite-My-Data</a> service to mint DOIs,
+                            <p>ZoaTrack provides two mechanisms by which you can gain citations for your data. You can</p>
+                            <ol>
+                                <li>mint a DOI for the project data collection (see the DOI information below), and/or</li>
+                                <li>add the reference for any associated publication.</li>
+                            </ol>
+                            <p>As the data custodian, you can specify how you would like your data to be cited by others
+                            by filling these details into the <span style="font-weight:bold">Rights Statement</span> field
+                            in the project metadata. The ZoaTrack community depends on open-access to animal tracking data.
+                            We want to ensure that you are accredited appropriately for your hard-won data.</p>
+                        </div>
+                    </div>
+
+                    <div class="media" id="cite-2">
+                        <h4>Using and Citing data from the ZoaTrack data repository</h4>
+                        <div class="media-body">
+                            <p>If you use data from ZoaTrack in any type of publication then you must cite the project
+                            DOI (if available) or any published peer-reviewed papers associated with the study. We
+                            strongly encourage you to contact the data custodians to discuss data usage and appropriate
+                            accreditation.</p>
+                        </div>
+                    </div>
+
+                    <div class="media" id="cite-3">
+                        <h4>Cite the ZoaTrack platform</h4>
+                        <div class="media-body">
+                            <p>If you publish data from the ZoaTrack data repository or use any of the analysis tools
+                                to process and sythesise your animal tracking data then please citethe following paper:</p>
+                            <p style="font-style:italic">R. G. Dwyer, C. Brooking, W. Brimblecombe, H. A. Campbell, J. Hunter, M. E. Watts, C. E. Franklin, "An open Web-based system for the analysis and sharing of animal tracking data", Animal Biotelemetry 3:1, 29 Jan 2015, DOI 10.1186/s40317-014-0021-8.</p>
+                            <p>References for specific analysis tools can be found <a href="${pageContext.request.contextPath}/toolkit/analysis#analysis">here</a>.</p>
+                        </div>
+                    </div>
+
+                    <div class="media" id="doi-1">
+                        <h4>ZoaTrack DOIs</h4>
+                        <div class="media-body">
+                            <p>A DOI is a Digital Object Identifier. This is a persistent identifier that indicates that the resource
+                                is managed and accessible in the long term. </p>
+                            <p>A DOI url will always resolve to a publicly available landing page which will display the associated metadata
+                                and provide an active link to the resource.</p>
+                            <p>ZoaTrack uses the <a href="http://ands.org.au/services/cite-my-data.html" target="_blank">ANDS Cite-My-Data</a> service to mint DOIs,
                                 which is intended for publicly funded Australian research institutions. ANDS policy broadly states that datasets should: </p>
                                <ul>
                                 <li>be part of the scholarly record;</li>
@@ -313,48 +361,43 @@
                     </div>
                     <hr/>
 
-                    <div class="media" id="doi-2">
-                        <h4>What's a DOI?</h4>
-                        <div class="media-body">
-                            <p>A DOI is a Digital Object Identifier. This is a persistent identifier that indicates that the resource
-                            is managed and accessible in the long term. </p>
-                            <p>A DOI url will always resolve to a publicly available landing page which will display the associated metadata
-                            and provide an active link to the resource.</p>
-                        </div>
-                    </div>
-                    <hr/>
-
                     <div class="media" id="doi-3">
-                        <h4>What do I have to do in ZoaTrack to mint a DOI?</h4>
+                        <h4>Getting a DOI minted for a ZoaTrack project</h4>
                         <div class="media-body">
                             <p>A user with 'manage' access to a ZoaTrack project can create a data package eligible for a DOI
                                 from the DOI Request page within the 'Manage Project' menu. If the project satisfies the minimum criteria, the manager will
                                 be able to create a package of raw files containing project metadata and data.</p>
-                            <p>The manager can edit the package by deleting it, editing the project and rebuilding it as many times as they like until they submit it.</p>
-                            <p>Once submitted, ZoaTrack administrators will manually review the package and process the request to mint.</p>
+                            <p>The manager can edit the package by deleting it, editing the project and rebuilding it as many times as they like until the submission.</p>
+                            <p>Once submitted, ZoaTrack administrators will manually review the package and process the request.
+                            You will be advised by email if the DOI has been successfully minted and the project published,
+                            or whether further information is required.</p>
                         </div>
                     </div>
                     <hr/>
 
 
                     <div class="media" id="doi-4">
-                        <h4>What data does ZoaTrack publish?</h4>
+                        <h4>ZoaTrack DOI Datasets</h4>
                         <div class="media-body">
-                            <p>When a project manager requests a DOI, the package will contain a snapshot of all data in that project as at that date.
-                               A DOI on a data package generated from a ZoaTrack project can't be updated or refreshed. The publication is based on the
-                                data in the zip file only.  If new data is uploaded to the project after the DOI is minted, it won't be included.</p>
-                            <p>The DOI includes detections that have been deleted from the project, flagged as deleted.</p>
+                            <p>When a project manager requests a DOI, the package will contain a snapshot of all data in
+                                that project. A DOI on a data package generated from a ZoaTrack project
+                                can't be updated or refreshed once it has been minted. Therefore you need to ensure the
+                                project you submit is exactly how you want it to be preserved. The publication is based
+                                on the data in the zip file only. If new data is uploaded to the project after the DOI
+                                is minted, it will not be included.</p>
+                            <p>The final DOI publication will include detections that have been deleted, and these
+                                will be flagged as deleted points.</p>
                         </div>
                     </div>
                     <hr/>
 
                     <div class="media" id="doi-5">
-                        <h4>What metadata does ZoaTrack publish?</h4>
+                        <h4>ZoaTrack DOI Metadata</h4>
                         <div class="media-body">
-                            <p>ZoaTrack will include all of the project metadata and animal/tag deployment metadata that is included in the project. The project
-                            metadata is the set of fields that are filled out when the project is created, although you can edit this by following an 'Edit Project Metadata'
-                                link. </p>
-                            <p>Animal/tag metadata can be populated by following the links to 'Edit Animal Metadata'.</p>
+                            <p>All of the project metadata and animal/tag deployment metadata entered into the project
+                                 will be included when the DOI is minted. This is the opportunity to add additional
+                            metadata using the links for 'Edit Project Metadata' and 'Edit Animal Metadata'. The more
+                            metadata a project has, the more likely it is to be reused and cited.</p>
                         </div>
                     </div>
                     <hr/>

@@ -714,7 +714,7 @@
                     </div>
                 </div>
                 <div class="control-group">
-                    <label class="control-label" for="publicationUrl">Rights Statement</label>
+                    <label class="control-label" for="rightsStatement">Rights Statement</label>
                     <div class="controls">
                         <p class="help-block" style="margin: 5px 0 1em 0;">
                             If your project requires a statement about the intellectual property rights held in
@@ -728,7 +728,7 @@
                             <c:if test="${not status.last}"> / </c:if>
                             </c:forEach>
                         </c:set>
-                        <form:textarea path="rightsStatement" cssStyle="width: 400px; height: 100px;" placeholder="e.g. Copyright ${not empty institutions ? institutions : 'The University of Queensland'} ${currentYear}"/>
+                        <form:textarea path="rightsStatement" cssStyle="width: 400px; height: 100px;" placeholder="e.g. Copyright ${not empty institutions ? institutions : ''} ${currentYear}"/>
                         <form:errors path="rightsStatement" element="div" cssClass="help-block formErrors"/>
                     </div>
                 </div>
