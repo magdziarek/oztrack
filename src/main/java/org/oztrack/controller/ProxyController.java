@@ -2,15 +2,15 @@ package org.oztrack.controller;
 
 import java.io.IOException;
 import java.net.URI;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.*;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.poi.util.IOUtils;
+import org.oztrack.app.OzTrackApplication;
+import org.oztrack.app.OzTrackConfiguration;
 import org.oztrack.util.HttpClientUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 public class ProxyController {
+
     @RequestMapping(value="/proxy/portal.tern.org.au/ternapi/search", method=RequestMethod.GET)
     public void handleTernSearch(HttpServletRequest outerRequest, HttpServletResponse outerResponse) throws IOException {
         handle("http://portal.tern.org.au/ternapi/search", outerRequest, outerResponse);
@@ -45,6 +46,21 @@ public class ProxyController {
         response.setStatus(innerResponse.getStatusLine().getStatusCode());
         if (innerResponse.getEntity() != null) {
             IOUtils.copy(innerResponse.getEntity().getContent(), response.getOutputStream());
+        }
+    }
+
+    @RequestMapping(value="/proxy/youtubesearch", method=RequestMethod.GET)
+    public void getYouTubeFeed(HttpServletRequest outerRequest, HttpServletResponse outerResponse) throws IOException {
+        String youTubeUrl = "https://www.googleapis.com/youtube/v3/search";
+        OzTrackConfiguration configuration = OzTrackApplication.getApplicationContext();
+        DefaultHttpClient client = HttpClientUtils.createDefaultHttpClient();
+        String newRequestString = outerRequest.getQueryString() + "&key=" + configuration.getGoogleApiKey();
+        HttpGet innerRequest = new HttpGet(URI.create(youTubeUrl + ((outerRequest.getQueryString() != null) ? ("?" + newRequestString) : "")));
+        HttpResponse innerResponse = client.execute(innerRequest);
+        outerResponse.setStatus(innerResponse.getStatusLine().getStatusCode());
+        if (innerResponse.getEntity() != null) {
+            IOUtils.copy(innerResponse.getEntity().getContent(), outerResponse.getOutputStream());
+
         }
     }
 }
