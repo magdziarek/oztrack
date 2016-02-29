@@ -68,7 +68,7 @@
                 font-size: 1.5em;
             }
 
-            #blog-table th {
+            .news-table th {
                 text-align:left;
                 font-size: 1.5em;
                 background-color:#FBFEEE;
@@ -228,14 +228,15 @@
             </div>
         </div>
 
-        <span id="by-line">Calculate movement metrics and space use for individually marked animals anywhere in the world.</span>
+        <span id="by-line">Calculate movement metrics and space use for individually marked animals anywhere in the world.<br/>
+        Acquire citations for your hard-won animal tracking data.</span>
         <hr/>
         <div class="row">
 
             <div id="blog-div" class="span8">
-                <table class="table" id="blog-table">
+                <table class="table, news-table" id="blog-table">
                     <thead>
-                    <tr><th>Updates</th></tr>
+                    <tr><th>Blog</th></tr>
                     </thead>
                     <tbody></tbody>
                 </table>
@@ -258,5 +259,9 @@
                 </div>
             </div>
         </div>
+
+
+
+
     </jsp:body>
 </tags:page>

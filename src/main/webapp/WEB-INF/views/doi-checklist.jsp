@@ -262,11 +262,11 @@
                     <tr>
                         <td class="doi-check-icon-td"><img src="${pageContext.request.contextPath}/img/accept.png"/></td>
                         <td>The overall project metadata was last updated on
-                            <fmt:formatDate pattern="${datePattern}" value="${project.updateDate}"/>. <a href="">Review</a></td>
+                            <fmt:formatDate pattern="${datePattern}" value="${project.updateDate}"/>.<a href="${pageContext.request.contextPath}/projects/${project.id}/edit" target="_blank">Review</a></td>
                     </tr>
                     <tr>
                         <td class="doi-check-icon-td"><img src="${pageContext.request.contextPath}/img/error.png"/></td>
-                        <td>Is the metadata for each animal tag deployment ready for publication? <a href="">Review</a></td>
+                        <td>Is the metadata for each animal tag deployment ready for publication? <a href="${pageContext.request.contextPath}/projects/${project.id}/animals" target="_blank">Review</a></td>
                     </tr>
                 </table>
             </div>
