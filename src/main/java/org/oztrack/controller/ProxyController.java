@@ -36,7 +36,7 @@ public class ProxyController {
 
     @RequestMapping(value="/proxy/blog", method=RequestMethod.GET)
     public void getBlogFeed(HttpServletRequest outerRequest, HttpServletResponse outerResponse) throws IOException {
-        handle("https://oztrackblog.wordpress.com/feed", outerRequest, outerResponse);
+        handle("https://zoatrack.wordpress.com/feed", outerRequest, outerResponse);
     }
 
     private void handle(String baseUrl, HttpServletRequest request, HttpServletResponse response) throws IOException, ClientProtocolException {

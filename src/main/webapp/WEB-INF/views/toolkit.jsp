@@ -371,6 +371,33 @@
                             <p>Once submitted, ZoaTrack administrators will manually review the package and process the request.
                             You will be advised by email if the DOI has been successfully minted and the project published,
                             or whether further information is required.</p>
+                            <p>Here are the steps to follow in more detail:</p>
+                            <ul>
+                                <li>Go to the <strong>Project Summary/Manage Project</strong> menu</li>
+                                <li>Click on <strong>Create a DOI Request</strong> in the menu on the left hand side</li>
+                                <li>Click Yes to state that you agree with each of the 4 statements:</li>
+                                <ul>
+                                    <li>The data is Open Access and will be discoverable in Research Data Australia</li>
+                                    <li>You won't be able to update the data once it's published</li>
+                                    <li>The authorship information is correct and one of the authors is affiliated with an Australian
+                                            research institution (these are the Project Contributors) </li>
+                                    <li>The project and animal metadata is sufficient</li>
+                                    <p>Some of these conditions are automated checks by ZoaTrack and you won't be able to proceed until you fix them.
+                                    Links are provided to guide you to areas of ZoaTrack that you may need to update, like the Project Contributors section
+                                    or the animal metadata.</p>
+                                </ul>
+                                <li>Click on <strong>Build a DOI data package</strong>. This takes you to a page containing a draft version of your submission,
+                                which is a zip file and some metadata.</li>
+                                <li><strong>Review your DOI data package.</strong> From here you can iteratively update the data in your project, and go back
+                                to <strong>Create the DOI Request</strong> again. There is a delete button to remove it completely.</li>
+                                <li>Click <strong>Submit request to mint DOI</strong>. This will finalise your DOI package and submit it
+                                to ZoaTrack admin to evaluate manually and mint via the Cite My Data service. The status will change from
+                                Draft to Requested.</li>
+                                <li>The admin will evaluate your package and either reject it, providing a reason and changing the status
+                                to Rejected, or accept and mint the DOI. </li>
+                                <li>Once minted, the status will be Completed and the landing page and DOI package will appear in our Publications
+                                list, with the citation updated to reflect the DOI number and link.</li>
+                            </ul>
                         </div>
                     </div>
                     <hr/>
