@@ -147,7 +147,6 @@
             $(document).ready(function() {
 
                 $('#navBrowse').addClass('active');
-                map = createHomeMap('homeMap');
 
                 $(".clickable-row").click(function() {
                     window.document.location = $(this).data('url');
@@ -202,13 +201,15 @@
                     "bProcessing": true,
                     "bDeferRender": true
                 } );
-                $('#table-loading').hide();
-                $('#projects-table').show();
-
                 $( "#createprojectbuttonarea" ).html('<button id="createprojectbutton">Create a new ZoaTrack Project</button>');
                 $("#createprojectbutton").click( function () {
                     window.document.location = "${pageContext.request.contextPath}/projects/new"
                 });
+                $('#table-loading').hide();
+                $('#projects-table').show();
+                map = createHomeMap('homeMap');
+
+
             });
 
         </script>
