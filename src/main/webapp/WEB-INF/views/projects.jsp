@@ -199,7 +199,8 @@
                     ],
                     "sDom": '<"H"f<"#createprojectbuttonarea">lr>t<"F"ip>',
                     "bProcessing": true,
-                    "bDeferRender": true
+                    "bDeferRender": true,
+                    "search": { "search": "${searchTerm}" }
                 } );
                 $( "#createprojectbuttonarea" ).html('<button id="createprojectbutton">Create a new ZoaTrack Project</button>');
                 $("#createprojectbutton").click( function () {

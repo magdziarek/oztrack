@@ -131,6 +131,15 @@ public class ProjectListController {
         return "projects";
     }
 
+    @RequestMapping(value="/search", method=RequestMethod.GET)
+    @PreAuthorize("permitAll")
+    public String getSearchView(Model model, @RequestParam(value="s", required=false) String s) {
+        List<Project> projects = projectDao.getAll();
+        model.addAttribute("projects", projects);
+        model.addAttribute("searchTerm", s); //eg. search?cane+toad
+        return "projects";
+    }
+
     @RequestMapping(value="/projects/new", method=RequestMethod.GET)
     @PreAuthorize("isAuthenticated()")
     public String getNewView(Model model, @ModelAttribute(value="project") Project project) {
