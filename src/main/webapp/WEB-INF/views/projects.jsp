@@ -236,14 +236,13 @@
                     <thead>
                     <tr>
                         <th></th>
-                        <th class="span3">Title</th>
-                        <th class="span3">Species</th>
-                        <th class="span2">Spatial Coverage</th>
-                        <th class="span1">Updated Date</th>
+                        <th width="30%">Title</th>
+                        <th width="20%">Species</th>
+                        <th width="20%">Spatial Coverage</th>
+                        <th width="15%">Updated Date</th>
                         <th>Sortable Date</th>
-                        <th class="span2">Access Type</th>
+                        <th width="15%">Access Type</th>
                         <c:if test="${currentUser != null}"><th>Role</th></c:if>
-                        <th class="span1"></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -270,7 +269,13 @@
                                     <c:when test="${project.access == 'OPEN'}">800</c:when>
                                 </c:choose>
                             </td>
-                            <td><c:out value="${project.title}"/></td>
+                            <td><c:out value="${project.title}"/><br/>
+                                <c:if test="${fn:length(project.dois) > 0}">
+                                    <c:forEach var="doi" items="${project.dois}">
+                                        DOI: ${doi.doi} <br/>
+                                    </c:forEach>
+                                </c:if>
+                            </td>
                             <td><c:if test="${project.speciesScientificName != null}">
                                 <span style="font-style: italic"><c:out value="${project.speciesScientificName}"/></span><br/>
                             </c:if>
@@ -278,22 +283,23 @@
                             <td><c:out value="${project.spatialCoverageDescr}"/></td>
                             <td><fmt:formatDate value="${project.updateDate}" type="date" pattern="dd/MM/yyyy"/></td>
                             <td><fmt:formatDate value="${project.updateDate}" type="date" pattern="yyyyMMdd" /></td>
+                            <c:if test="${currentUser != null}">
+                                <td>
+                                    <c:if test="${userRole != ''}"><c:out value="${userRole}"/></c:if>
+                                </td></c:if>
                             <td>
                                 <c:choose>
                                     <c:when test="${project.access == 'OPEN'}">Open Access<br/></c:when>
                                     <c:when test="${project.access == 'CLOSED'}">Closed Access<br/></c:when>
                                     <c:when test="${project.access == 'EMBARGO'}">Delayed Access<br/></c:when>
-                                </c:choose></td>
-                            <c:if test="${currentUser != null}">
-                                <td>
-                                    <c:if test="${userRole != ''}"><c:out value="${userRole}"/></c:if>
-                                </td></c:if>
-                            <td><c:choose>
-                                <c:when test="${userAccessToTracks == 'true'}">
-                                    <span class="label label-success">Tracks</span></c:when>
-                                <c:otherwise>
-                                    <span class="label label-info">Metadata</span></c:otherwise>
-                            </c:choose></td>
+                                </c:choose>
+                                <c:choose>
+                                    <c:when test="${userAccessToTracks == 'true'}">
+                                        <span class="label label-success">Tracks</span></c:when>
+                                    <c:otherwise>
+                                        <span class="label label-info">Metadata</span></c:otherwise>
+                                </c:choose>
+                            </td>
                         </tr>
                     </c:forEach>
                     </tbody>
