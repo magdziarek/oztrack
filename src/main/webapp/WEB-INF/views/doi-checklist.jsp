@@ -169,8 +169,8 @@
                         </c:if>
                         <c:if test="${doiChecklistMap['cc_licence'] eq false}">
                             <td class="doi-check-icon-td"><img src="${pageContext.request.contextPath}/img/cross.png"/></td>
-                            <td>This data in this project is not available under a Creative Commons Data Licence.
-                                <a href="${pageContext.request.contextPath}/projects/${project.id}/edit#datalicence" target="_blank">Specify a licence</a></td>
+                            <td>This data in this project must be available under a CC-BY licence.
+                                <a href="${pageContext.request.contextPath}/projects/${project.id}/edit#datalicence" target="_blank">Update licence</a></td>
                             </td>
                         </c:if>
                     </tr>

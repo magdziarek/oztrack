@@ -377,7 +377,7 @@
                                 <li>Click on <strong>Create a DOI Request</strong> in the menu on the left hand side</li>
                                 <li>Click Yes to state that you agree with each of the 4 statements:</li>
                                 <ul>
-                                    <li>The data is Open Access and will be discoverable in Research Data Australia</li>
+                                    <li>The data is Open Access under a CC-BY licence and will be discoverable in Research Data Australia</li>
                                     <li>You won't be able to update the data once it's published</li>
                                     <li>The authorship information is correct and one of the authors is affiliated with an Australian
                                             research institution (these are the Project Contributors) </li>
