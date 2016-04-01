@@ -534,7 +534,7 @@
             <div class="row">
                 <div class="span9">
                     <dl>
-                        <c:if test="${not empty project.dois}">
+                        <c:if test="${not empty project.dois and project.dois.get(0).status == 'COMPLETED'}">
                         <dt>ZoaTrack Dataset</dt>
                         <dd>
                             <ul>
