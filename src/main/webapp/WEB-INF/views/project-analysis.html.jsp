@@ -904,7 +904,7 @@
                     </dl>
                 </div>
 
-                <c:if test="${not empty project.publications or not empty project.dois}">
+                <c:if test="${not empty project.publications or (not empty project.dois and project.dois.get(0).status == 'COMPLETED')}">
                     <h2>Citations</h2>
                     <dl>
                         <c:if test="${not empty project.dois}">
@@ -912,7 +912,9 @@
                             <dd>
                                 <ul>
                                     <c:forEach var="doi" items="${project.dois}">
-                                        <li><c:out value="${doi.citation}"/></li>
+                                        <c:if test="${doi.status == 'COMPLETED'}">
+                                            <li><c:out value="${doi.citation}"/></li>
+                                        </c:if>
                                     </c:forEach>
                                 </ul>
                             </dd>

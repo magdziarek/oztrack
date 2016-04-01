@@ -195,6 +195,7 @@ public class SearchController {
     ) throws Exception {
         List<Animal> projectAnimalsList = animalDao.getAnimalsByProjectId(project.getId());
         Page<PositionFix> positionFixPage = positionFixDao.getPage(searchQuery, offset, 30);
+        model.addAttribute("project", project);
         model.addAttribute("searchQuery", searchQuery);
         model.addAttribute("positionFixPage", positionFixPage);
         model.addAttribute("projectAnimalsList", projectAnimalsList);
