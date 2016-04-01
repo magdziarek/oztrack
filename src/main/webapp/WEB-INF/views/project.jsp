@@ -511,29 +511,6 @@
         </div> <!--  .span3 -->
 
         </div> <!-- .row -->
-
-        <c:if test="${not empty project.publications}">
-        <div class="row">
-        <div class="span9">
-        <dl>
-            <dt>Publications</dt>
-            <dd>
-            <ol>
-                <c:forEach var="publication" items="${project.publications}">
-                <li>
-                    <c:out value="${publication.reference}"/>
-                    <c:if test="${not empty publication.url}">
-                    [<a target="_blank" href="<c:out value="${publication.url}"/>">Link</a>]
-                    </c:if>
-                </li>
-                </c:forEach>
-            </ol>
-            </dd>
-        </dl>
-        </div> <!-- .span6 -->
-        </div> <!-- .row -->
-        </c:if>
-
         <c:if test="${not empty project.licencingAndEthics}">
         <div class="row">
         <div class="span9">
@@ -551,6 +528,42 @@
         </div>
         </div>
         </c:if>
+
+        <c:if test="${not empty project.publications or not empty project.dois}">
+            <h2>Citations</h2>
+            <div class="row">
+                <div class="span9">
+                    <dl>
+                        <c:if test="${not empty project.dois}">
+                        <dt>ZoaTrack Dataset</dt>
+                        <dd>
+                            <ul>
+                                <c:forEach var="doi" items="${project.dois}">
+                                <li><c:out value="${doi.citation}"/></li>
+                                </c:forEach>
+                            </ul>
+                        </dd>
+                        </c:if>
+                        <c:if test="${not empty project.publications}">
+                        <dt>Related Publications</dt>
+                        <dd>
+                            <ol>
+                                <c:forEach var="publication" items="${project.publications}">
+                                    <li>
+                                        <c:out value="${publication.reference}"/>
+                                        <c:if test="${not empty publication.url}">
+                                            [<a target="_blank" href="<c:out value="${publication.url}"/>">Link</a>]
+                                        </c:if>
+                                    </li>
+                                </c:forEach>
+                            </ol>
+                        </dd>
+                        </c:if>
+                    </dl>
+                </div> <!-- .span6 -->
+            </div> <!-- .row -->
+        </c:if>
+
 
         <c:if test="${fn:length(project.projectContributions) > 0}">
         <h2>Project Contributors</h2>

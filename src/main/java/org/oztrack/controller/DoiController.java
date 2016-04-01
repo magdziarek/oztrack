@@ -289,7 +289,7 @@ public class DoiController {
 
         doiChecklistMap.put("author_count", project.getProjectContributions().size() > 0);
         doiChecklistMap.put("data", project.getAnimals().size() > 0);
-        doiChecklistMap.put("cc_licence", (project.getDataLicence() != null));
+        doiChecklistMap.put("cc_licence", (project.getDataLicence().getIdentifier().equals("CC-BY")));
         doiChecklistMap.put("australian_research", australianResearchCheck);
         doiChecklistMap.put("access", project.getAccess().equals(ProjectAccess.OPEN));
         return doiChecklistMap;
@@ -299,18 +299,21 @@ public class DoiController {
     private String getAuthorList(Project project, String listType) {
 
         // listType = "fullNames" or "citation"
-       List<ProjectContribution> projectContributionsList =  project.getProjectContributions();
+        List<ProjectContribution> projectContributionsList =  project.getProjectContributions();
         Iterator iterator = projectContributionsList.iterator();
         String authorList = "";
         while (iterator.hasNext()) {
             ProjectContribution projectContribution = (ProjectContribution) iterator.next();
             Person person = projectContribution.getContributor();
             if (listType.equals("citation")) {
-                authorList = authorList + person.getLastName() + ", " + person.getFirstName().charAt(0);
+                String [] initialsArray = person.getFirstName().split(" ");
+                String initials = "";
+                for (String s:initialsArray) initials = initials + s.charAt(0);
+                authorList = authorList + person.getLastName() + ", " + initials;
             } else if (listType.equals("fullNames")){
                 authorList = authorList + person.getFullName();
             }
-                if (iterator.hasNext()) authorList = authorList + ", ";
+            if (iterator.hasNext()) authorList = authorList + ", ";
             else authorList = authorList + " ";
         }
         return authorList;

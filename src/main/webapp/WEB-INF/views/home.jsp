@@ -11,10 +11,7 @@
         individual-based animal location data. Upload your tracking data now.
     </jsp:attribute>
     <jsp:attribute name="head">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/optimised/openlayers.css" type="text/css">
         <style type="text/css">
-
-
 
             #caro {
                 width:900px;
@@ -96,7 +93,6 @@
                 color: #746E4D;
             }
 
-
             #tutorials-table td a {
                 text-decoration: none;
             }
@@ -106,9 +102,6 @@
     </jsp:attribute>
 
   <jsp:attribute name="tail">
-        <script src="${pageContext.request.scheme}://maps.google.com/maps/api/js?v=3.9&sensor=false"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/optimised/openlayers.js"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/home.js"></script>
         <script type="text/javascript">
 
             function getBlogFeed(div) {
@@ -126,7 +119,6 @@
                                 var title = $(this).children('title').text();
                                 var url = $(this).find('link').text();
                                 var pubDate = $(this).find('pubDate').text();
-//                                $('#blog-table > tbody:last').append('<tr><td><a href="' + url + '" target="_blank">' + title + '</a></td></tr>');
                                   $('#blog-table > tbody:last').append('<tr><td><a href="' + url + '" class="heading" target="_blank">' + title + '</a>' +
                                   '<p class="blogdate">' + pubDate.split(' ', 4).join(' ') + '</p>' +
                                   '<p>' + $(this).find('description').text().replace('>Continue reading',' target="_blank">Continue reading') + '</p>' +
@@ -139,32 +131,28 @@
             }
 
             function getYouTubeFeed(div) {
+                var channelId = 'UCboSpLAfIMLdORmGl37Qftw';
                 $.ajax({
                     type: "GET",
                     url: '${pageContext.request.contextPath}/proxy/youtubesearch',
                     data: {
                         part: 'snippet',
-                        channelId: 'UCCjp-sEpmfwLhf_0DXvEdGg',
+                        channelId: channelId,
                         type: 'video'
                     },
                     dataType: "json",
                     success: function (data) {
-
-                        console.log(data.items[0].snippet.title);
-
                         $.each(data.items, function(i) {
-
-                            var title = this.snippet.title.replace("ZoaTrack","").replace("Zoatrack","");
                             var videoUrl = '"http://www.youtube.com/watch?v=' + this.id.videoId + '"';
                             $('#tutorials-table > tbody:last').append(
                                     '<tr><td><img src="' + this.snippet.thumbnails.default.url
                                     + '" width = "60" height = "45"/></td>'
                                     + '<td><a href=' + videoUrl + ' target="_blank">'
-                                    + '' + title + '</a></td></tr>');
+                                    + '' + this.snippet.title + '</a></td></tr>');
                         });
 
                         $('#tutorials-table > tbody:last').append('<tr><td></td>' +
-                          '<td><a target="_blank" style="float:right" href="https://www.youtube.com/channel/UCCjp-sEpmfwLhf_0DXvEdGg">More ...</a></td></tr>');
+                          '<td><a target="_blank" style="float:right" href="https://www.youtube.com/channel/' + channelId + '">More ...</a></td></tr>');
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                     }
@@ -259,9 +247,5 @@
                 </div>
             </div>
         </div>
-
-
-
-
     </jsp:body>
 </tags:page>
