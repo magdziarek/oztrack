@@ -272,7 +272,9 @@
                             <td><c:out value="${project.title}"/><br/>
                                 <c:if test="${fn:length(project.dois) > 0}">
                                     <c:forEach var="doi" items="${project.dois}">
-                                        DOI: ${doi.doi} <br/>
+                                        <c:if test="${doi.status == 'COMPLETED'}">
+                                            DOI: ${doi.doi} <br/>
+                                        </c:if>
                                     </c:forEach>
                                 </c:if>
                             </td>
