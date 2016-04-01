@@ -242,7 +242,7 @@
                         <th width="15%">Updated Date</th>
                         <th>Sortable Date</th>
                         <th width="15%">Access Type</th>
-                        <c:if test="${currentUser != null}"><th>Role</th></c:if>
+                        <!--<c:if test="${currentUser != null}"><th>Role</th></c:if>-->
                     </tr>
                     </thead>
                     <tbody>
@@ -283,10 +283,7 @@
                             <td><c:out value="${project.spatialCoverageDescr}"/></td>
                             <td><fmt:formatDate value="${project.updateDate}" type="date" pattern="dd/MM/yyyy"/></td>
                             <td><fmt:formatDate value="${project.updateDate}" type="date" pattern="yyyyMMdd" /></td>
-                            <c:if test="${currentUser != null}">
-                                <td>
-                                    <c:if test="${userRole != ''}"><c:out value="${userRole}"/></c:if>
-                                </td></c:if>
+
                             <td>
                                 <c:choose>
                                     <c:when test="${project.access == 'OPEN'}">Open Access<br/></c:when>
@@ -299,6 +296,9 @@
                                     <c:otherwise>
                                         <span class="label label-info">Metadata</span></c:otherwise>
                                 </c:choose>
+                                <c:if test="${currentUser != null}">
+                                    <c:if test="${userRole != ''}"><c:out value="${userRole}"/></c:if>
+                                </c:if>
                             </td>
                         </tr>
                     </c:forEach>
