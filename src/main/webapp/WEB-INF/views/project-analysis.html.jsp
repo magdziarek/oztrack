@@ -603,6 +603,7 @@
                 <li><a href="#animalPanel">Animals</a></li>
                 <li><a href="#homeRangeCalculatorPanel">Analysis</a></li>
                 <li><a href="#previousAnalysesPanel">History</a></li>
+                <li><a href="#metadataPanel">Metadata</a></li>
             </ul>
             <div id="animalPanel">
                 <div class="animalHeader" style="margin-top: 0; border-bottom: 1px solid #ccc;">
@@ -795,6 +796,146 @@
                 <ul id="previousAnalysesList" class="icons" style="display: none;">
                 </ul>
             </div>
+
+            <div id="metadataPanel">
+                <h2>Project Summary</h2>
+                <dl>
+                    <dt>Species</dt>
+                    <dd>
+                        <p>
+                            <c:if test="${!empty project.speciesScientificName}">
+                                <i><c:out value="${project.speciesScientificName}"/></i>
+                                <c:if test="${!empty project.speciesCommonName}">
+                                    <br/>
+                                </c:if>
+                            </c:if>
+                            <c:if test="${!empty project.speciesCommonName}">
+                                <c:out value="${project.speciesCommonName}"/>
+                            </c:if>
+                        </p>
+                    </dd>
+                    <dt>Location</dt>
+                    <dd>
+                        <p><c:out value="${project.spatialCoverageDescr}"/></p>
+                    </dd>
+                    <c:if test="${not empty projectDetectionDateRange}">
+                        <dt>Date Range</dt>
+                        <dd>
+                            <c:set var="dateFormatPattern" value="yyyy-MM-dd"/>
+                            <p><fmt:formatDate pattern="${dateFormatPattern}" value="${projectDetectionDateRange.minimum}"/> to <fmt:formatDate pattern="${dateFormatPattern}" value="${projectDetectionDateRange.maximum}"/></p>
+                        </dd>
+                    </c:if>
+                    <c:if test="${not empty projectAnimalsList}">
+                        <dt>Animals</dt>
+                        <dd>
+                            <p><a href="${pageContext.request.contextPath}/projects/${project.id}/animals">${fn:length(projectAnimalsList)} animals</a></p>
+                        </dd>
+                    </c:if>
+                    <c:if test="${not empty project.srsIdentifier}">
+                        <dt>Spatial Reference System</dt>
+                        <dd>
+                            <c:url var="srsHref" value="http://spatialreference.org/ref/">
+                                <c:param name="search">${project.srsIdentifier}</c:param>
+                            </c:url>
+                            <p><a target="_blank" href="${srsHref}"><c:out value="${project.srsIdentifier}"/></a></p>
+                        </dd>
+                    </c:if>
+                </dl>
+                <c:set var="dataAccessRowClass">
+                    <c:choose>
+                        <c:when test="${project.access == 'OPEN'}">
+                            project-access-open
+                        </c:when>
+                        <c:when test="${project.access == 'EMBARGO'}">
+                            project-access-embargo
+                        </c:when>
+                        <c:otherwise>
+                            project-access-closed
+                        </c:otherwise>
+                    </c:choose>
+                </c:set>
+                <div class="row ${dataAccessRowClass}" style="margin-left: 0; padding: 5px">
+
+                    <c:choose>
+                        <c:when test="${project.access == 'OPEN'}">
+                            <p class="project-access-open-title">Open Access</p>
+                            <p>
+                                The data in this project is publicly available under a <a target="_blank" href="${project.dataLicence.infoUrl}">${project.dataLicence.title}</a>.
+                                If you use these data in any type of publication then you must cite the project DOI (if available) or any
+                                published peer-reviewed papers associated with the study. We strongly encourage you to contact the data custodians
+                                to discuss data usage and appropriate accreditation.
+                            </p>
+                        </c:when>
+                        <c:when test="${project.access == 'EMBARGO'}">
+                            <p class="project-access-embargo-title">Delayed Open Access</p>
+                            <p>
+                                The data in this project are under embargo until
+                                <fmt:formatDate pattern="${dateFormatPattern}" value="${project.embargoDate}"/>.
+                            </p>
+                        </c:when>
+                        <c:otherwise>
+                            <p class="project-access-closed-title">Closed Access</p>
+                            <p>
+                                The data in this project are not publicly available.
+                            </p>
+                        </c:otherwise>
+                    </c:choose>
+                    <c:if test="${not empty project.rightsStatement}">
+                        <p><span style="font-weight:bold">Rights Statement</span><br/>
+                            <c:out value="${project.rightsStatement}"/></p>
+                    </c:if>
+                    <dl>
+                        <dt>Contact</dt>
+                        <dd>
+                            <ul class="unstyled">
+                                <li><c:out value="${project.createUser.fullName}"/></li>
+                                <c:set var="institutions">
+                                    <c:forEach var="institution" items="${project.createUser.institutions}" varStatus="status">
+                                        ${institution.title}
+                                        <c:if test="${not status.last}"> / </c:if>
+                                    </c:forEach>
+                                </c:set>
+                                <c:if test="${not empty institutions}">
+                                    <li><c:out value="${institutions}"/></li>
+                                </c:if>
+                                <li><a href="mailto:<c:out value="${project.createUser.email}"/>"><c:out value="${project.createUser.email}"/></a></li>
+                            </ul>
+                        </dd>
+                    </dl>
+                </div>
+
+                <c:if test="${not empty project.publications or not empty project.dois}">
+                    <h2>Citations</h2>
+                    <dl>
+                        <c:if test="${not empty project.dois}">
+                            <dt>ZoaTrack Dataset</dt>
+                            <dd>
+                                <ul>
+                                    <c:forEach var="doi" items="${project.dois}">
+                                        <li><c:out value="${doi.citation}"/></li>
+                                    </c:forEach>
+                                </ul>
+                            </dd>
+                        </c:if>
+                        <c:if test="${not empty project.publications}">
+                            <dt>Related Publications</dt>
+                            <dd>
+                                <ol>
+                                    <c:forEach var="publication" items="${project.publications}">
+                                        <li>
+                                            <c:out value="${publication.reference}"/>
+                                            <c:if test="${not empty publication.url}">
+                                                [<a target="_blank" href="<c:out value="${publication.url}"/>">Link</a>]
+                                            </c:if>
+                                        </li>
+                                    </c:forEach>
+                                </ol>
+                            </dd>
+                        </c:if>
+                    </dl>
+                </c:if>
+            </div>
+
 
             <a id="toggleSidebar" href="#toggleSidebar"><i class="icon-chevron-left"></i></a>
         </div>
