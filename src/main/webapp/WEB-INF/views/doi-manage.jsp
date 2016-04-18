@@ -32,6 +32,7 @@
         &rsaquo; <span class="active">DOI Request</span>
     </jsp:attribute>
     <jsp:attribute name="sidebar">
+        <tags:project-menu project="${project}"/>
         <tags:project-actions project="${project}"/>
         <tags:project-licence project="${project}"/>
     </jsp:attribute>
