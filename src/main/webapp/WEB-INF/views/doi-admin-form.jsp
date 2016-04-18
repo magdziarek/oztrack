@@ -71,7 +71,7 @@
             }
 
         </style>
-        <h1><c:out value="${fn:replace(doi.filename, '-zoatrack.zip', '')} Admin"/></h1>
+        <h1>DOI Admin</h1>
 
         <c:choose>
             <c:when test="${doi.status == 'DRAFT'}"><c:set var="style" value="warning"/></c:when>
@@ -80,59 +80,104 @@
             <c:when test="${doi.status == 'FAILED'}"><c:set var="style" value="important"/></c:when>
             <c:when test="${doi.status == 'COMPLETED'}"><c:set var="style" value="success"/></c:when>
         </c:choose>
-
         <div class="span10">
-            <div class="sidebar-actions doi-status-div">
-            <table id="doi-admin-table">
-                <tr><td class="tag">Status:</td><td><span class="label label-${style}"><c:out value="${doi.status}"/></span>
-                    <a class="btn btn-${style}" style="float:right" href="${pageContext.request.contextPath}/projects/${doi.project.id}/doi/file">
-                         Download ZIP </a></td></tr>
-                <tr><td class="tag">Title:</td><td><a href="${pageContext.request.contextPath}/projects/${doi.project.id}/doi"><c:out value="${doi.title}"/></a>
-                    </td>
-                    </tr>
-                <tr><td class="tag">Creators:</td><td><c:out value="${doi.creators}"/></td></tr>
-                <tr><td class="tag">Landing URL:</td><td><c:out value="${doi.url}"/></td></tr>
-                <c:if test="${doi.status == 'COMPLETED'}">
-                    <tr><td class="tag">DOI URL:</td><td>http://dx.doi.org/<c:out value = "${doi.doi}"/></td></tr>
+        <div class="sidebar-actions doi-status-div">
+            <h2>DOI Details</h2>
+            <dl class="dl-horizontal">
+                <dt>Status:</dt><dd><span class="label label-${style}" style="margin-bottom:5px">${doi.status}</span></dd>
+                <dt>Title:</dt><dd><a target="_blank" href="${pageContext.request.contextPath}/projects/${doi.project.id}/doi">${doi.title}</a></dd>
+                <dt>Creators:</dt><dd>${fn:replace(doi.creators,",","<br/>")}</dd>
+                <dt>Landing URL:</dt><dd>${doi.url}</dd>
+                <dt>DOI URL:</dt><dd>http://dx.doi.org/${doi.doi}</dd>
+                <br/>
+                <dt>Draft Created:</dt><dd><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.draftDate}"/></dd>
+
+                <c:if test="${doi.submitDate != null}">
+                    <dt>Request Submitted:</dt><dd><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.submitDate}"/></dd>
                 </c:if>
-                <tr><td class="tag">Draft Created:</td><td><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.draftDate}"/></td></tr>
-                <tr><td class="tag">Request Submitted:</td><td><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.submitDate}"/></td></tr>
                 <c:if test="${doi.cancelDate != null}">
-                    <tr><td class="tag">Request Cancelled:</td><td><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.cancelDate}"/></td></tr>
+                    <dt>Request Cancelled:</dt><dd><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.cancelDate}"/></dd>
                 </c:if>
                 <c:if test="${doi.rejectDate != null}">
-                    <tr><td class="tag">Request Rejected:</td><td><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.rejectDate}"/> <br/>
-                                              Rejection Message: <c:out value="${doi.rejectMessage}"/></td></tr>
+                    <dt>Request Rejected:</dt>
+                    <dd><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.rejectDate}"/><br/>
+                            ${doi.rejectMessage}
+                    </dd>
                 </c:if>
                 <c:if test="${doi.mintDate != null}">
-                <tr><td class="tag">DOI Minted:</td><td><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.mintDate}"/><br/>
-                    <c:out value="${doi.mintResponse}"/></td></tr>
+                    <dt>DOI Minted:</dt>
+                    <dd><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.mintDate}"/><br/>
+                        <c:out value="${doi.mintResponse}"/></dd>
                 </c:if>
-                <tr><td class="tag">Created:</td><td><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.createDate}"/> by <c:out value="${doi.createUser.fullName}"/></td></tr>
-                <tr><td class="tag">Last Updated:</td><td><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.updateDate}"/> by <c:out value="${doi.updateUser.fullName}"/></td></tr>
-                <tr><td class="tag">Project Manager:</td><td><c:forEach items="${doi.project.projectUsers}" var="projectUser">
-                                                    <c:if test="${projectUser.role == 'MANAGER'}">
-                                                        <c:out value="${projectUser.user.fullName}"/>
-                                                        (last login <c:out value="${projectUser.user.lastLoginDate}"/>)<br/>
-                                                    </c:if>
-                                                 </c:forEach>
-                <tr><td class="tag">XML:</td><td><a id="xml-btn">View XML ...</a>
-                            <div id="doi-xml" style="display:none"><c:out value="${doi.xml}"/></div></td></tr>
-            </table>
-            </div>
-        </div>
+                <dt>XML:</dt><dd><a id="xml-btn">View XML ...</a><div id="doi-xml" style="display:none"><c:out value="${doi.xml}"/></div></dd>
+                <br/>
+                <c:if test="${doi.status != 'COMPLETED'}">
+                    <dt> </dt><dd><a class="btn btn-${style}" href="${pageContext.request.contextPath}/projects/${doi.project.id}/doi/file">
+                Download ZIP </a></dd>
+                </c:if>
+            </dl>
 
+            <h2>Project Details</h2>
+            <dl class="dl-horizontal">
+                <dt>Last Updated: </dt><dd><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.project.updateDate}"/></dd>
+                <dt>Data Licence:</dt><dd>${doi.project.dataLicence.identifier} (${doi.project.dataLicence.title})</dd>
+                <dt>Number of animals:</dt><dd>${doi.project.animals.size()}</dd>
+                <dt>Contributors:</dt><dd><c:forEach items="${doi.project.projectContributions}" var="projectContribution">
+                    ${projectContribution.contributor.fullName}<br/></c:forEach>
+                </dd>
+                <br/>
+                <dt> </dt><dd>
+                    <a class="btn btn-${style}" href="${pageContext.request.contextPath}/projects/${doi.project.id}" target="_blank">Metadata</a>
+                    <a class="btn btn-${style}" href="${pageContext.request.contextPath}/projects/${doi.project.id}/analysis" target="_blank">Tracks</a>
+                </dd>
+            </dl>
+            <h2>People</h2>
+            <table  class="table table-bordered table-striped">
+                <th>Role</th>
+                <th>Name</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Last Login Date</th>
+                <tr>
+                    <td>DOI Creator</td>
+                    <td>${doi.createUser.fullName}</td>
+                    <td>${doi.createUser.username}</td>
+                    <td>${doi.createUser.person.email}</td>
+                    <td><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${doi.createUser.lastLoginDate}"/></td>
+                </tr>
+                <c:forEach items="${doi.project.projectUsers}" var="projectUser">
+                    <tr>
+                        <td>${projectUser.role}</td>
+                        <td>${projectUser.user.person.fullName}</td>
+                        <td>${projectUser.user.username}</td>
+                        <td>${projectUser.user.person.email}</td>
+                        <td><fmt:formatDate pattern="${dateTimeFormatPattern}" value="${projectUser.user.lastLoginDate}"/></td>
+                    </tr>
+                </c:forEach>
+            </table>
+
+        </div>
+        </div>
+        <c:if test="${doi.project.updateDate > doi.draftDate}">
+            <c:set var="warning" value="Warning! The project has been updated since this draft was created!"/>
+        </c:if>
+        <c:if test="${not empty doi.rejectDate && doi.draftDate < doi.rejectDate}">
+            <c:set var="warning" value="Warning! This DOI draft hasn't been rebuilt since it was rejected."/>
+        </c:if>
+        <c:if test="${not empty warning}">
+            <div class="row span6" style="color:red; font-weight:bold">${warning}</div>
+        </c:if>
         <c:choose>
         <c:when test="${doi.status == 'DRAFT'}">
             <div class="row span6 alert-${style}">
                 <p>A request to mint a DOI has not been submitted yet. No action is required.</p>
             </div>
         </c:when>
-            <c:when test="${doi.status == 'REJECTED'}">
+        <c:when test="${doi.status == 'REJECTED'}">
                 <div class="row span6 alert-${style}">
                     <p>This request has been rejected by the admin. No action is required until the project manager submits again.</p>
                 </div>
-            </c:when>
+        </c:when>
         <c:when test="${(doi.status == 'REQUESTED') || (doi.status == 'FAILED')}">
             <div class="row span6" id="admin-buttons">
                 <a id="reject-reason-toggle" class="btn" href="#reject-reason-form">Reject this Request</a>
