@@ -58,7 +58,7 @@ public class DoiDaoImpl implements DoiDao {
 
     @Override
     public List<User> getAdminUsers() {
-        Query query = em.createQuery("SELECT o from User o where o.admin");
+        Query query = em.createQuery("SELECT o from org.oztrack.data.model.User o where o.admin = TRUE");
         try {
             List <User> resultList = query.getResultList();
             return resultList;

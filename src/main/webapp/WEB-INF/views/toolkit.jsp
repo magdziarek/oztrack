@@ -349,8 +349,8 @@
                                 is managed and accessible in the long term. </p>
                             <p>A DOI url will always resolve to a publicly available landing page which will display the associated metadata
                                 and provide an active link to the resource.</p>
-                            <p>ZoaTrack uses the <a href="http://ands.org.au/services/cite-my-data.html" target="_blank">ANDS Cite-My-Data</a> service to mint DOIs,
-                                which is intended for publicly funded Australian research institutions. ANDS policy broadly states that datasets should: </p>
+                            <p>ZoaTrack uses the <a href="http://ands.org.au/services/cite-my-data.html" target="_blank">ANDS Cite-My-Data</a> service to mint DOIs.
+                                ANDS policy broadly states that datasets should: </p>
                                <ul>
                                 <li>be part of the scholarly record;</li>
                                 <li>be persistently available;</li>
@@ -379,8 +379,7 @@
                                 <ul>
                                     <li>The data is Open Access under a CC-BY licence and will be discoverable in Research Data Australia</li>
                                     <li>You won't be able to update the data once it's published</li>
-                                    <li>The authorship information is correct and one of the authors is affiliated with an Australian
-                                            research institution (these are the Project Contributors) </li>
+                                    <li>The authorship information that you've provided is correct (these are the Project Contributors in your project metadata) </li>
                                     <li>The project and animal metadata is sufficient</li>
                                     <p>Some of these conditions are automated checks by ZoaTrack and you won't be able to proceed until you fix them.
                                     Links are provided to guide you to areas of ZoaTrack that you may need to update, like the Project Contributors section

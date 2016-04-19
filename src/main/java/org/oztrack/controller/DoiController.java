@@ -1,5 +1,6 @@
 package org.oztrack.controller;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.oztrack.app.OzTrackApplication;
@@ -40,6 +41,9 @@ public class DoiController {
     private PositionFixDao positionFixDao;
 
     @Autowired
+    private EmailBuilderFactory emailBuilderFactory;
+
+    @Autowired
     private OzTrackPermissionEvaluator permissionEvaluator;
 
     @Autowired
@@ -62,6 +66,14 @@ public class DoiController {
         if (doi != null) {
             view = "doi-manage";
             model.addAttribute("doi", doi);
+            String fileUrl;
+            if (doi.getStatus().equals(DoiStatus.COMPLETED)) {
+                fileUrl = configuration.getDataDir() + File.separator + "publication"  + File.separator + doi.getUuid().toString() + ".zip";
+            } else {
+                fileUrl = project.getAbsoluteDataDirectoryPath() + File.separator + "ZoaTrack.zip";
+            }
+            File zipFile = new File(fileUrl);
+            model.addAttribute("fileSize", FileUtils.byteCountToDisplaySize(zipFile.length()));
         } else {
             view = "redirect:/projects/" + project.getId() + "/doi/create";
         }
@@ -80,7 +92,7 @@ public class DoiController {
     }
 
 
-        @RequestMapping(value="/projects/{projectId}/doi/file", method=RequestMethod.GET, produces={ "application/zip"})
+    @RequestMapping(value="/projects/{projectId}/doi/file", method=RequestMethod.GET, produces={ "application/zip"})
     @PreAuthorize("hasPermission(#project, 'manage')")
     public void getDoiZip(
             @ModelAttribute(value="project") Project project,
@@ -90,8 +102,8 @@ public class DoiController {
         response.setContentType("application/zip");
         response.setCharacterEncoding("UTF-8");
         FileInputStream fileInputStream = new FileInputStream(project.getAbsoluteDataDirectoryPath() + File.separator + "ZoaTrack.zip");
-        IOUtils.copy(fileInputStream, response.getOutputStream());
 
+        IOUtils.copy(fileInputStream, response.getOutputStream());
     }
 
     @RequestMapping(value="/projects/{projectId}/doi/new", method= RequestMethod.GET)
@@ -116,6 +128,8 @@ public class DoiController {
             File file = new File(project.getAbsoluteDataDirectoryPath() + File.separator + "ZoaTrack.zip");
             if (!file.exists()) {
                 model.addAttribute("errorMessage","There was an error generating the package. Please contact the administrator.");
+            } else {
+                model.addAttribute("fileSize", FileUtils.byteCountToDisplaySize(file.length()));
             }
             return "doi-manage";
         } else {
@@ -173,12 +187,8 @@ public class DoiController {
         doiInProgress.setUpdateDate(new java.util.Date());
         doiInProgress.setSubmitDate(new java.util.Date());
         doiDao.update(doiInProgress);
-        try {
-            emailMintRequestToAdmin(doiInProgress, currentUser);
-            logger.info("DOI Request submitted for project " + project.getId());
-        } catch (Exception e) {
-            logger.error("Mint request email to admin failed " + e.getLocalizedMessage());
-        }
+        emailMintRequestToAdmin(doiInProgress, currentUser);
+        logger.info("DOI Request submitted for project " + project.getId());
         return "redirect:/projects/" + project.getId() + "/doi";
     }
 
@@ -224,19 +234,14 @@ public class DoiController {
         return doi;
     }
 
-    private void emailMintRequestToAdmin(Doi doi, User currentUser) throws Exception {
+    private void emailMintRequestToAdmin(Doi doi, User currentUser) {
 
-        EmailBuilderFactory emailBuilderFactory = new EmailBuilderFactory();
-        EmailBuilder emailBuilder = emailBuilderFactory.getObject();
-        emailBuilder.to(doiDao.getAdminUsers().get(0));
-        emailBuilder.subject("Request to Mint DOI");
-
+        String projectLink = configuration.getBaseUrl() + "/projects/" + doi.getProject().getId();
         StringBuilder htmlMsgContent = new StringBuilder();
         htmlMsgContent.append("<p>\n");
         htmlMsgContent.append("    " + currentUser.getFullName() + " has requested a DOI for the project \n");
         htmlMsgContent.append("    <i>" + doi.getProject().getTitle() + "</i></p>\n");
 
-        String projectLink = configuration.getBaseUrl() + "/projects/" + doi.getProject().getId();
         htmlMsgContent.append("<p>\n");
         htmlMsgContent.append("    To view the project, click here:\n");
         htmlMsgContent.append("    <a href=\"" + projectLink + "\">" + projectLink + "</a>\n");
@@ -246,8 +251,20 @@ public class DoiController {
         htmlMsgContent.append("    To mint the DOI, go to the Admin screen:\n");
         htmlMsgContent.append("    <a href=\"" + configuration.getBaseUrl() + "\">settings/doi/" + doi.getId() + "/a>\n");
         htmlMsgContent.append("</p>\n");
-        emailBuilder.htmlMsgContent(htmlMsgContent.toString());
-        emailBuilder.build().send();
+        User adminUser = doiDao.getAdminUsers().get(0);
+        logger.info("Sending email to admin user: " + adminUser.getFullName());
+
+        try {
+
+            EmailBuilder emailBuilder = emailBuilderFactory.getObject();
+            emailBuilder.to(adminUser);
+            emailBuilder.subject("Request to Mint DOI");
+            emailBuilder.htmlMsgContent(htmlMsgContent.toString());
+            emailBuilder.build().send();
+
+        } catch (Exception e) {
+            logger.error("Mint request email to admin failed.", e);
+        }
     }
 
     private boolean testDoiChecklist(Project project) {
@@ -264,33 +281,9 @@ public class DoiController {
     private HashMap<String, Boolean> createDoiChecklist(Project project) {
 
         HashMap<String, Boolean> doiChecklistMap = new HashMap<String, Boolean>();
-        boolean australianResearchCheck = false;
-        List<ProjectContribution> contributions = project.getProjectContributions();
-        Iterator contributionsIterator = contributions.iterator();
-        // look for either an Australian institution or a .au email address
-        while (contributionsIterator.hasNext()) {
-            ProjectContribution projectContribution = (ProjectContribution) contributionsIterator.next();
-            Person person = projectContribution.getContributor();
-            List<Institution> institutionList = person.getInstitutions();
-            Iterator institutionIterator = institutionList.iterator();
-            while (institutionIterator.hasNext()) {
-                Institution institution = (Institution) institutionIterator.next();
-                if (institution.getCountry().getCode().equals("AU")) {
-                    australianResearchCheck = true;
-                }
-            }
-            if (person.getEmail() != null && person.getEmail().endsWith("au")) {
-                australianResearchCheck = true;
-            }
-            if (person.getCountry() != null && person.getCountry().getCode().equals("AU")) {
-                australianResearchCheck = true;
-            }
-        }
-
         doiChecklistMap.put("author_count", project.getProjectContributions().size() > 0);
         doiChecklistMap.put("data", project.getAnimals().size() > 0);
         doiChecklistMap.put("cc_licence", (project.getDataLicence().getIdentifier().equals("CC-BY")));
-        doiChecklistMap.put("australian_research", australianResearchCheck);
         doiChecklistMap.put("access", project.getAccess().equals(ProjectAccess.OPEN));
         return doiChecklistMap;
 

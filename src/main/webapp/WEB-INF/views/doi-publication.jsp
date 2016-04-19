@@ -83,7 +83,7 @@
                 <dd><a href="${pageContext.request.contextPath}/projects/${doi.project.id}" target="_blank"><c:out value="${doi.project.title}"/></a></dd>
             </dl>
             <a style="margin-bottom:10px" class="btn btn-success" href="${pageContext.request.contextPath}/publication/${doi.uuid}/file">
-                <i class="icon-download icon-white"></i> Download zip</a>
+                <i class="icon-download icon-white"></i> Download zip (${fileSize})</a>
             <div class="help-inline" style="margin-bottom: 5px;">
                 <div class="help-popover" title="DOI Zip Package">
                     <p>The zip contains 3 files:</p>

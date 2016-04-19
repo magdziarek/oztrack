@@ -32,6 +32,7 @@
         &rsaquo; <span class="active">DOI Request</span>
     </jsp:attribute>
     <jsp:attribute name="sidebar">
+        <tags:project-menu project="${project}"/>
         <tags:project-actions project="${project}"/>
         <tags:project-licence project="${project}"/>
     </jsp:attribute>
@@ -134,7 +135,7 @@
 
                 </dl>
                 <a style="margin-bottom:10px" class="btn btn-${style}" href="${fileUrl}">
-                    <i class="icon-download icon-white"></i> Download zip</a>
+                    <i class="icon-download icon-white"></i> Download zip (${fileSize})</a>
                 <div class="help-inline" style="margin-bottom: 5px;">
                     <div class="help-popover" title="DOI Zip Package">
                         <p>The zip contains 3 files:</p>

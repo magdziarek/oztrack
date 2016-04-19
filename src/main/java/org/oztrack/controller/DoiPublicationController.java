@@ -1,5 +1,6 @@
 package org.oztrack.controller;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.oztrack.app.OzTrackApplication;
@@ -8,6 +9,7 @@ import org.oztrack.data.access.DoiDao;
 import org.oztrack.data.model.Doi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,7 +33,10 @@ public class DoiPublicationController {
     }
 
     @RequestMapping(value="/publication/{uuid}", method= RequestMethod.GET, produces="text/html")
-    public String getHtmlView(@ModelAttribute(value="doi") Doi doi)  throws Exception {
+    public String getHtmlView(@ModelAttribute(value="doi") Doi doi, Model model)  throws Exception {
+        OzTrackConfiguration configuration = OzTrackApplication.getApplicationContext();
+        File zipFile = new File(configuration.getDataDir() + File.separator + "publication"  + File.separator + doi.getUuid().toString() + ".zip");
+        model.addAttribute("fileSize", FileUtils.byteCountToDisplaySize(zipFile.length()));
         return "doi-publication";
     }
 
