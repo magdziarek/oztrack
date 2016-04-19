@@ -113,7 +113,7 @@
                 <br/>
                 <c:if test="${doi.status != 'COMPLETED'}">
                     <dt> </dt><dd><a class="btn btn-${style}" href="${pageContext.request.contextPath}/projects/${doi.project.id}/doi/file">
-                Download ZIP </a></dd>
+                Download ZIP (${fileSize})</a></dd>
                 </c:if>
             </dl>
 

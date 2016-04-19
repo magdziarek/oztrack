@@ -1,5 +1,6 @@
 package org.oztrack.controller;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.oztrack.app.OzTrackApplication;
@@ -65,6 +66,8 @@ public class DoiController {
         if (doi != null) {
             view = "doi-manage";
             model.addAttribute("doi", doi);
+            File zipFile = new File(project.getAbsoluteDataDirectoryPath() + File.separator + "ZoaTrack.zip");
+            model.addAttribute("fileSize", FileUtils.byteCountToDisplaySize(zipFile.length()));
         } else {
             view = "redirect:/projects/" + project.getId() + "/doi/create";
         }
@@ -83,7 +86,7 @@ public class DoiController {
     }
 
 
-        @RequestMapping(value="/projects/{projectId}/doi/file", method=RequestMethod.GET, produces={ "application/zip"})
+    @RequestMapping(value="/projects/{projectId}/doi/file", method=RequestMethod.GET, produces={ "application/zip"})
     @PreAuthorize("hasPermission(#project, 'manage')")
     public void getDoiZip(
             @ModelAttribute(value="project") Project project,
@@ -93,8 +96,8 @@ public class DoiController {
         response.setContentType("application/zip");
         response.setCharacterEncoding("UTF-8");
         FileInputStream fileInputStream = new FileInputStream(project.getAbsoluteDataDirectoryPath() + File.separator + "ZoaTrack.zip");
-        IOUtils.copy(fileInputStream, response.getOutputStream());
 
+        IOUtils.copy(fileInputStream, response.getOutputStream());
     }
 
     @RequestMapping(value="/projects/{projectId}/doi/new", method= RequestMethod.GET)

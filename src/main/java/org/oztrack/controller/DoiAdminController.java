@@ -1,5 +1,6 @@
 package org.oztrack.controller;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.oztrack.app.OzTrackApplication;
@@ -51,7 +52,16 @@ public class DoiAdminController {
 
     @RequestMapping(value="/settings/doi/{id}", method=RequestMethod.GET, produces="text/html")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public String getHtmlView(@ModelAttribute(value="doi") Doi doi)  throws Exception {
+    public String getHtmlView(@ModelAttribute(value="doi") Doi doi, Model model)  throws Exception {
+
+        String fileUrl;
+        if (doi.getStatus().equals(DoiStatus.COMPLETED)) {
+            fileUrl = configuration.getDataDir() + File.separator + "publication"  + File.separator + doi.getUuid().toString() + ".zip";
+        } else {
+            fileUrl = doi.getProject().getAbsoluteDataDirectoryPath() + File.separator + "ZoaTrack.zip";
+        }
+        File zipFile = new File(fileUrl);
+        model.addAttribute("fileSize", FileUtils.byteCountToDisplaySize(zipFile.length()));
         return "doi-admin-form";
     }
 
