@@ -40,6 +40,9 @@ public class DoiController {
     private PositionFixDao positionFixDao;
 
     @Autowired
+    private EmailBuilderFactory emailBuilderFactory;
+
+    @Autowired
     private OzTrackPermissionEvaluator permissionEvaluator;
 
     @Autowired
@@ -173,12 +176,8 @@ public class DoiController {
         doiInProgress.setUpdateDate(new java.util.Date());
         doiInProgress.setSubmitDate(new java.util.Date());
         doiDao.update(doiInProgress);
-        try {
-            emailMintRequestToAdmin(doiInProgress, currentUser);
-            logger.info("DOI Request submitted for project " + project.getId());
-        } catch (Exception e) {
-            logger.error("Mint request email to admin failed " + e.getLocalizedMessage());
-        }
+        emailMintRequestToAdmin(doiInProgress, currentUser);
+        logger.info("DOI Request submitted for project " + project.getId());
         return "redirect:/projects/" + project.getId() + "/doi";
     }
 
@@ -224,19 +223,14 @@ public class DoiController {
         return doi;
     }
 
-    private void emailMintRequestToAdmin(Doi doi, User currentUser) throws Exception {
+    private void emailMintRequestToAdmin(Doi doi, User currentUser) {
 
-        EmailBuilderFactory emailBuilderFactory = new EmailBuilderFactory();
-        EmailBuilder emailBuilder = emailBuilderFactory.getObject();
-        emailBuilder.to(doiDao.getAdminUsers().get(0));
-        emailBuilder.subject("Request to Mint DOI");
-
+        String projectLink = configuration.getBaseUrl() + "/projects/" + doi.getProject().getId();
         StringBuilder htmlMsgContent = new StringBuilder();
         htmlMsgContent.append("<p>\n");
         htmlMsgContent.append("    " + currentUser.getFullName() + " has requested a DOI for the project \n");
         htmlMsgContent.append("    <i>" + doi.getProject().getTitle() + "</i></p>\n");
 
-        String projectLink = configuration.getBaseUrl() + "/projects/" + doi.getProject().getId();
         htmlMsgContent.append("<p>\n");
         htmlMsgContent.append("    To view the project, click here:\n");
         htmlMsgContent.append("    <a href=\"" + projectLink + "\">" + projectLink + "</a>\n");
@@ -246,8 +240,20 @@ public class DoiController {
         htmlMsgContent.append("    To mint the DOI, go to the Admin screen:\n");
         htmlMsgContent.append("    <a href=\"" + configuration.getBaseUrl() + "\">settings/doi/" + doi.getId() + "/a>\n");
         htmlMsgContent.append("</p>\n");
-        emailBuilder.htmlMsgContent(htmlMsgContent.toString());
-        emailBuilder.build().send();
+        User adminUser = doiDao.getAdminUsers().get(0);
+        logger.info("Sending email to admin user: " + adminUser.getFullName());
+
+        try {
+
+            EmailBuilder emailBuilder = emailBuilderFactory.getObject();
+            emailBuilder.to(adminUser);
+            emailBuilder.subject("Request to Mint DOI");
+            emailBuilder.htmlMsgContent(htmlMsgContent.toString());
+            emailBuilder.build().send();
+
+        } catch (Exception e) {
+            logger.error("Mint request email to admin failed.", e);
+        }
     }
 
     private boolean testDoiChecklist(Project project) {

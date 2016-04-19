@@ -308,11 +308,8 @@ public class ProjectController {
         Collection<Person> notifiedContributors = CollectionUtils.union(previousContributors, currentContributors);
         notifiedContributors.remove(currentUser.getPerson());
         for (Person notifiedContributor : notifiedContributors) {
-            try {
-                EmailBuilder emailBuilder = emailBuilderFactory.getObject();
-                emailBuilder.to(notifiedContributor);
-                emailBuilder.subject("ZoaTrack project contributor change");
 
+            try {
                 StringBuilder htmlMsgContent = new StringBuilder();
 
                 if (addedContributors.contains(notifiedContributor)) {
@@ -393,13 +390,16 @@ public class ProjectController {
                     htmlMsgContent.append("</p>\n");
                     htmlMsgContent.append("    <a href=\"" + rejectionLink + "\">" + rejectionLink + "</a>\n");
                     htmlMsgContent.append("<p>\n");
-                    emailBuilder.htmlMsgContent(htmlMsgContent.toString());
                 }
-
+                EmailBuilder emailBuilder = emailBuilderFactory.getObject();
+                emailBuilder.to(notifiedContributor);
+                emailBuilder.subject("ZoaTrack project contributor change");
+                emailBuilder.htmlMsgContent(htmlMsgContent.toString());
                 emailBuilder.build().send();
             }
             catch (Exception e) {
                 logger.error("Error sending notification to " + notifiedContributor.getFullName() + " " + notifiedContributor.getEmail(), e);
+
             }
         }
     }
