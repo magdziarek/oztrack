@@ -66,7 +66,13 @@ public class DoiController {
         if (doi != null) {
             view = "doi-manage";
             model.addAttribute("doi", doi);
-            File zipFile = new File(project.getAbsoluteDataDirectoryPath() + File.separator + "ZoaTrack.zip");
+            String fileUrl;
+            if (doi.getStatus().equals(DoiStatus.COMPLETED)) {
+                fileUrl = configuration.getDataDir() + File.separator + "publication"  + File.separator + doi.getUuid().toString() + ".zip";
+            } else {
+                fileUrl = project.getAbsoluteDataDirectoryPath() + File.separator + "ZoaTrack.zip";
+            }
+            File zipFile = new File(fileUrl);
             model.addAttribute("fileSize", FileUtils.byteCountToDisplaySize(zipFile.length()));
         } else {
             view = "redirect:/projects/" + project.getId() + "/doi/create";
@@ -122,6 +128,8 @@ public class DoiController {
             File file = new File(project.getAbsoluteDataDirectoryPath() + File.separator + "ZoaTrack.zip");
             if (!file.exists()) {
                 model.addAttribute("errorMessage","There was an error generating the package. Please contact the administrator.");
+            } else {
+                model.addAttribute("fileSize", FileUtils.byteCountToDisplaySize(file.length()));
             }
             return "doi-manage";
         } else {
@@ -273,33 +281,9 @@ public class DoiController {
     private HashMap<String, Boolean> createDoiChecklist(Project project) {
 
         HashMap<String, Boolean> doiChecklistMap = new HashMap<String, Boolean>();
-        boolean australianResearchCheck = false;
-        List<ProjectContribution> contributions = project.getProjectContributions();
-        Iterator contributionsIterator = contributions.iterator();
-        // look for either an Australian institution or a .au email address
-        while (contributionsIterator.hasNext()) {
-            ProjectContribution projectContribution = (ProjectContribution) contributionsIterator.next();
-            Person person = projectContribution.getContributor();
-            List<Institution> institutionList = person.getInstitutions();
-            Iterator institutionIterator = institutionList.iterator();
-            while (institutionIterator.hasNext()) {
-                Institution institution = (Institution) institutionIterator.next();
-                if (institution.getCountry().getCode().equals("AU")) {
-                    australianResearchCheck = true;
-                }
-            }
-            if (person.getEmail() != null && person.getEmail().endsWith("au")) {
-                australianResearchCheck = true;
-            }
-            if (person.getCountry() != null && person.getCountry().getCode().equals("AU")) {
-                australianResearchCheck = true;
-            }
-        }
-
         doiChecklistMap.put("author_count", project.getProjectContributions().size() > 0);
         doiChecklistMap.put("data", project.getAnimals().size() > 0);
         doiChecklistMap.put("cc_licence", (project.getDataLicence().getIdentifier().equals("CC-BY")));
-        doiChecklistMap.put("australian_research", australianResearchCheck);
         doiChecklistMap.put("access", project.getAccess().equals(ProjectAccess.OPEN));
         return doiChecklistMap;
 

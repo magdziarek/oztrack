@@ -209,7 +209,7 @@
             </div>
             <div class="btn-group">
                 <btn class="btn no-btn btn-danger">No</btn><btn class="btn yes-btn">Yes</btn>
-                <input type="hidden" class="doi-ready-check" value="${doiChecklistMap['author_count'] && doiChecklistMap['australian_research']}"/>
+                <input type="hidden" class="doi-ready-check" value="${doiChecklistMap['author_count']}"/>
             </div>
             <div class="span6">
                 <table class="doi-check-table">
@@ -232,18 +232,6 @@
                                 You need to add <a href="${pageContext.request.contextPath}/projects/${project.id}/edit#contributorslist" target="_blank">project contributors</a>
                                 to your project. Note that this is a different list of people to the ZoaTrack users who have read or write
                                 access to your project.</td>
-                        </tr>
-                    </c:if>
-                    <c:if test="${doiChecklistMap['australian_research'] eq true}">
-                        <tr>
-                            <td class="doi-check-icon-td"><img src="${pageContext.request.contextPath}/img/accept.png"/></td>
-                            <td>At least one author has an affiliation with an Australian research institution.</td>
-                        </tr>
-                    </c:if>
-                    <c:if test="${doiChecklistMap['australian_research'] eq false}">
-                        <tr>
-                            <td class="doi-check-icon-td"><img src="${pageContext.request.contextPath}/img/cross.png"/></td>
-                            <td>No data creators have an affiliation with an Australian research institution. <a href="${pageContext.request.contextPath}/projects/${project.id}/edit#contributorslist" target="_blank">Change</a></td>
                         </tr>
                     </c:if>
                 </table>
