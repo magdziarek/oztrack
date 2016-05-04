@@ -90,6 +90,15 @@
             .layerInfoTitle {
                 padding: 3px 0;
             }
+            .layerInfoActions a {
+                color:#666;
+                font-weight:bold;
+                text-decoration: none;
+                font-size:smaller;
+            }
+            .layerInfoActions a:hover {
+                color:#ef9800;
+            }
             .layerExplanationExpander {
                 display: block;
                 padding: 4px 0 9px 0;
@@ -327,14 +336,14 @@
                                 '${pageContext.request.contextPath}/' +
                                 ((layerName == 'Detections') ? 'detections' : 'trajectory') +
                                 '?projectId=' + ${project.id} +
-                                '&animalIds=' + animalIds.join(',') +
+                                '&animalIds=' + animalId + // animalIds.join(',') +
                                 '&fromDate=' + fromDate +
                                 '&toDate=' + toDate;
-                            exportHtml += '<a class="icon kml" href="' + exportBaseUrl + '&format=kml">KML</a>, ';
+                            exportHtml += '<a class="icon kml" href="' + exportBaseUrl + '&format=kml">KML</a> ';
                             exportHtml += '<a class="icon shp" href="' + exportBaseUrl + '&format=shp">SHP</a>';
                         }
                         if (exportHtml != '') {
-                            html += '<div class="layerInfoExport">Download: ' + exportHtml + '</div>';
+                            html += '<div class="layerInfoExport">Download: <span class="layerInfoActions">' + exportHtml + '</span></div>';
                         }
                         $('#animalInfo-' + animalId).append('<div class="layerInfo projectMapLayerInfo-' + layerId + '">' + html + '</div>');
                     },
@@ -606,6 +615,31 @@
                 <li><a href="#metadataPanel">Metadata</a></li>
             </ul>
             <div id="animalPanel">
+
+                <div class="layerInfo">
+                    <div class="layerInfoHeader">All Animals</div>
+                    <div class="layerInfoStats">
+                        <span class="layerInfoStat">Date Range:
+                        <fmt:formatDate pattern="${isoDateFormatPattern}" value="${projectDetectionDateRange.minimum}"/> to
+                        <fmt:formatDate pattern="${isoDateFormatPattern}" value="${projectDetectionDateRange.maximum}"/></span>
+                        <span class="layerInfoStat">Animals: ${projectAnimalsList.size()}</span>
+                    </div>
+                    <div class="layerInfoExport">
+                        <div>
+                        Detections Layer
+                        <span class="layerInfoActions">
+                            <a class="icon kml" href="${pageContext.request.contextPath}/detections?projectId=${project.id}&format=kml">KML</a>
+                            <a class="icon shp" href="${pageContext.request.contextPath}/detections?projectId=${project.id}&format=shp">SHP</a>
+                        </span></div>
+                        <div style="margin-top:5px">
+                        Trajectory Layer
+                        <span class="layerInfoActions">
+                            <a class="icon kml" href="${pageContext.request.contextPath}/trajectory?projectId=${project.id}&format=kml">KML</a>
+                            <a class="icon shp" href="${pageContext.request.contextPath}/trajectory?projectId=${project.id}&format=shp">SHP</a>
+                        </span></div>
+                    </div>
+                </div>
+
                 <div class="animalHeader" style="margin-top: 0; border-bottom: 1px solid #ccc;">
                 <div class="animalCheckbox">
                     <input
@@ -618,7 +652,7 @@
                 </div>
 
                 <c:forEach items="${projectAnimalsList}" var="animal" varStatus="animalStatus">
-                    <c:set var="showAnimalInfo" value="${animalStatus.index == 0}"/>
+                    <c:set var="showAnimalInfo" value='false'/>
                     <div class="animalHeader">
                         <div class="btn-group" style="float: right;">
                             <button

@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.oztrack.app.OzTrackConfiguration;
 import org.oztrack.data.access.AnimalDao;
@@ -38,6 +39,7 @@ import org.springframework.web.servlet.view.AbstractView;
 
 @Controller
 public class TracksController {
+    private final Logger logger = Logger.getLogger(getClass());
     private final SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     @Autowired
@@ -96,7 +98,12 @@ public class TracksController {
         searchQuery.setProject(project);
         List<PositionFix> positionFixList = positionFixDao.getProjectPositionFixList(searchQuery);
         if (format.equals("kml")) {
-            List<Animal> animals = animalDao.getAnimalsById(searchQuery.getAnimalIds());
+            List<Animal> animals;
+            if (searchQuery.getAnimalIds() == null ) {
+                animals = project.getAnimals();
+            } else {
+                animals = animalDao.getAnimalsById(searchQuery.getAnimalIds());
+            }
             return
                 path.equals("detections") ? new DetectionsKMLView(configuration, animals, positionFixList) :
                 path.equals("trajectory") ? new TrajectoryKMLView(configuration, animals, positionFixList) :
