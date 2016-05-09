@@ -516,7 +516,8 @@ public class PositionFixDaoImpl implements PositionFixDao {
             "        else null\n" +
             "    end\n" +
             "from positionfixlayer\n" +
-            "where project_id = :projectId\n";
+            "where project_id = :projectId\n" +
+            "and not deleted\n";
         if (fromDate != null) {
             Date fromDateTrunc = DateUtils.truncate(fromDate, Calendar.DATE);
             totalQueryString += " and detectiontime >= DATE '" + isoDateFormat.format(fromDateTrunc) + "'\n";
