@@ -151,6 +151,30 @@
         });
         that.map.addLayer(that.osmLayer);
 
+        that.grayscaleLayer = new OpenLayers.Layer.OSM('OpenStreetMap Grayscale', null, {
+            maxExtent: that.maxExtent,
+            metadata: {
+                category: 'base',
+                showInformation: false
+            },
+            eventListeners: {
+                tileloaded: function(evt) {
+                    var ctx = evt.tile.getCanvasContext();
+                    if (ctx) {
+                        var imgd = ctx.getImageData(0, 0, evt.tile.size.w, evt.tile.size.h);
+                        var pix = imgd.data;
+                        for (var i = 0, n = pix.length; i < n; i += 4) {
+                            pix[i] = pix[i + 1] = pix[i + 2] = (3 * pix[i] + 4 * pix[i + 1] + pix[i + 2]) / 8;
+                        }
+                        ctx.putImageData(imgd, 0, 0);
+                        evt.tile.imgDiv.removeAttribute("crossorigin");
+                        evt.tile.imgDiv.src = ctx.canvas.toDataURL();
+                    }
+                }
+            }
+        });
+        that.map.addLayer(that.grayscaleLayer);
+
         that.emptyBaseLayer = new OpenLayers.Layer('None', {
             isBaseLayer: true,
             maxExtent: that.maxExtent,
