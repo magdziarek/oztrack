@@ -237,7 +237,9 @@ public class DoiController {
     private void emailMintRequestToAdmin(Doi doi, User currentUser) {
 
         String projectLink = configuration.getBaseUrl() + "/projects/" + doi.getProject().getId();
+        String doiAdminLink = configuration.getBaseUrl().replace("http:","https:") + "/settings/doi/" + doi.getId();
         StringBuilder htmlMsgContent = new StringBuilder();
+
         htmlMsgContent.append("<p>\n");
         htmlMsgContent.append("    " + currentUser.getFullName() + " has requested a DOI for the project \n");
         htmlMsgContent.append("    <i>" + doi.getProject().getTitle() + "</i></p>\n");
@@ -249,10 +251,11 @@ public class DoiController {
 
         htmlMsgContent.append("<p>\n");
         htmlMsgContent.append("    To mint the DOI, go to the Admin screen:\n");
-        htmlMsgContent.append("    <a href=\"" + configuration.getBaseUrl() + "\">settings/doi/" + doi.getId() + "/a>\n");
+        htmlMsgContent.append("    <a href=\"" + doiAdminLink + "\">" + doiAdminLink + "</a>\n");
         htmlMsgContent.append("</p>\n");
         User adminUser = doiDao.getAdminUsers().get(0);
         logger.info("Sending email to admin user: " + adminUser.getFullName());
+        logger.info("Email html: " + htmlMsgContent.toString());
 
         try {
 

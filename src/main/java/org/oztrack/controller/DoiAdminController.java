@@ -160,12 +160,12 @@ public class DoiAdminController {
         StringBuilder htmlMsgContent = new StringBuilder();
 
         htmlMsgContent.append("<p>\n");
-        htmlMsgContent.append("Regarding your request to mint a DOI for your project: \n");
-        htmlMsgContent.append("    <i>" + doi.getProject().getTitle() + "</i></p>\n");
+        htmlMsgContent.append("Regarding your request to mint a DOI for your project titled ");
+        htmlMsgContent.append("<i>" + doi.getProject().getTitle() + "</i></p>\n");
 
         htmlMsgContent.append("<p>\n");
-        htmlMsgContent.append("The request to mint a DOI for your project has been rejected.The administrator gives this reason:\n");
-        htmlMsgContent.append("    <i>" + doi.getRejectMessage() + "</i></p>\n");
+        htmlMsgContent.append("The request to mint a DOI for your project has been rejected. The administrator gives this reason:</p>\n");
+        htmlMsgContent.append("    <span style = \"color:red; margin-left:10px\">" + doi.getRejectMessage() + "</span>\n");
 
         htmlMsgContent.append("<p>\n");
         htmlMsgContent.append("    You may choose to recreate and resubmit the request, or delete it from your project.\n");

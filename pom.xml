@@ -14,7 +14,7 @@
     <groupId>org.oztrack</groupId>
     <artifactId>oztrack</artifactId>
     <packaging>war</packaging>
-    <version>4.8-SNAPSHOT</version>
+    <version>4.9-SNAPSHOT</version>
     <name>OzTrack</name>
     <url>http://zoatrack.org/</url>
     <scm>
@@ -213,7 +213,6 @@
                                 </execution>
                             </executions>
                         </plugin>
-
             <plugin>
                 <groupId>org.jvnet.jaxb2.maven2</groupId>
                 <artifactId>maven-jaxb2-plugin</artifactId>
@@ -234,9 +233,7 @@
                     </execution>
                 </executions>
             </plugin>
-
         </plugins>
-
     </build>
     <dependencies>
         <dependency>
