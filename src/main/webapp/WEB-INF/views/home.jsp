@@ -138,17 +138,18 @@
                     data: {
                         part: 'snippet',
                         channelId: channelId,
-                        type: 'video'
+                        type: 'video',
+                        maxResults: 10,
+                        orderby: 'published'
                     },
                     dataType: "json",
                     success: function (data) {
                         $.each(data.items, function(i) {
                             var videoUrl = '"http://www.youtube.com/watch?v=' + this.id.videoId + '"';
-                            $('#tutorials-table > tbody:last').append(
-                                    '<tr><td><img src="' + this.snippet.thumbnails.default.url
+                            $('<tr><td><img src="' + this.snippet.thumbnails.default.url
                                     + '" width = "60" height = "45"/></td>'
                                     + '<td><a href=' + videoUrl + ' target="_blank">'
-                                    + '' + this.snippet.title + '</a></td></tr>');
+                                    + '' + this.snippet.title + '</a></td></tr>').prependTo('#tutorials-table > tbody');
                         });
 
                         $('#tutorials-table > tbody:last').append('<tr><td></td>' +
