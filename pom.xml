@@ -25,7 +25,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <geotools.version>9.3</geotools.version>
-        <jetty.version>8.1.5.v20120716</jetty.version>
+        <jetty.version>9.2.13.v20150730</jetty.version>
+
     </properties>
     <build>
         <finalName>oztrack</finalName>
@@ -98,7 +99,6 @@
                     </filesets>
                 </configuration>
             </plugin>
-<!--
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
@@ -124,95 +124,77 @@
                         <artifactId>jetty-jsp</artifactId>
                         <version>${jetty.version}</version>
                     </dependency>
+                    <dependency>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>jetty-rewrite</artifactId>
+                        <version>${jetty.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>jetty-server</artifactId>
+                        <version>${jetty.version}</version>
+                    </dependency>
                 </dependencies>
-            </plugin>
-            -->
-            <plugin>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>jetty-maven-plugin</artifactId>
-                <version>${jetty.version}</version>
-                <configuration>
-                    <webAppConfig>
-                        <contextPath>/</contextPath>
-                        <overrideDescriptor>${basedir}/src/main/resources/override-web.xml</overrideDescriptor>
-                    </webAppConfig>
-                    <connectors>
-                        <connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">
-                            <port>8181</port>
-                        </connector>
-                        <connector implementation="org.eclipse.jetty.server.ssl.SslSocketConnector">
-                            <port>9443</port>
-                            <keystore>keystore</keystore>
-                            <keyPassword>123456</keyPassword>
-                            <password>123456</password>
-                            <!-- keystore produced by JDK keytool: keytool -keystore keystore -alias jetty -genkey -keyalg RSA -->
-                        </connector>
-                    </connectors>
-                    <stopKey>STOP</stopKey>
-                    <stopPort>8005</stopPort>
-                </configuration>
             </plugin>
             <!-- Run jslint using mvn jslint4java:lint -->
             <!-- http://jslint4java.googlecode.com/svn/docs/2.0.0/maven.html -->
-
-
-                        <plugin>
-                            <groupId>com.googlecode.jslint4java</groupId>
-                            <artifactId>jslint4java-maven-plugin</artifactId>
-                            <version>2.0.3</version>
-                            <configuration>
-                                <sourceFolders>
-                                    <sourceFolder>${basedir}/src/main/webapp/js</sourceFolder>
-                                </sourceFolders>
-                                <excludes>
-                                    <exclude>optimised/**/*.js</exclude>
-                                    <exclude>vendor/**/*.js</exclude>
-                                </excludes>
-                                <options>
-                                    <browser>true</browser>
-                                    <sloppy>true</sloppy>
-                                    <white>true</white>
-                                    <vars>true</vars>
-                                    <predef>$</predef>
-                                </options>
-                            </configuration>
-                        </plugin>
-                        <plugin>
-                            <groupId>ro.isdc.wro4j</groupId>
-                            <artifactId>wro4j-maven-plugin</artifactId>
-                            <version>1.6.0</version>
-                            <configuration>
-                                <contextFolder>${basedir}/src/main/webapp/</contextFolder>
-                                <wroManagerFactory>ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory</wroManagerFactory>
-                            </configuration>
-                            <executions>
-                                <execution>
-                                    <id>bootstrap</id>
-                                    <phase>compile</phase>
-                                    <goals>
-                                        <goal>run</goal>
-                                    </goals>
-                                    <configuration>
-                                        <wroFile>${basedir}/src/main/webapp/WEB-INF/wro-bootstrap.xml</wroFile>
-                                        <extraConfigFile>${basedir}/src/main/webapp/WEB-INF/wro-bootstrap.properties</extraConfigFile>
-                                        <cssDestinationFolder>${basedir}/src/main/webapp/css/generated/bootstrap/</cssDestinationFolder>
-                                    </configuration>
-                                </execution>
-                                <execution>
-                                    <id>compile</id>
-                                    <phase>compile</phase>
-                                    <goals>
-                                        <goal>run</goal>
-                                    </goals>
-                                    <configuration>
-                                        <wroFile>${basedir}/src/main/webapp/WEB-INF/wro-optimise.xml</wroFile>
-                                        <extraConfigFile>${basedir}/src/main/webapp/WEB-INF/wro-optimise.properties</extraConfigFile>
-                                        <cssDestinationFolder>${basedir}/src/main/webapp/css/optimised/</cssDestinationFolder>
-                                        <jsDestinationFolder>${basedir}/src/main/webapp/js/optimised/</jsDestinationFolder>
-                                    </configuration>
-                                </execution>
-                            </executions>
-                        </plugin>
+            <plugin>
+                <groupId>com.googlecode.jslint4java</groupId>
+                <artifactId>jslint4java-maven-plugin</artifactId>
+                <version>2.0.3</version>
+                <configuration>
+                    <sourceFolders>
+                        <sourceFolder>${basedir}/src/main/webapp/js</sourceFolder>
+                    </sourceFolders>
+                    <excludes>
+                        <exclude>optimised/**/*.js</exclude>
+                        <exclude>vendor/**/*.js</exclude>
+                    </excludes>
+                    <options>
+                        <browser>true</browser>
+                        <sloppy>true</sloppy>
+                        <white>true</white>
+                        <vars>true</vars>
+                        <predef>$</predef>
+                    </options>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>ro.isdc.wro4j</groupId>
+                <artifactId>wro4j-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <configuration>
+                    <contextFolder>${basedir}/src/main/webapp/</contextFolder>
+                    <wroManagerFactory>ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory</wroManagerFactory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>bootstrap</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <wroFile>${basedir}/src/main/webapp/WEB-INF/wro-bootstrap.xml</wroFile>
+                            <extraConfigFile>${basedir}/src/main/webapp/WEB-INF/wro-bootstrap.properties</extraConfigFile>
+                            <cssDestinationFolder>${basedir}/src/main/webapp/css/generated/bootstrap/</cssDestinationFolder>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <wroFile>${basedir}/src/main/webapp/WEB-INF/wro-optimise.xml</wroFile>
+                            <extraConfigFile>${basedir}/src/main/webapp/WEB-INF/wro-optimise.properties</extraConfigFile>
+                            <cssDestinationFolder>${basedir}/src/main/webapp/css/optimised/</cssDestinationFolder>
+                            <jsDestinationFolder>${basedir}/src/main/webapp/js/optimised/</jsDestinationFolder>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.jvnet.jaxb2.maven2</groupId>
                 <artifactId>maven-jaxb2-plugin</artifactId>
@@ -245,6 +227,12 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-jsp</artifactId>
+            <version>${jetty.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-rewrite</artifactId>
             <version>${jetty.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -494,10 +482,9 @@
     </dependencies>
     <repositories>
         <repository>
-            <id>maven2-repository.dev.java.net</id>
-            <name>Java.net Repository for Maven</name>
-            <url>http://download.java.net/maven/2/</url>
-            <layout>default</layout>
+            <id>ala-nexus</id>
+            <name>ALA Nexus Repository</name>
+            <url>http://nexus.ala.org.au/content/groups/public/</url>
         </repository>
          <repository>
             <id>osgeo</id>
