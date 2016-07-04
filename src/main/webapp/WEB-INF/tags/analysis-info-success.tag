@@ -86,10 +86,11 @@ if (analysis.result.type === 'HOME_RANGE') {
     exportHtml += '</div>';
 }
 </c:if>
+exportHtml += '<span class="layerInfoActions">';
 exportHtml += $.map(analysis.result.files, function(r) {
     return '<a class="icon ' + r.format + '" href="' + r.url + '">' + r.title + '</a>';
-}).join(', ');
-exportHtml += '</div>';
+}).join('  ');
+exportHtml += '</span></div>';
 $('#' + ${childIdJsExpr}).append(exportHtml);
 <c:if test="${project.crosses180}">
 if (analysis.result.type === 'HOME_RANGE') {

@@ -3,6 +3,7 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ attribute name="analysisTypeList" type="java.util.List" required="true" %>
 <%@ attribute name="headerActionsJsExpr" type="java.lang.String" required="false" %>
+<%@ attribute name="alaActionJsExpr" type="java.lang.String" required="false" %>
 <%@ attribute name="parentIdJsExpr" type="java.lang.String" required="true" %>
 <%@ attribute name="childIdJsExpr" type="java.lang.String" required="true" %>
 <%@ attribute name="statsIdJsExpr" type="java.lang.String" required="true" %>
@@ -10,7 +11,10 @@
 var html = '<div class="layerInfoHeader">';
 html += '<span class="layerInfoTitle">' + layerName + '</span>';
 <c:if test="${not empty headerActionsJsExpr}">
-html += $('<div>').append($('<span class="layerInfoActions">').append(${headerActionsJsExpr})).html();
+    html += $('<div>').append($('<span class="layerInfoActions">').append(${headerActionsJsExpr})).html();
+</c:if>
+<c:if test="${not empty alaActionJsExpr}">
+    html += $('<div>').append($('<span class="layerInfoActions">').append(${alaActionJsExpr})).html();
 </c:if>
 html += '<div style="clear: both;"></div>';
 html += '</div>';
@@ -40,3 +44,5 @@ $('#' + ${parentIdJsExpr}).append(
         </c:if>
         .html(html)
 );
+
+

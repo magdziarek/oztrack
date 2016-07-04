@@ -14,4 +14,5 @@ public interface AnalysisDao {
     Analysis update(Analysis analysis);
     List<Analysis> getSavedAnalyses(Project project);
     List<Analysis> getPreviousAnalyses(Project project, User createUser, String createSession);
+    String getAnalysisGeoJson(Long analysisId, Long animalId);
 }

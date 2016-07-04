@@ -32,6 +32,7 @@ public class OzTrackConfigurationImpl implements OzTrackConfiguration {
     private String doiClientId;
     private String doiLandingBaseUrl;
     private String googleApiKey;
+    private String alaApiKey;
 
 
     @Override
@@ -266,5 +267,16 @@ public class OzTrackConfigurationImpl implements OzTrackConfiguration {
     public void setGoogleApiKey(String googleApiKey) {
         this.googleApiKey = googleApiKey;
     }
+
+    @Override
+    public String getAlaApiKey() {
+        return alaApiKey;
+    }
+
+    public void setAlaApiKey(String alaApiKey) {
+        this.alaApiKey = alaApiKey;
+    }
+
+
 
 }

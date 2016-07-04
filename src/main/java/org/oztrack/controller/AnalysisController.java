@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringReader;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,6 +15,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.StringEntity;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,12 +31,19 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.json.JSONWriter;
+import org.oztrack.app.OzTrackApplication;
 import org.oztrack.app.OzTrackConfiguration;
 import org.oztrack.data.access.AnalysisDao;
+import org.oztrack.data.access.AnimalDao;
 import org.oztrack.data.access.PositionFixDao;
 import org.oztrack.data.access.ProjectDao;
 import org.oztrack.data.model.Analysis;
@@ -39,12 +54,14 @@ import org.oztrack.data.model.types.AnalysisResultAttributeType;
 import org.oztrack.data.model.types.AnalysisResultType;
 import org.oztrack.data.model.types.AnalysisStatus;
 import org.oztrack.error.RserveInterfaceException;
+import org.oztrack.util.HttpClientUtils;
 import org.oztrack.util.ShpUtils;
 import org.oztrack.view.HomeRangeResultFeatureBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -58,6 +75,8 @@ import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.RedirectView;
 
 @Controller
 public class AnalysisController {
@@ -78,6 +97,9 @@ public class AnalysisController {
 
     @Autowired
     private ProjectDao projectDao;
+
+    @Autowired
+    private AnimalDao animalDao;
 
     @Autowired
     private OzTrackPermissionEvaluator permissionEvaluator;
@@ -248,6 +270,7 @@ public class AnalysisController {
         analysis.setUpdateUser(currentUser);
         analysisDao.update(analysis);
         response.setStatus(204);
+
     }
 
     @RequestMapping(
@@ -297,6 +320,7 @@ public class AnalysisController {
             return;
         }
     }
+
 
     private void writeResultKml(
         HttpServletResponse response,
@@ -466,4 +490,61 @@ public class AnalysisController {
         out.append("    <error>" + StringUtils.trim(error) + "</error>\n");
         out.append("</analysis-result-response>\n");
     }
+
+    @RequestMapping(value="/projects/{projectId}/analyses/{analysisId}/ala", method=RequestMethod.GET, produces="application/json")
+    @PreAuthorize("hasPermission(#project, 'read')")
+    public void getAlaSpatialUrl(
+            Authentication authentication,
+            HttpServletRequest request,
+            HttpServletResponse response,
+            @ModelAttribute(value="analysis") Analysis analysis,
+            @RequestParam(value="animalId") Long animalId
+    ) throws URISyntaxException, IOException, JSONException {
+
+        // Post GeoJSON to ALA and return the ID response
+        OzTrackConfiguration configuration = OzTrackApplication.getApplicationContext();
+        String geoJson = analysisDao.getAnalysisGeoJson(analysis.getId(), animalId);
+        Animal animal = animalDao.getAnimalById(animalId);
+
+        JSONObject alaPostJson = new JSONObject();
+        alaPostJson.put("api_key", configuration.getAlaApiKey() );
+        alaPostJson.put("user_id", "zoatrack");
+        alaPostJson.put("geojson", new JSONObject(geoJson));
+        alaPostJson.put("name", animal.getAnimalName());
+        alaPostJson.put("description", "ZoaTrack data -  " + animal.getProject().getTitle());
+        logger.info("alaPostJson: " + alaPostJson.toString());
+
+        try {
+            URI uri = new URIBuilder()
+                    .setScheme("https")
+                    .setHost("spatial.ala.org.au/ws/shape/upload/geojson")
+                    .build();
+
+            HttpPost httpPost = new HttpPost(uri);
+            httpPost.setHeader("Content-Type", "application/json");
+            httpPost.setEntity(new StringEntity(alaPostJson.toString()));
+
+            DefaultHttpClient client = HttpClientUtils.createDefaultHttpClient();
+            HttpResponse httpResponse = client.execute(httpPost);
+            String stringJson = EntityUtils.toString(httpResponse.getEntity());
+            logger.info("ALA httpResponse: " + stringJson);
+            JSONObject jsonObject = new JSONObject(stringJson);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.setHeader("Cache-Control", "no-cache");
+            response.setHeader("Expires", "Thu, 01 Jan 1970 00:00:00 GMT");
+            JSONWriter out = new JSONWriter(response.getWriter());
+            out.object();
+            out.key("response");
+            out.value(jsonObject);
+            out.endObject();
+        } catch (Exception e) {
+            String msg = "Error connecting to ALA";
+            logger.error(msg, e);
+            response.setStatus(500);
+            writeResultError(response, msg);
+
+        }
+    }
+
 }
