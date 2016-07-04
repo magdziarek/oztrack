@@ -28,5 +28,6 @@ public interface OzTrackConfiguration {
     String getDoiClientId();
     String getDoiLandingBaseUrl();
     String getGoogleApiKey();
+    String getAlaApiKey();
 
 }

@@ -72,6 +72,7 @@
         <property name="doiClientId" value="${org.oztrack.conf.doiClientId}"/>
         <property name="doiLandingBaseUrl" value="${org.oztrack.conf.doiLandingBaseUrl}"/>
         <property name="googleApiKey" value="${org.oztrack.conf.googleApiKey}"/>
+        <property name="alaApiKey" value="${org.oztrack.conf.alaApiKey}"/>
         <property name="oaiPmhConfiguration">
             <bean class="org.oztrack.app.OzTrackOaiPmhConfigurationImpl">
                 <property name="oaiPmhEnabled" value="${org.oztrack.conf.oaipmh.oaiPmhEnabled}"/>
