@@ -71,5 +71,6 @@
         that.addAnalysisLayer = that.projectMap.addAnalysisLayer;
         that.deleteCurrentAnalysis = that.projectMap.deleteCurrentAnalysis;
         that.deleteAnalysis = that.projectMap.deleteAnalysis;
+        that.openAlaPolygon = that.projectMap.openAlaPolygon;
     };
 }(window.OzTrack = window.OzTrack || {}));

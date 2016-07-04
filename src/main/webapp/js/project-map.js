@@ -2053,6 +2053,28 @@
             }
         };
 
+        that.openAlaPolygon = function(analysisId, animalId) {
+            var getUrl =  "/projects/" + that.project.id + "/analyses/" + analysisId + "/ala";
+            $.ajax({
+                url: getUrl,
+                data: {animalId: animalId},
+                type: 'GET',
+                error: function(xhr, textStatus, errorThrown) {
+                    that.showMessage('Error', $(xhr.responseText).find('error').text() || 'Error sending polygon');
+                    that.onAnalysisError && that.onAnalysisError(null);
+                },
+                complete: function (xhr, textStatus) {
+                    if (textStatus == 'success') {
+                        var resp = $.parseJSON(xhr.responseText);
+                        var id = resp["response"]["id"];
+                        var url = "http://spatial.ala.org.au/webportal//?pid=" + id;
+                        window.open(url,"_blank");
+                    }
+                }
+            });
+        }
+
+
         function updateAnimalInfoFromAnalysisCreate(layerName, analysis) {
             if (that.onUpdateAnimalInfoFromAnalysisCreate) {
                 var fromDate = moment(analysis.params.fromDate || that.project.minDate).format('YYYY-MM-DD');
@@ -2097,5 +2119,6 @@
                 );
             }
         }
+        
     }
 }(window.OzTrack = window.OzTrack || {}));

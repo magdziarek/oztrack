@@ -257,7 +257,6 @@
                     $(this).prev().prop('disabled', false);
                     $('#projectMapCancel').fadeOut();
                 });
-
                 var projectBounds = new OpenLayers.Bounds(
                     ${projectBoundingBox.envelopeInternal.minX}, ${projectBoundingBox.envelopeInternal.minY},
                     ${projectBoundingBox.envelopeInternal.maxX}, ${projectBoundingBox.envelopeInternal.maxY}
@@ -351,12 +350,22 @@
                         <tags:analysis-info-create
                             headerActionsJsExpr="
                                 $('<button>')
+                                .addClass('btn')
+                                .addClass('btn-small')
+                                .addClass('btn-layer-info')
+                                .attr('onclick', 'analysisMap.deleteAnalysis(\\'' + analysis.id + '\\', true);')
+                                .append($('<i>').addClass('icon-trash'))
+
+                            "
+                            alaActionJsExpr="
+                                     $('<button>')
                                     .addClass('btn')
                                     .addClass('btn-small')
                                     .addClass('btn-layer-info')
-                                    .attr('onclick', 'analysisMap.deleteAnalysis(\\'' + analysis.id + '\\', true);')
-                                    .append($('<i>').addClass('icon-trash'))
-                            "
+                                    .addClass('ala-btn')
+                                    .attr('onclick', 'analysisMap.openAlaPolygon(\\'' + analysis.id + '\\', \\'' + animalId + '\\');')
+                                    .append($('<img>').attr('src','../../img/ala-logo-sm.png'))
+                                    "
                             parentIdJsExpr="'animalInfo-' + animalId"
                             childIdJsExpr="'analysisInfo-' + animalId + '-' + analysis.id"
                             statsIdJsExpr="'analysis-stats-' + animalId + '-' + analysis.id"
@@ -616,7 +625,7 @@
             </ul>
             <div id="animalPanel">
 
-                <div class="layerInfo">
+                <div id="allAnimals" class="layerInfo">
                     <div class="layerInfoHeader">All Animals</div>
                     <div class="layerInfoStats">
                         <span class="layerInfoStat">Date Range:
