@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 import org.oztrack.data.access.AnalysisDao;
 import org.oztrack.data.model.Analysis;
@@ -87,5 +88,18 @@ public class AnalysisDaoImpl implements AnalysisDao {
         // Now reverse the list of those N analyses so order is by date ascending.
         Collections.reverse(resultList);
         return resultList;
+    }
+
+    @Override
+    public String getAnalysisGeoJson(Long analysisId, Long animalId) {
+
+        Query query = em.createNativeQuery(
+                "select ST_AsGeoJSON(the_geom) \n" +
+                "from analysis_result_feature f \n" +
+                "where f.analysis_id = :analysisId \n" +
+                "and f.animal_id = :animalId");
+        query.setParameter("analysisId", analysisId);
+        query.setParameter("animalId", animalId);
+        return (String) query.getSingleResult();
     }
 }
