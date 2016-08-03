@@ -145,10 +145,10 @@ public class AnalysisController {
     @RequestMapping(value="/projects/{projectId}/analyses/{analysisId}", method=RequestMethod.GET, produces="application/json")
     @PreAuthorize("permitAll")
     public void handleJSON(
-        Authentication authentication,
-        HttpServletRequest request,
-        HttpServletResponse response,
-        @ModelAttribute(value="analysis") Analysis analysis
+            Authentication authentication,
+            HttpServletRequest request,
+            HttpServletResponse response,
+            @ModelAttribute(value="analysis") Analysis analysis
     ) throws IOException, JSONException {
         if (!hasPermission(authentication, request, analysis, "read")) {
             response.setStatus(403);
@@ -233,11 +233,11 @@ public class AnalysisController {
     @RequestMapping(value="/projects/{projectId}/analyses/{analysisId}/saved", method=RequestMethod.PUT, consumes="application/json")
     @PreAuthorize("permitAll")
     public void updateSaved(
-        Authentication authentication,
-        HttpServletRequest request,
-        HttpServletResponse response,
-        @ModelAttribute(value="analysis") Analysis analysis,
-        @RequestBody String savedString
+            Authentication authentication,
+            HttpServletRequest request,
+            HttpServletResponse response,
+            @ModelAttribute(value="analysis") Analysis analysis,
+            @RequestBody String savedString
     ) {
         User currentUser = permissionEvaluator.getAuthenticatedUser(authentication);
         if (!hasPermission(authentication, request, analysis, "write")) {
@@ -254,11 +254,11 @@ public class AnalysisController {
     @RequestMapping(value="/projects/{projectId}/analyses/{analysisId}/description", method=RequestMethod.PUT, consumes="text/plain")
     @PreAuthorize("permitAll")
     public void updateDescription(
-        Authentication authentication,
-        HttpServletRequest request,
-        HttpServletResponse response,
-        @ModelAttribute(value="analysis") Analysis analysis,
-        @RequestBody String description
+            Authentication authentication,
+            HttpServletRequest request,
+            HttpServletResponse response,
+            @ModelAttribute(value="analysis") Analysis analysis,
+            @RequestBody String description
     ) {
         User currentUser = permissionEvaluator.getAuthenticatedUser(authentication);
         if (!hasPermission(authentication, request, analysis, "write")) {
@@ -274,21 +274,21 @@ public class AnalysisController {
     }
 
     @RequestMapping(
-        value="/projects/{projectId}/analyses/{analysisId}/result",
-        method=RequestMethod.GET,
-        produces={
-            "application/vnd.google-earth.kml+xml",
-            "application/zip"
-        }
+            value="/projects/{projectId}/analyses/{analysisId}/result",
+            method=RequestMethod.GET,
+            produces={
+                    "application/vnd.google-earth.kml+xml",
+                    "application/zip"
+            }
     )
     @PreAuthorize("permitAll")
     public void handleResult(
-        Authentication authentication,
-        HttpServletRequest request,
-        HttpServletResponse response,
-        @ModelAttribute(value="analysis") Analysis analysis,
-        @RequestParam(value="format", defaultValue="kml") String format,
-        @RequestParam(value="fill", defaultValue="true") Boolean fill
+            Authentication authentication,
+            HttpServletRequest request,
+            HttpServletResponse response,
+            @ModelAttribute(value="analysis") Analysis analysis,
+            @RequestParam(value="format", defaultValue="kml") String format,
+            @RequestParam(value="fill", defaultValue="true") Boolean fill
     ) {
         if (!hasPermission(authentication, request, analysis, "read")) {
             response.setStatus(403);
@@ -323,11 +323,11 @@ public class AnalysisController {
 
 
     private void writeResultKml(
-        HttpServletResponse response,
-        Analysis analysis,
-        Boolean fill
+            HttpServletResponse response,
+            Analysis analysis,
+            Boolean fill
     )
-    throws Exception {
+            throws Exception {
         String fileName = "analysis-" + analysis.getId() + ".kml";
         response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
         response.setContentType("application/vnd.google-earth.kml+xml");
@@ -457,15 +457,15 @@ public class AnalysisController {
     }
 
     @RequestMapping(
-        value="/projects/{projectId}/analyses/{analysisId}/apply",
-        method=RequestMethod.POST,
-        produces="application/xml"
+            value="/projects/{projectId}/analyses/{analysisId}/apply",
+            method=RequestMethod.POST,
+            produces="application/xml"
     )
     @PreAuthorize("hasPermission(#analysis.project, 'write')")
     public void processCleanse(
-        @ModelAttribute(value="analysis") Analysis analysis,
-        HttpServletRequest request,
-        HttpServletResponse response
+            @ModelAttribute(value="analysis") Analysis analysis,
+            HttpServletRequest request,
+            HttpServletResponse response
     ) throws IOException, RserveInterfaceException {
         positionFixDao.applyKalmanFilter(analysis);
         ArrayList<Long> animalIds = new ArrayList<Long>();
@@ -491,8 +491,8 @@ public class AnalysisController {
         out.append("</analysis-result-response>\n");
     }
 
+    @PreAuthorize("permitAll")
     @RequestMapping(value="/projects/{projectId}/analyses/{analysisId}/ala", method=RequestMethod.GET, produces="application/json")
-    @PreAuthorize("hasPermission(#project, 'read')")
     public void getAlaSpatialUrl(
             Authentication authentication,
             HttpServletRequest request,
@@ -500,6 +500,21 @@ public class AnalysisController {
             @ModelAttribute(value="analysis") Analysis analysis,
             @RequestParam(value="animalId") Long animalId
     ) throws URISyntaxException, IOException, JSONException {
+
+        if (!hasPermission(authentication, request, analysis, "read")) {
+            response.setStatus(403);
+            return;
+        }
+        if (analysis.getStatus() == AnalysisStatus.FAILED) {
+            response.setStatus(500);
+            writeResultError(response, analysis.getMessage());
+            return;
+        }
+        if ((analysis.getStatus() == AnalysisStatus.NEW) || (analysis.getStatus() == AnalysisStatus.PROCESSING)) {
+            response.setStatus(404);
+            writeResultError(response, "Processing");
+            return;
+        }
 
         // Post GeoJSON to ALA and return the ID response
         OzTrackConfiguration configuration = OzTrackApplication.getApplicationContext();
@@ -512,7 +527,6 @@ public class AnalysisController {
         alaPostJson.put("geojson", new JSONObject(geoJson));
         alaPostJson.put("name", animal.getAnimalName());
         alaPostJson.put("description", "ZoaTrack data -  " + animal.getProject().getTitle());
-        logger.info("alaPostJson: " + alaPostJson.toString());
 
         try {
             URI uri = new URIBuilder()

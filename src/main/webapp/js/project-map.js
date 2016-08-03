@@ -2068,7 +2068,10 @@
                         var resp = $.parseJSON(xhr.responseText);
                         var id = resp["response"]["id"];
                         var url = "http://spatial.ala.org.au/webportal//?pid=" + id;
-                        window.open(url,"_blank");
+                        var open = window.open(url,"_blank");
+                        if (open == null || typeof(open)=='undefined') {
+                            alert("Please disable your popup blocker.")
+                        }
                     }
                 }
             });

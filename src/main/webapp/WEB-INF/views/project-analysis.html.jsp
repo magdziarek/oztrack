@@ -364,6 +364,8 @@
                                     .addClass('btn-layer-info')
                                     .addClass('ala-btn')
                                     .attr('onclick', 'analysisMap.openAlaPolygon(\\'' + analysis.id + '\\', \\'' + animalId + '\\');')
+                                    .attr('data-toggle','tooltip')
+                                    .attr('title','Open this analysis in the Atlas of Living Australia Spatial Portal')
                                     .append($('<img>').attr('src','../../img/ala-logo-sm.png'))
                                     "
                             parentIdJsExpr="'animalInfo-' + animalId"
