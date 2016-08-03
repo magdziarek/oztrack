@@ -26,12 +26,12 @@ public class ProxyController {
 
     @RequestMapping(value="/proxy/bie.ala.org.au/search", method=RequestMethod.GET)
     public void handleAlaSearch(HttpServletRequest outerRequest, HttpServletResponse outerResponse) throws IOException {
-        handle("http://bie.ala.org.au/search.json", outerRequest, outerResponse);
+        handle("http://bie.ala.org.au/ws/search.json", outerRequest, outerResponse);
     }
 
     @RequestMapping(value="/proxy/bie.ala.org.au/search/auto.json", method=RequestMethod.GET)
     public void handleAlaSearchAuto(HttpServletRequest outerRequest, HttpServletResponse outerResponse) throws IOException {
-        handle("http://bie.ala.org.au/search/auto.json", outerRequest, outerResponse);
+        handle("http://bie.ala.org.au/ws/search/auto.json", outerRequest, outerResponse);
     }
 
     @RequestMapping(value="/proxy/blog", method=RequestMethod.GET)
