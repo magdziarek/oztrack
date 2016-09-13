@@ -94,7 +94,7 @@ public class SearchController {
     }
 
     @RequestMapping(value="/projects/{id}/search", method=RequestMethod.GET)
-    @PreAuthorize("hasPermission(#project, 'read')")
+    @PreAuthorize("hasPermission(#searchQuery.project, 'read')")
     public String showForm(
         Model model,
         @ModelAttribute(value="project") Project project,
