@@ -167,17 +167,8 @@
 <c:if test="${not fluid}">
     <div id="footer">
         <div id="logos">
-
             <a target="_blank" href="http://ala.org.au/"><img src="${pageContext.request.contextPath}/img/logo_ala.png" width="77px" height="60px"/></a>
-            <a target="_blank" href="http://une.edu.au/"><img src="${pageContext.request.contextPath}/img/logo_UNE.gif" width="93px" height="78px"/></a>
-            <a target="_blank" href="http://tern.edu.au/"><img src="${pageContext.request.contextPath}/img/logo_tern.gif" width="111px" height="97px"/></a>
-            <a target="_blank" href="http://sims.edu.au/"><img src="${pageContext.request.contextPath}/img/logo_SIMS.png" width="131px" height="59px"/></a>
-            <a target="_blank" href="http://csiro.au/"><img src="${pageContext.request.contextPath}/img/logo_CSIRO.png" width="100px" height="100px"/></a>
-            <a target="_blank" href="http://mq.edu.au//"><img src="${pageContext.request.contextPath}/img/logo_MQlogo1.png" width="125px" height="38px"/></a>
-            <br/>
-            <a target="_blank" href="http://mq.edu.au//"><img src="${pageContext.request.contextPath}/img/logo_uni_auckland.png" width="76px" height="89px"/></a>
             <a target="_blank" href="http://nectar.org.au/"><img src="${pageContext.request.contextPath}/img/nectar-logo.png" width="140px" height="32px"/></a>
-            <a target="_blank" href="http://itee.uq.edu.au/~eresearch/"><img src="${pageContext.request.contextPath}/img/uq_logo.png" width="140px" height="40px"/></a>
         </div>
         <div id="site-licence">
             All site content, except where otherwise noted, is licensed under a
