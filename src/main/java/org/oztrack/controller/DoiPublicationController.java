@@ -32,7 +32,7 @@ public class DoiPublicationController {
         return doiDao.getDoiByUuid(convertedUuid);
     }
 
-    @RequestMapping(value="/publication/{uuid}", method= RequestMethod.GET, produces="text/html")
+    @RequestMapping(value="/publication/{uuid}", method={RequestMethod.GET,RequestMethod.HEAD}, produces="text/html")
     public String getHtmlView(@ModelAttribute(value="doi") Doi doi, Model model)  throws Exception {
         OzTrackConfiguration configuration = OzTrackApplication.getApplicationContext();
         File zipFile = new File(configuration.getDataDir() + File.separator + "publication"  + File.separator + doi.getUuid().toString() + ".zip");
