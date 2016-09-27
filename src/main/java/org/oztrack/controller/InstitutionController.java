@@ -51,10 +51,12 @@ public class InstitutionController {
         binder.setAllowedFields(
             "title",
             "domainName",
-            "country"
+            "country",
+            "alaInstitutionId"
         );
         binder.registerCustomEditor(String.class, "domainName", new StringTrimmerEditor(true));
         binder.registerCustomEditor(Country.class, "country", new CountryPropertyEditor(countryDao));
+        binder.registerCustomEditor(String.class, "alaInstitutionId", new StringTrimmerEditor(true));
     }
 
     @ModelAttribute("institution")

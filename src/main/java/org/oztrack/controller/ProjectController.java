@@ -127,9 +127,11 @@ public class ProjectController {
             "srsIdentifier",
             "access",
             "rightsStatement",
-            "licencingAndEthics"
+            "licencingAndEthics",
+                "institution"
         );
         binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("yyyy-MM-dd"), true));
+        binder.registerCustomEditor(Institution.class, "institution", new InstitutionPropertyEditor(institutionDao));
     }
 
     @ModelAttribute("project")
@@ -187,6 +189,12 @@ public class ProjectController {
         String[] publicationUrlParam = request.getParameterValues("publicationUrl");
         String[] contributorIdParam = request.getParameterValues("contributor");
 
+        if (project.getInstitution() == null) {
+            logger.info("no primary institution info returned in project object");
+        } else {
+            logger.info("primary institution returned: " + project.getInstitution().getId() + "," + project.getInstitution());
+        }
+
         Date prevEmbargoDate = project.getEmbargoDate();
         if (project.getAccess().equals(ProjectAccess.EMBARGO) && StringUtils.isNotBlank(embargoDateString)) {
             Date embargoDate = isoDateFormat.parse(embargoDateString);
@@ -215,7 +223,7 @@ public class ProjectController {
         List<ProjectContribution> previousContributions = new ArrayList<ProjectContribution>(project.getProjectContributions());
         setProjectContributions(project, bindingResult, contributorIdParam, personDao);
 
-        new ProjectFormValidator(projectDao, prevEmbargoDate).validate(project, bindingResult);
+        new ProjectFormValidator(projectDao, prevEmbargoDate, institutionDao).validate(project, bindingResult);
 
         if (bindingResult.hasErrors()) {
             project.setEmbargoDate(prevEmbargoDate);
@@ -511,6 +519,7 @@ public class ProjectController {
         model.addAttribute("srsList", srsDao.getAllOrderedByBoundsAreaDesc());
         model.addAttribute("currentYear", currentCalendar.get(Calendar.YEAR));
         model.addAttribute("currentDate", currentCalendar.getTime());
+        model.addAttribute("institutions", institutionDao.getAllOrderedByTitle());
         boolean beforeClosedAccessDisableDate =
             (configuration.getClosedAccessDisableDate() == null) ||
             (project.getCreateDate().before(configuration.getClosedAccessDisableDate()));

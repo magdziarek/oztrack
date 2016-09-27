@@ -502,6 +502,21 @@
             <fieldset>
                 <div class="legend">Research Metadata</div>
                 <div class="control-group">
+                    <label class="control-label" for="institution">Primary Institution</label>
+                    <div class="controls">
+                            <form:select path="institution" id="institution">
+                                <form:option value="">Select institution ...</form:option>
+                                <form:options items="${institutions}" itemValue="id" itemLabel="title"/>
+                            </form:select>
+                         <form:errors path="institution" element="div" cssClass="help-block formErrors"/>
+                           <div class="help-inline">
+                            <div class="help-popover" title="Nominate a Primary Institution">
+                                Choose the primary institution associated with this project. If your institution doesn't appear on the list, email the administrator.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="control-group">
                     <label class="control-label" for="new-contributor">Contributors</label>
                     <div class="controls">
                         <p class="help-block" style="margin: 5px 0 9px 0;">

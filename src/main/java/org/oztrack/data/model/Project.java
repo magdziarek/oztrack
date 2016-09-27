@@ -127,6 +127,13 @@ public class Project extends OzTrackBaseEntity {
     @Column(columnDefinition="TEXT")
     private String licencingAndEthics;
 
+    @ManyToOne
+    @JoinColumn(name="institution_id")
+    private Institution institution;
+
+    @Column(name="ala_data_resource_id")
+    private String alaDataResourceId;
+
     public Project() {
     }
 
@@ -341,6 +348,23 @@ public class Project extends OzTrackBaseEntity {
     public void setLicencingAndEthics(String licencingAndEthics) {
         this.licencingAndEthics = licencingAndEthics;
     }
+
+    public String getAlaDataResourceId() {
+        return alaDataResourceId;
+    }
+
+    public void setAlaDataResourceId(String alaDataResourceId) {
+        this.alaDataResourceId = alaDataResourceId;
+    }
+
+    public Institution getInstitution() {
+        return institution;
+    }
+
+    public void setInstitution(Institution institution) {
+        this.institution = institution;
+    }
+
 
     @Override
     public boolean equals(Object obj) {

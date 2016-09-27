@@ -56,6 +56,9 @@ public class Institution extends OzTrackBaseEntity {
     @Sort(type=SortType.NATURAL)
     private SortedSet<String> oaiPmhSetSpecs;
 
+    @Column(name="ala_institution_id")
+    private String alaInstitutionId;
+
     public Long getId() {
         return id;
     }
@@ -119,4 +122,16 @@ public class Institution extends OzTrackBaseEntity {
     public void setOaiPmhSetSpecs(SortedSet<String> oaiPmhSetSpecs) {
         this.oaiPmhSetSpecs = oaiPmhSetSpecs;
     }
+
+    public String getAlaInstitutionId() {
+        return alaInstitutionId;
+    }
+
+    public void setAlaInstitutionId(String alaInstitutionId) {
+        this.alaInstitutionId = alaInstitutionId;
+    }
+
+
+
+
 }

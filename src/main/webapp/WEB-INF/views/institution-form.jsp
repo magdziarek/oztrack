@@ -14,8 +14,21 @@
         &rsaquo; <a href="${pageContext.request.contextPath}/settings/institutions">Institutions</a>
         &rsaquo; <span class="active">${institution.title}</span>
     </jsp:attribute>
+	<jsp:attribute name="tail">
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$('#alaInstitutionCheck').click(function(e) {
+					e.preventDefault();
+					var id =  $(e.target).siblings('.input-xlarge').val();
+					if (id != "") {
+						window.open('http://collections.ala.org.au/public/show/' + id, '_blank');
+					}
+				});
+			});
+		</script>
+	</jsp:attribute>
     <jsp:body>
-        <h1>${institution.title}</h2>
+        <h1>${institution.title}</h1>
         <form:form class="form-horizontal form-bordered" commandName="institution"
         	method="PUT" action="${pageContext.request.contextPath}/institutions/${institution.id}">
         	<fieldset>
@@ -36,16 +49,26 @@
 	                </div>
                 </div>
                 <div class="control-group">
-            		<label for="institution-${institution.id}-domainName" class="control-label">Country</label>
-		            <div class="controls">
-			            <select name="country" id="institution-${institution.id}-country" style="width: 284px;">
-			                <option value="">Select country</option>
-			                <c:forEach var="country" items="${countries}">
-			                <option value="${country.id}"<c:if test="${country == institution.country}"> selected="selected"</c:if>>${country.title}</option>
-			                </c:forEach>
-			            </select>
-		            </div>
-	            </div>
+				<label for="institution-${institution.id}-domainName" class="control-label">Country</label>
+				<div class="controls">
+					<select name="country" id="institution-${institution.id}-country" style="width: 284px;">
+						<option value="">Select country</option>
+						<c:forEach var="country" items="${countries}">
+							<option value="${country.id}"<c:if test="${country == institution.country}"> selected="selected"</c:if>>${country.title}</option>
+						</c:forEach>
+					</select>
+				</div>
+				</div>
+				<div class="control-group">
+					<label for="institution-${institution.id}-alaInstitutionId" class="control-label">ALA Institution Id</label>
+					<div class="controls">
+						<form:input type="text" class="input-xlarge"
+									id="institution-${institution.id}-alaInstitutionId"
+									path="alaInstitutionId" placeholder="e.g. in9999 (see collections.ala.org.au)" />
+						<button id="alaInstitutionCheck">Check</button>
+					</div>
+
+				</div>
             </fieldset>
             <div class="form-actions">
             	<button type="submit" class="btn btn-primary">Save</button>
@@ -86,5 +109,15 @@
 	                )); return false;">Delete</button>
             </div>
         </form>
+		<div class="form-horizontal form-bordered">
+			<div class="legend">Affiliations</div>
+			<c:if test="${institution.people.size() == 0}">- None.</c:if>
+			<ul>
+				<c:forEach items="${institution.people}" var="person">
+					<li>${person.fullName}<c:if test="${not empty person.email}"> (${person.email})</c:if></li>
+				</c:forEach>
+			</ul>
+			<br/>
+		</div>
     </jsp:body>
 </tags:page>

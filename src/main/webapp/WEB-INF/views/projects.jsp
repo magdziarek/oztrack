@@ -88,15 +88,6 @@
                 padding-bottom:15px;
             }
 
-            a.morelink {
-                text-decoration:none;
-                outline: none;
-                color: #aaaaaa;
-            }
-            .morecontent span {
-                display: none;
-            }
-
             #project-list-div {
                 margin:10px 0;
             }
@@ -141,6 +132,7 @@
         <script src="${pageContext.request.scheme}://maps.google.com/maps/api/js?v=3.9&sensor=false"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/optimised/openlayers.js"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/home.js"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/oztrack.js"></script>
         <script type="text/javascript">
 
 
@@ -152,39 +144,7 @@
                     window.document.location = $(this).data('url');
                 });
 
-                var showChar = 50;
-                var ellipsestext = "...";
-                var moretext = "more";
-                var lesstext = "less";
 
-                $('.more').each(function() {
-
-                    var content = $(this).html();
-                    if(content.length > showChar) {
-
-                        var c = content.substr(0, showChar);
-                        var h = content.substr(showChar, content.length - showChar);
-
-                        var html = c + '<span class="moreellipses">' + ellipsestext + ' </span>' +
-                                '<span class="morecontent"><span>' + h +
-                                '</span>  <a href="" class="morelink">' + moretext + '</a></span>';
-
-                        $(this).html(html);
-                    }
-                });
-
-                $(".morelink").click(function(){
-                    if($(this).hasClass("less")) {
-                        $(this).removeClass("less");
-                        $(this).html(moretext);
-                    } else {
-                        $(this).addClass("less");
-                        $(this).html(lesstext);
-                    }
-                    $(this).parent().prev().toggle();
-                    $(this).prev().toggle();
-                    return false;
-                });
 
                 $('#projects-table').DataTable({
                    "aLengthMenu": [[5, 10, 50, -1], [5, 10, 50, "All"]],

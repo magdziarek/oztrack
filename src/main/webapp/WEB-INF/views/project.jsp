@@ -397,7 +397,17 @@
     </jsp:attribute>
     <jsp:body>
         <h1 id="projectTitle"><c:out value="${project.title}"/></h1>
-        
+
+        <c:if test="${not empty project.institution}">
+            <div class="row">
+                <div class="span9">
+                    <h3>
+                       ${project.institution.title}<c:if test="${not empty project.institution.country}">, ${project.institution.country.title}</c:if>
+                    </h3>
+                </div> <!-- .span9 -->
+            </div> <!-- .row -->
+        </c:if>
+
         <c:if test="${not empty project.description}">
         <div class="row">
         <div class="span9">

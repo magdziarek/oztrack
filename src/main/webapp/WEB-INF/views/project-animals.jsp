@@ -9,28 +9,6 @@
 <tags:page title="${project.title}: Animals">
     <jsp:attribute name="head">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/optimised/openlayers.css" type="text/css">
-        <style type="text/css">
-
-            #zoatrack-datatable-div {
-                margin:10px 0;
-                font-size:11px;
-            }
-
-            #zoatrack-datatable-div select {
-                width: 55px;
-            }
-
-            table.dataTable thead th, table.dataTable thead td {
-                padding: 8px;
-                vertical-align: middle;
-            }
-
-            table.dataTable thead th {
-                background-color: #f5ce7c;
-            }
-
-
-        </style>
     </jsp:attribute>
     <jsp:attribute name="description">
         Listing of animals tracked in the ${project.title} project.

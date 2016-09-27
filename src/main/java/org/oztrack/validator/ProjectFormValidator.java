@@ -7,7 +7,9 @@ import java.util.Date;
 import org.apache.commons.lang3.time.DateUtils;
 import org.geotools.referencing.CRS;
 import org.oztrack.app.OzTrackApplication;
+import org.oztrack.data.access.InstitutionDao;
 import org.oztrack.data.access.ProjectDao;
+import org.oztrack.data.model.Institution;
 import org.oztrack.data.model.Project;
 import org.oztrack.data.model.types.ProjectAccess;
 import org.oztrack.util.EmbargoUtils;
@@ -20,10 +22,12 @@ public class ProjectFormValidator implements Validator {
 
     private final ProjectDao projectDao;
     private final Date prevEmbargoDate;
+    private final InstitutionDao institutionDao;
 
-    public ProjectFormValidator(ProjectDao projectDao, Date prevEmbargoDate) {
+    public ProjectFormValidator(ProjectDao projectDao, Date prevEmbargoDate, InstitutionDao institutionDao) {
         this.projectDao = projectDao;
         this.prevEmbargoDate = prevEmbargoDate;
+        this.institutionDao = institutionDao;
     }
 
     @Override
@@ -86,6 +90,10 @@ public class ProjectFormValidator implements Validator {
         Project projectWithSameTitle = projectDao.getProjectByTitle(project.getTitle());
         if ((projectWithSameTitle != null) && (projectWithSameTitle.getId() != project.getId())) {
             errors.rejectValue("title", "error.duplicateTitle", "Project with same title already exists.");
+        }
+
+        if (project.getInstitution() != null && institutionDao.getById(project.getInstitution().getId()) == null) {
+            errors.rejectValue("institution", "error.institution", "Problem with the institution");
         }
     }
 }

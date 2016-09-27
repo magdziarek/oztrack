@@ -18,6 +18,8 @@ import org.oztrack.data.access.PersonDao;
 import org.oztrack.data.access.ProjectDao;
 import org.oztrack.data.access.SrsDao;
 import org.oztrack.data.access.UserDao;
+import org.oztrack.data.access.InstitutionDao;
+import org.oztrack.data.model.Institution;
 import org.oztrack.data.model.Project;
 import org.oztrack.data.model.ProjectContribution;
 import org.oztrack.data.model.User;
@@ -64,6 +66,9 @@ public class ProjectListController {
     private DataLicenceDao dataLicenceDao;
 
     @Autowired
+    private InstitutionDao institutionDao;
+
+    @Autowired
     private EmailBuilderFactory emailBuilderFactory;
 
     @InitBinder("project")
@@ -79,9 +84,11 @@ public class ProjectListController {
             "access",
             "embargoDate",
             "rightsStatement",
-            "licencingAndEthics"
+            "licencingAndEthics",
+                "institution"
         );
         binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("yyyy-MM-dd"), true));
+        binder.registerCustomEditor(Institution.class, "institution", new InstitutionPropertyEditor(institutionDao));
     }
 /*
     @InitBinder("openAccessProjects")
@@ -177,7 +184,7 @@ public class ProjectListController {
         }
         ProjectController.setProjectPublications(project, bindingResult, publicationReferenceParam, publicationUrlParam);
         ProjectController.setProjectContributions(project, bindingResult, conbtributorIdParam, personDao);
-        new ProjectFormValidator(projectDao, null).validate(project, bindingResult);
+        new ProjectFormValidator(projectDao, null, institutionDao).validate(project, bindingResult);
         if (bindingResult.hasErrors()) {
             project.setEmbargoDate(DateUtils.addYears(currentCalendar.getTime(), 1));
             addFormAttributes(model);
@@ -205,6 +212,7 @@ public class ProjectListController {
         model.addAttribute("srsList", srsDao.getAllOrderedByBoundsAreaDesc());
         model.addAttribute("currentYear", currentCalendar.get(Calendar.YEAR));
         model.addAttribute("currentDate", currentCalendar.getTime());
+        model.addAttribute("institutions", institutionDao.getAllOrderedByTitle());
         boolean beforeClosedAccessDisableDate =
             (configuration.getClosedAccessDisableDate() == null) ||
             (currentCalendar.getTime().before(configuration.getClosedAccessDisableDate()));
