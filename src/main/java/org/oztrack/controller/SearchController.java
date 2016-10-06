@@ -94,7 +94,7 @@ public class SearchController {
     }
 
     @RequestMapping(value="/projects/{id}/search", method=RequestMethod.GET)
-    @PreAuthorize("hasPermission(#searchQuery.project, 'read')")
+    @PreAuthorize("hasPermission(#project, 'read')")
     public String showForm(
         Model model,
         @ModelAttribute(value="project") Project project,
@@ -195,7 +195,6 @@ public class SearchController {
     ) throws Exception {
         List<Animal> projectAnimalsList = animalDao.getAnimalsByProjectId(project.getId());
         Page<PositionFix> positionFixPage = positionFixDao.getPage(searchQuery, offset, 30);
-        model.addAttribute("project", project);
         model.addAttribute("searchQuery", searchQuery);
         model.addAttribute("positionFixPage", positionFixPage);
         model.addAttribute("projectAnimalsList", projectAnimalsList);
