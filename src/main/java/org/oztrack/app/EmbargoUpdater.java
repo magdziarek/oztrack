@@ -43,13 +43,15 @@ public class EmbargoUpdater implements Runnable {
 
     @Override
     public void run() {
-        logger.debug("Running embargo updater.");
-        EntityManager entityManager = entityManagerFactory.createEntityManager();
-        ProjectDaoImpl projectDao = new ProjectDaoImpl();
-        projectDao.setEntityManger(entityManager);
-        Date currentDate = new Date();
-        endEmbargo(entityManager, projectDao, currentDate);
-        sendNotifications(entityManager, projectDao, currentDate);
+        if (!configuration.getTestServer()) {
+            logger.debug("Running embargo updater.");
+            EntityManager entityManager = entityManagerFactory.createEntityManager();
+            ProjectDaoImpl projectDao = new ProjectDaoImpl();
+            projectDao.setEntityManger(entityManager);
+            Date currentDate = new Date();
+            endEmbargo(entityManager, projectDao, currentDate);
+            sendNotifications(entityManager, projectDao, currentDate);
+        }
     }
 
     private void endEmbargo(EntityManager entityManager, ProjectDaoImpl projectDao, Date currentDate) {
