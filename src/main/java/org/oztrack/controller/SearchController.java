@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.oztrack.data.access.AnimalDao;
 import org.oztrack.data.access.Page;
 import org.oztrack.data.access.PositionFixDao;
@@ -53,19 +54,15 @@ public class SearchController {
     private PositionFixDao positionFixDao;
 
     @Autowired
-    AnimalDao animalDao;
+    private AnimalDao animalDao;
 
     @Autowired
     private OzTrackPermissionEvaluator permissionEvaluator;
 
-    @InitBinder("project")
-    public void initProjectBinder(WebDataBinder binder) {
-        binder.setAllowedFields();
-    }
 
-    @InitBinder
+    @InitBinder("searchQuery")
     public void initSearchQueryBinder(WebDataBinder binder) {
-        binder.setAllowedFields(
+     binder.setAllowedFields(
             "fromDate",
             "toDate",
             "animalIds",
@@ -94,15 +91,21 @@ public class SearchController {
     }
 
     @RequestMapping(value="/projects/{id}/search", method=RequestMethod.GET)
-    @PreAuthorize("hasPermission(#project, 'read')")
+    @PreAuthorize("hasPermission(#searchQuery.project, 'read')")
     public String showForm(
         Model model,
         @ModelAttribute(value="project") Project project,
         @ModelAttribute(value="searchQuery") SearchQuery searchQuery,
-        @RequestParam(value="offset", defaultValue="0") int offset
+        @RequestParam(value="offset", defaultValue = "0") int offset
     ) throws Exception {
         projectVisitDao.save(new ProjectVisit(project, ProjectVisitType.DATA_PAGE, new Date()));
-        return showFormInternal(model, project, searchQuery, offset);
+        List<Animal> projectAnimalsList = animalDao.getAnimalsByProjectId(project.getId());
+        Page<PositionFix> positionFixPage = positionFixDao.getPage(searchQuery, offset, 30);
+        model.addAttribute("searchQuery", searchQuery);
+        model.addAttribute("positionFixPage", positionFixPage);
+        model.addAttribute("projectAnimalsList", projectAnimalsList);
+        model.addAttribute("projectDetectionDateRange", projectDao.getDetectionDateRange(project, false));
+        return "project-search";
     }
 
     @RequestMapping(value="/projects/{id}/export", method=RequestMethod.GET)
@@ -187,18 +190,4 @@ public class SearchController {
         }
     }
 
-    private String showFormInternal(
-        Model model,
-        Project project,
-        SearchQuery searchQuery,
-        int offset
-    ) throws Exception {
-        List<Animal> projectAnimalsList = animalDao.getAnimalsByProjectId(project.getId());
-        Page<PositionFix> positionFixPage = positionFixDao.getPage(searchQuery, offset, 30);
-        model.addAttribute("searchQuery", searchQuery);
-        model.addAttribute("positionFixPage", positionFixPage);
-        model.addAttribute("projectAnimalsList", projectAnimalsList);
-        model.addAttribute("projectDetectionDateRange", projectDao.getDetectionDateRange(project, false));
-        return "project-search";
-    }
 }
