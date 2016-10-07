@@ -67,8 +67,7 @@ public class Project extends OzTrackBaseEntity {
     @OrderColumn(name="ordinal", nullable=false)
     private List<Publication> publications = new ArrayList<Publication>();
 
-    //@OneToMany(mappedBy="project", cascade={CascadeType.ALL}, orphanRemoval=true, fetch=FetchType.EAGER)
-    @OneToMany(mappedBy="project", cascade={CascadeType.ALL}, orphanRemoval=true, fetch=FetchType.LAZY)
+    @OneToMany(mappedBy="project", cascade={CascadeType.ALL}, orphanRemoval=true, fetch=FetchType.EAGER)
     private List<ProjectUser> projectUsers = new ArrayList<ProjectUser>();
 
     @OneToMany(mappedBy="project", cascade={CascadeType.ALL}, orphanRemoval=true, fetch=FetchType.EAGER)
