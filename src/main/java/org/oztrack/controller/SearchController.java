@@ -59,7 +59,6 @@ public class SearchController {
     @Autowired
     private OzTrackPermissionEvaluator permissionEvaluator;
 
-
     @InitBinder("searchQuery")
     public void initSearchQueryBinder(WebDataBinder binder) {
      binder.setAllowedFields(
@@ -72,7 +71,7 @@ public class SearchController {
     }
 
     @ModelAttribute("project")
-    public Project getProject(@PathVariable(value="id") Long projectId) {
+    public Project getProject(@PathVariable(value="projectId") Long projectId) {
         return projectDao.getProjectById(projectId);
     }
 
@@ -90,14 +89,15 @@ public class SearchController {
         return searchQuery;
     }
 
-    @RequestMapping(value="/projects/{id}/search", method=RequestMethod.GET)
+    @RequestMapping(value="/projects/{projectId}/search", method=RequestMethod.GET)
     @PreAuthorize("hasPermission(#searchQuery.project, 'read')")
     public String showForm(
         Model model,
-        @ModelAttribute(value="project") Project project,
+//        @ModelAttribute(value="project") Project project,
         @ModelAttribute(value="searchQuery") SearchQuery searchQuery,
         @RequestParam(value="offset", defaultValue = "0") int offset
     ) throws Exception {
+        Project project = searchQuery.getProject();
         projectVisitDao.save(new ProjectVisit(project, ProjectVisitType.DATA_PAGE, new Date()));
         List<Animal> projectAnimalsList = animalDao.getAnimalsByProjectId(project.getId());
         Page<PositionFix> positionFixPage = positionFixDao.getPage(searchQuery, offset, 30);
@@ -108,7 +108,7 @@ public class SearchController {
         return "project-search";
     }
 
-    @RequestMapping(value="/projects/{id}/export", method=RequestMethod.GET)
+    @RequestMapping(value="/projects/{projectId}/export", method=RequestMethod.GET)
     @PreAuthorize("hasPermission(#searchQuery.project, 'read')")
     public View handleRequest(
         Model model,
