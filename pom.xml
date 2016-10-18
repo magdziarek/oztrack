@@ -14,7 +14,7 @@
     <groupId>org.oztrack</groupId>
     <artifactId>oztrack</artifactId>
     <packaging>war</packaging>
-    <version>4.10-SNAPSHOT</version>
+    <version>4.11-SNAPSHOT</version>
     <name>OzTrack</name>
     <url>http://zoatrack.org/</url>
     <scm>
@@ -366,7 +366,7 @@
         <dependency>
             <groupId>postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>8.4-701.jdbc4</version>
+            <version>9.1-901.jdbc4</version>
         </dependency>
         <dependency>
             <groupId>org.postgis</groupId>

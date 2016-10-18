@@ -19,6 +19,9 @@
         <c:if test="${not empty project.dataFiles}">
         <li id="projectMenuSearch" class="view-data"><a href="${pageContext.request.contextPath}/projects/${project.id}/search">Raw data</a></li>
         </c:if>
+        <c:if test="${project.id == 298}">
+        <li id="projectMenuSearch" class="view-data"><a href="${pageContext.request.contextPath}/projects/${project.id}/envdata">Environmental Data Demo</a></li>
+        </c:if>
         </sec:authorize>
 <c:if test="${itemsOnly == null || itemsOnly == false}">
     </ul>
