@@ -9,7 +9,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
 import org.oztrack.data.access.AnimalDao;
 import org.oztrack.data.access.Page;
 import org.oztrack.data.access.PositionFixDao;
@@ -61,26 +60,22 @@ public class SearchController {
 
     @InitBinder("searchQuery")
     public void initSearchQueryBinder(WebDataBinder binder) {
-     binder.setAllowedFields(
-            "fromDate",
-            "toDate",
-            "animalIds",
-            "sortField"
+        binder.setAllowedFields(
+                "fromDate",
+                "toDate",
+                "animalIds",
+                "sortField"
         );
         binder.registerCustomEditor(Date.class, new CustomDateEditor(isoDateFormat, true));
     }
 
-    @ModelAttribute("project")
-    public Project getProject(@PathVariable(value="projectId") Long projectId) {
-        return projectDao.getProjectById(projectId);
-    }
-
     @ModelAttribute("searchQuery")
     public SearchQuery getSearchQuery(
-        Authentication authentication,
-        @ModelAttribute(value="project") Project project,
-        @RequestParam(value="includeDeleted", required=false) Boolean includeDeleted
+            @PathVariable("projectId") Long projectId,
+            Authentication authentication,
+            @RequestParam(value="includeDeleted", required=false) Boolean includeDeleted
     ) {
+        Project project = projectDao.getProjectById(projectId);
         SearchQuery searchQuery = new SearchQuery();
         searchQuery.setProject(project);
         if (permissionEvaluator.hasPermission(authentication, project, "write")) {
@@ -92,16 +87,17 @@ public class SearchController {
     @RequestMapping(value="/projects/{projectId}/search", method=RequestMethod.GET)
     @PreAuthorize("hasPermission(#searchQuery.project, 'read')")
     public String showForm(
-        Model model,
-//        @ModelAttribute(value="project") Project project,
-        @ModelAttribute(value="searchQuery") SearchQuery searchQuery,
-        @RequestParam(value="offset", defaultValue = "0") int offset
+            @PathVariable("projectId") Long projectId,
+            Model model,
+            @ModelAttribute(value="searchQuery") SearchQuery searchQuery,
+            @RequestParam(value="offset", defaultValue = "0") int offset
     ) throws Exception {
-        Project project = searchQuery.getProject();
+        Project project = projectDao.getProjectById(projectId);
         projectVisitDao.save(new ProjectVisit(project, ProjectVisitType.DATA_PAGE, new Date()));
         List<Animal> projectAnimalsList = animalDao.getAnimalsByProjectId(project.getId());
         Page<PositionFix> positionFixPage = positionFixDao.getPage(searchQuery, offset, 30);
         model.addAttribute("searchQuery", searchQuery);
+        model.addAttribute("project", project);
         model.addAttribute("positionFixPage", positionFixPage);
         model.addAttribute("projectAnimalsList", projectAnimalsList);
         model.addAttribute("projectDetectionDateRange", projectDao.getDetectionDateRange(project, false));
@@ -111,11 +107,12 @@ public class SearchController {
     @RequestMapping(value="/projects/{projectId}/export", method=RequestMethod.GET)
     @PreAuthorize("hasPermission(#searchQuery.project, 'read')")
     public View handleRequest(
-        Model model,
-        @ModelAttribute(value="project") Project project,
-        @ModelAttribute(value="searchQuery") final SearchQuery searchQuery,
-        @RequestParam(value="format", defaultValue="xls") String format
+            @PathVariable("projectId") Long projectId,
+            Model model,
+            @ModelAttribute(value="searchQuery") final SearchQuery searchQuery,
+            @RequestParam(value="format", defaultValue="xls") String format
     ) throws Exception {
+        Project project = projectDao.getProjectById(projectId);
         projectVisitDao.save(new ProjectVisit(project, ProjectVisitType.DATA_DOWNLOAD, new Date()));
         final List<PositionFix> positionFixes = positionFixDao.getProjectPositionFixList(searchQuery);
         if (format.equals("xls")) {
