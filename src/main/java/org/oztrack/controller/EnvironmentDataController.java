@@ -20,8 +20,6 @@ import java.util.Map;
 @Controller
 public class EnvironmentDataController {
 
-    private final Logger logger = Logger.getLogger(getClass());
-
     @Autowired
     private ProjectDao projectDao;
 
@@ -53,11 +51,9 @@ public class EnvironmentDataController {
             path = project.getAbsoluteDataDirectoryPath() + sep + "env" + sep;
             fileName = "env-" + animalId + ".csv";
         } else {
-            logger.info("no animalid");
-            path = configuration.getDataDir() + "common" + sep;
+            path = configuration.getDataDir() + sep + "common" + sep;
             fileName = "env-metadata.csv";
         }
-        logger.info("file: " + path + fileName);
 
         return new View() {
             @Override
@@ -69,7 +65,6 @@ public class EnvironmentDataController {
             public void render(Map<String, ?> model
                         , HttpServletRequest request
                         , HttpServletResponse response) throws Exception {
-                logger.info("render");
                 response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
                 response.setContentType("text/csv");
                 IOUtils.copy(new FileReader(new File(path + fileName)), response.getWriter());

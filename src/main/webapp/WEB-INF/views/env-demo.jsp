@@ -35,9 +35,10 @@
 
         <p>These files contain environmental values for each detection location sourced via the Atlas of Living Australia.
         </p>
-        <ul>
+        <ul style="list-style: none">
         <c:forEach items="${project.animals}" var="animal">
-            <li><a href="${pageContext.request.contextPath}/projects/${project.id}/env?id=${animal.id}">
+            <li><div style="width: 10px; height: 10px; background-color: ${animal.colour}; display:inline-block"></div>
+                <a href="${pageContext.request.contextPath}/projects/${project.id}/env?id=${animal.id}">
             ${animal.animalName}</a></li>
         </c:forEach>
             <li><a style="font-weight:bold" href="${pageContext.request.contextPath}/projects/${project.id}/env">Environmental layer metadata</a></li>
