@@ -61,7 +61,7 @@ var navigation = svg.append("g")
 // init some globals and get started
 var parseTime = d3.timeParse("%Y-%m-%d %H:%M:%S");
 var formatTime = d3.timeFormat("%Y-%m-%d %H:%M:%S");
-var roundNumber = d3.format(",.0f"); // round to 0 dec places
+var roundNumber = d3.format(",.2f"); // round to 0 dec places
 var dataNest, animalMetadata, extentMap;
 var line=d3.line(), line2=d3.line();
 var measure = "cumulative_distance";
@@ -287,7 +287,7 @@ function draw(d) {
                 div.transition()
                     .duration(200)
                     .style("opacity", .75);
-                div.html("<b>" + thisAnimal.name + "</b> " + formatTime(d.detectiontime) + " ("  + roundNumber(d[measure]) + "m)")
+                div.html("<b>" + thisAnimal.name + "</b> " + formatTime(d.detectiontime) + " ("  + roundNumber(d[measure]) + "km)")
                     .style("left", (d3.event.pageX) + "px")
                     .style("top", (d3.event.pageY - 28) + "px")
                     .style("background", thisAnimal.colour)
