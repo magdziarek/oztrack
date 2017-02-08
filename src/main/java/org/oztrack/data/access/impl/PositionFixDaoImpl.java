@@ -521,8 +521,7 @@ public class PositionFixDaoImpl implements PositionFixDao {
                         "    id,\n" +
                         "    project_id,\n" +
                         "    animal_id,\n" +
-                        "    colour,\n" +
-                        "    geojson,\n" +
+                        "    locationgeometry,\n" +
                         "    detectiontime,\n" +
                         "    detection_index,\n" +
                         "    displacement,\n" +
@@ -531,8 +530,7 @@ public class PositionFixDaoImpl implements PositionFixDao {
                         "select all_fixes.id\n" +
                         ", all_fixes.project_id\n" +
                         ", all_fixes.animal_id\n" +
-                        ", first_fix.colour\n" +
-                        ", ST_AsGeoJSON(all_fixes.locationgeometry) as geojson\n" +
+                        ", first_fix.locationgeometry\n" +
                         ", all_fixes.detectiontime\n" +
                         ", all_fixes.row_number-1  as detection_index\n" +
                         "," + displacementExpr + " as displacement\n" +
