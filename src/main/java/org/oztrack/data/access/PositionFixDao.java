@@ -1,5 +1,6 @@
 package org.oztrack.data.access;
 
+import java.sql.ResultSet;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -41,4 +42,5 @@ public interface PositionFixDao {
     Map<Long, PositionFixStats> getAnimalPositionFixStats(Project project, Date fromDate, Date toDate);
     Map<Long, TrajectoryStats> getAnimalTrajectoryStats(Project project, Date fromDate, Date toDate);
     Map<Long, Range<Date>> getAnimalStartEndDates(Project project, Date fromDate, Date toDate);
+    List<Object[]> getProjectPositionFixStats(Long projectId);
 }

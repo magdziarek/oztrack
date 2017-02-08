@@ -1,5 +1,6 @@
 package org.oztrack.data.access.impl;
 
+import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -702,5 +703,20 @@ public class PositionFixDaoImpl implements PositionFixDao {
             animalStartEndDates.put(animalId, Range.between(startDate, endDate));
         }
         return animalStartEndDates;
+    }
+
+    @Override
+    public List<Object[]> getProjectPositionFixStats(Long projectId) {
+
+        String query =  "select animal_id\n" +
+                        ", to_char(detectiontime, 'yyyy-mm-dd hh24:mi:ss') as detectiontime\n" +
+                ", detection_index\n" +
+                ", displacement\n" +
+                ", cumulative_distance\n" +
+                "from positionfixstats\n" +
+                "where project_id = :projectId\n";
+
+        return em.createNativeQuery(query).setParameter("projectId", projectId).getResultList();
+
     }
 }

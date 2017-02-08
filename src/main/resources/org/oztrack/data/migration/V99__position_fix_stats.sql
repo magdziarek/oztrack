@@ -1,4 +1,4 @@
--- add a new field to trajectorylayer: row_number
+-- add a new field to trajectorylayer: row_number (better for joins than timestamp)
 drop index trajectorylayer_index_1;
 drop table trajectorylayer;
 
@@ -32,8 +32,7 @@ create table positionfixstats
    id bigint PRIMARY KEY NOT NULL
  , project_id bigint NOT NULL
  , animal_id bigint NOT NULL
- , colour varchar NOT NULL
- , geojson varchar NOT NULL
+ , locationgeometry geometry NOT NULL
  , detectiontime timestamp NOT NULL
  , detection_index bigint NOT NULL
  , displacement numeric
@@ -46,8 +45,7 @@ insert into positionfixstats (
   id
  , project_id
  , animal_id
- , colour
- , geojson
+ , locationgeometry
  , detectiontime
  , detection_index
  , displacement
@@ -56,8 +54,7 @@ insert into positionfixstats (
 select all_fixes.id
  , all_fixes.project_id
  , all_fixes.animal_id
- , first_fix.colour
- , ST_AsGeoJSON(all_fixes.locationgeometry) as geojson
+ , all_fixes.locationgeometry
  , all_fixes.detectiontime
  , all_fixes.row_number-1  as detection_index -- start at 0
  , case when (select crosses180 from project where id = all_fixes.project_id)
@@ -79,5 +76,5 @@ from positionfixnumbered all_fixes
 	and all_fixes.row_number=trajectory.row_number+1
 ;
 
-CREATE INDEX positionfixstats_1 ON positionfixstats (project_id, animal_id, detection_index);
+CREATE INDEX positionfixstats_index_1 ON positionfixstats (project_id, animal_id, detection_index);
 ANALYZE positionfixstats;
