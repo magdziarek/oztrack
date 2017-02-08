@@ -1,5 +1,6 @@
 package org.oztrack.data.access.impl;
 
+import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -63,7 +64,6 @@ public class PositionFixDaoImpl implements PositionFixDao {
     public void setUpdateAnimalColour(ProjectAnimalsMutexExecutor updateAnimalColourExecutor) {
         this.updateAnimalColourExecutor = updateAnimalColourExecutor;
     }
-
 
     @Override
     @Transactional
@@ -475,6 +475,7 @@ public class PositionFixDaoImpl implements PositionFixDao {
                         "    startdetectiontime,\n" +
                         "    enddetectiontime,\n" +
                         "    colour,\n" +
+                        "    row_number,\n" +
                         "    trajectorygeometry\n" +
                         ")\n" +
                         "select\n" +
@@ -484,6 +485,7 @@ public class PositionFixDaoImpl implements PositionFixDao {
                         "    positionfix1.detectiontime as startdetectiontime,\n" +
                         "    positionfix2.detectiontime as enddetectiontime,\n" +
                         "    positionfix1.colour as colour,\n" +
+                        "    positionfix1.row_number as row_number,\n" +
                         "    " + lineExpr + " as trajectorygeometry\n" +
                         "from\n" +
                         "    positionfixnumbered positionfix1\n" +
@@ -498,6 +500,61 @@ public class PositionFixDaoImpl implements PositionFixDao {
                     .setParameter("projectId", project.getId())
                     .setParameter("animalIds", animalIds)
                     .executeUpdate();
+
+                em.createNativeQuery(
+                        "delete from positionfixstats\n" +
+                                "where\n" +
+                                "    project_id = :projectId and\n" +
+                                "    animal_id in (:animalIds)"
+                ).setParameter("projectId", project.getId())
+                 .setParameter("animalIds", animalIds)
+                 .executeUpdate();
+
+                String spheroidStr = "'SPHEROID[\"WGS 84\", 6378137, 298.257223563]'";
+                String displacementExpr = project.getCrosses180()
+                        ? "ST_Distance_Spheroid(ST_Shift_Longitude(first_fix.locationgeometry),ST_Shift_Longitude(all_fixes.locationgeometry)," + spheroidStr + ")"
+                        : "ST_Distance_Spheroid(first_fix.locationgeometry,all_fixes.locationgeometry," + spheroidStr + ")";
+
+
+                em.createNativeQuery(
+                        "insert into positionfixstats(\n" +
+                        "    id,\n" +
+                        "    project_id,\n" +
+                        "    animal_id,\n" +
+                        "    colour,\n" +
+                        "    geojson,\n" +
+                        "    detectiontime,\n" +
+                        "    detection_index,\n" +
+                        "    displacement,\n" +
+                        "    cumulative_distance\n" +
+                        ")\n" +
+                        "select all_fixes.id\n" +
+                        ", all_fixes.project_id\n" +
+                        ", all_fixes.animal_id\n" +
+                        ", first_fix.colour\n" +
+                        ", ST_AsGeoJSON(all_fixes.locationgeometry) as geojson\n" +
+                        ", all_fixes.detectiontime\n" +
+                        ", all_fixes.row_number-1  as detection_index\n" +
+                        "," + displacementExpr + " as displacement\n" +
+                        ", case when trajectory.id is null\n" +
+                        "  then 0\n" +
+                        "  else sum(ST_Length_Spheroid(trajectory.trajectorygeometry, " + spheroidStr + ")) over (partition by trajectory.project_id, trajectory.animal_id order by trajectory.enddetectiontime)\n" +
+                        "  end as cumulative_distance\n" +
+                        "from positionfixnumbered all_fixes\n" +
+                        "inner join positionfixnumbered first_fix\n" +
+                        "  on first_fix.row_number = 1\n" +
+                        "  and first_fix.project_id = :projectId\n" +
+                        "  and first_fix.animal_id in (:animalIds)\n" +
+                        "  and all_fixes.project_id = first_fix.project_id\n" +
+                        "  and all_fixes.animal_id = first_fix.animal_id\n" +
+                        "left outer join trajectorylayer trajectory\n" +
+                        "  on all_fixes.project_id=trajectory.project_id\n" +
+                        "  and all_fixes.animal_id=trajectory.animal_id\n" +
+                        "  and all_fixes.row_number=trajectory.row_number+1\n")
+                .setParameter("projectId", project.getId())
+                .setParameter("animalIds", animalIds)
+                .executeUpdate();
+
             }
         });
     }
@@ -646,5 +703,20 @@ public class PositionFixDaoImpl implements PositionFixDao {
             animalStartEndDates.put(animalId, Range.between(startDate, endDate));
         }
         return animalStartEndDates;
+    }
+
+    @Override
+    public List<Object[]> getProjectPositionFixStats(Long projectId) {
+
+        String query =  "select animal_id\n" +
+                        ", to_char(detectiontime, 'yyyy-mm-dd hh24:mi:ss') as detectiontime\n" +
+                ", detection_index\n" +
+                ", displacement\n" +
+                ", cumulative_distance\n" +
+                "from positionfixstats\n" +
+                "where project_id = :projectId\n";
+
+        return em.createNativeQuery(query).setParameter("projectId", projectId).getResultList();
+
     }
 }
