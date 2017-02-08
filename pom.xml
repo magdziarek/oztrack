@@ -14,7 +14,7 @@
     <groupId>org.oztrack</groupId>
     <artifactId>oztrack</artifactId>
     <packaging>war</packaging>
-    <version>4.11-SNAPSHOT</version>
+    <version>4.12-SNAPSHOT</version>
     <name>OzTrack</name>
     <url>http://zoatrack.org/</url>
     <scm>
@@ -379,6 +379,7 @@
             <version>4.11</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>

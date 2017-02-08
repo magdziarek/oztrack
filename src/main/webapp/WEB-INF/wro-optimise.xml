@@ -45,4 +45,7 @@
     <css>/css/vendor/farbtastic/farbtastic.css</css>
     <js>/js/vendor/farbtastic/farbtastic.js</js>
   </group>
+  <group name="d3">
+    <js>/js/vendor/d3/d3.v4.min.js</js>
+  </group>
 </groups>
