@@ -16,7 +16,7 @@
     </jsp:attribute>
     <jsp:attribute name="head">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/optimised/openlayers.css" type="text/css">
-        <style type="text/css">
+        <style type="text/css" title="analysis-styles">
             #main {
                 padding-bottom: 0;
             }
@@ -162,6 +162,139 @@
             #projectMapOptions.minimised #toggleSidebar {
                 background-color: #e6e6c0;
             }
+            #projectMapOptions {
+                width: 40%;
+            }
+            .line {
+                fill: none;
+                clip-path: url(#clip);
+                stroke-width:2;
+            }
+            .nav-line {
+                stroke-width: 1.5;
+            }
+            .point {
+                stroke: "grey";
+                stroke-width:0.5;
+                fill-opacity:0.7;
+            }
+            #layer-control {
+                display:list-item;
+                width:40%;
+            }
+            rect.selection {
+                fill: #c5c56d	;
+                stroke: #a4a441;
+                stroke-opacity: 0.5;
+                shape-rendering: auto;
+            }
+            .zoom {
+                cursor: move;
+                fill: none;
+                pointer-events: all;
+            }
+            div.tooltip {
+                position: absolute;
+                text-align: center;
+                padding: 4px;
+                border-radius: 3px;
+                box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.2);
+                pointer-events: none;
+            }
+            #legendDiv   {
+                padding: 5px 0px;
+                overflow:auto;
+                -webkit-column-count: 3; /* Chrome, Safari, Opera */
+                -moz-column-count: 3; /* Firefox */
+                column-count: 3;
+                height:40%;
+            }
+            .legend {
+                overflow: auto;
+            }
+            .legendSquare {
+                position:absolute;
+                cursor: pointer;
+            }
+            #chart-menu-tabs {
+                margin-bottom: 5px;
+            }
+            #chart-tab-wrapper {
+                position:relative;
+                margin:0 auto;
+                overflow:hidden;
+                padding:5px;
+                height:25px;
+            }
+            #chart-menu-tabs {
+                position:absolute;
+                left:0px;
+                top:0px;
+                min-width:700px;
+                margin-left:10px;
+                margin-top:0px;
+            }
+            #chart-menu-tabs > li {
+                margin-bottom: 7px;
+                display:table-cell;
+                position:relative;
+                text-align:center;
+                cursor:grab;
+                cursor:-webkit-grab;
+                vertical-align:middle;
+            }
+            #chart-menu-tabs  > li > a {
+                background-color: #f0f0da;
+                font-weight:normal;
+            }
+            .chart-menu-tab-li > a {
+                text-decoration:none;
+            }
+            #chart-menu-tabs > .active > a, .chart-menu-tabs > .active > a:hover, .chart-menu-tabs > .active > a:focus {
+                background-color: #FBFEEE;
+                font-weight:bold;
+            }
+            #chartArea {
+                background-color: #FBFEEE;
+                -moz-border-radius: 6px;
+                border-radius: 6px;
+                padding-top: 15px;
+                padding-bottom: 10px;
+                padding-right:5px;
+            }
+            #chartTitle {
+                font-weight: bold;
+                text-align: center;
+            }
+            #chartDescription {
+                text-align: center;
+                font-size:0.9em;
+                font-style: italic;
+                margin: 5px 5px;
+            }
+            #chartHelp {
+                position: absolute;
+                right: 20px;
+                margin-top:-20px;
+            }
+           #exportConfirmation {
+                margin: 5px;
+                padding: 15px;
+            }
+            .scroller {
+                text-align:center;
+                cursor:pointer;
+                display:none;
+                padding:10px 10px;
+                white-space:nowrap;
+                vertical-align:middle;
+            }
+            .scroller-right{
+                float:right;
+            }
+            .scroller-left {
+                float:left;
+            }
         </style>
     </jsp:attribute>
     <jsp:attribute name="tail">
@@ -169,11 +302,22 @@
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/optimised/openlayers.js"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/project-map.js"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/project-analysis.js"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/optimised/d3.js"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/project-temporal-chart.js"></script>
+
         <script type="text/javascript">
             $(document).ready(function() {
+
                 $('#navTrack').addClass('active');
                 $('#projectMenuAnalysis').addClass('active');
-                $("#projectMapOptionsTabs").tabs();
+                var temporalTabIndex = 2;
+                $("#projectMapOptionsTabs").tabs({
+                   activate: function(event, ui) {
+                        if (ui.newTab.index() == temporalTabIndex) {
+                            chartTabs();
+                        }
+                    }
+                });
                 $('#fromDateVisible').datepicker({
                     altField: '#fromDate',
                     minDate: new Date(${projectDetectionDateRange.minimum.time}),
@@ -308,7 +452,7 @@
                         $('a[href="#animalPanel"]').trigger('click');
                     },
                     onLayerSuccess: function() {
-                        $('a[href="#animalPanel"]').trigger('click');
+                      //  $('a[href="#animalPanel"]').trigger('click'); // not ideal
                     },
                     onUpdateAnimalInfoFromLayer: function(layerName, layerId, animalId, animalIds, fromDate, toDate, layerAttrs) {
                         var html = '<div class="layerInfoHeader">';
@@ -383,6 +527,14 @@
                             analysisTypeList="${analysisTypeList}"/>
                     }
                 });
+                distanceCharts = null;
+                distanceCharts = new OzTrack.DistanceCharts();
+                var url = "${pageContext.request.contextPath}/projects/${project.id}/analysis/posfixstats";
+                distanceCharts.loadProjectChartData(url, analysisMap.projectMap.animals);
+                <c:if test="${not empty temporal && temporal}">
+                    $('a[href="#temporalPanel"]').trigger('click');
+                </c:if>
+
                 <c:forEach items="${savedAnalyses}" var="analysis">
                 addAnalysis(
                     '${analysis.analysisType.displayName}',
@@ -406,7 +558,9 @@
                     $('#projectMapOptions').toggleClass('minimised');
                     onResize();
                 });
+
             });
+
             function addAnalysis(layerName, analysisUrl, analysisCreateDate, saved) {
                 var analysisContainer = $('<li class="analysis">');
                 var analysisHeader = $('<div class="analysis-header">');
@@ -610,6 +764,9 @@
                 if (analysisMap) {
                     analysisMap.updateSize();
                 }
+                //distanceCharts.adjustChartTabs();
+                chartTabs();
+
             }
         </script>
     </jsp:attribute>
@@ -621,7 +778,8 @@
         <div id="projectMapOptionsTabs">
             <ul>
                 <li><a href="#animalPanel">Animals</a></li>
-                <li><a href="#homeRangeCalculatorPanel">Analysis</a></li>
+                <li><a href="#homeRangeCalculatorPanel">Spatial</a></li>
+                <li><a href="#temporalPanel">Temporal</a></li>
                 <li><a href="#previousAnalysesPanel">History</a></li>
                 <li><a href="#metadataPanel">Metadata</a></li>
             </ul>
@@ -830,6 +988,72 @@
                         </div>
                     </div>
                     </c:forEach>
+                </div>
+            </div>
+
+            <div id="temporalPanel">
+                <div id="projectCharts" width="100%">
+                    <div id="chart-menu">
+                        <div class="scroller scroller-left"><i class="icon-chevron-left"></i></div>
+                        <div class="scroller scroller-right"><i class="icon-chevron-right"></i></div>
+                        <div id="chart-tab-wrapper">
+                            <ul id="chart-menu-tabs" class="nav nav-tabs">
+                                <!--
+                                <li class="chart-menu-tab-li dropdown">
+                                    <a href="#" id="export-dropdown" class="dropdown-toggle" data-toggle="dropdown">
+                                        Export<b class="caret" style="border-top-color:#000000;margin-left:5px"></b>&nbsp;</a>
+                                    <ul id="export-options-list" class="dropdown-menu">
+                                        <li><a id="csv-export" href="#" class="export-option">CSV</a></li>
+                                        <li><a id="chart-img" href="#" class="export-option">Chart Image</a></li>
+                                    </ul>
+                                </li>-->
+                                <li class="chart-menu-tab-li"><a id="export-open">
+                                Export <b class="caret" style="border-top-color:#000000;margin:6px"></b>&nbsp;</a></li>
+                            </ul>
+                        </div>
+                        <div class="tab-content">
+                            <div class="tab-pane" id="exp-conf" style="line-height:1px;">
+                            </div>
+                        </div>
+                    </div>
+                    <div id="chartArea">
+                    <div id="chartTitle"></div>
+                    <div id="chartHelp">
+                        <div class="help-popover" title="Temporal Analysis">
+                            The graphs are interactive. The smaller graph is a navigator window for the larger graph. You can:
+                            <ul>
+                                <li>Zoom in by double-clicking on the graph canvas, or by using a mouse scroll</li>
+                                <li>Zoom out by shift-double-clicking</li>
+                                <li>Drag on either canvas to pan the graph</li>
+                                <li>Hover over a data point to see detail</li>
+                                <li>Click on an animal in the legend to add/remove it from the graph</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div id="chartDescription"></div>
+                    <div id="exportConfirmation" class="form-bordered exportConfirmation" style="display: none;">
+                        <p>Data in this project are made available under the following licence:</p>
+                        <p style="margin-top: 18px;">
+                            <a target="_blank" href="${project.dataLicence.infoUrl}"
+                            ><img src="${pageContext.request.scheme}://${fn:substringAfter(project.dataLicence.imageUrl, '://')}" /></a>
+                        </p>
+                        <p><span style="font-weight: bold;">${project.dataLicence.title}</span></p>
+                        <p>${project.dataLicence.description} <a target="_blank" href="${project.dataLicence.infoUrl}">More information</a></p>
+                        <p style="margin-top: 18px;">By downloading these data, you agree to the licence terms.</p>
+                        <p>
+                            If you use these data in any type of publication then you must cite the project DOI (if available) or any
+                            published peer-reviewed papers associated with the study. We strongly encourage you to contact the data custodians
+                            to discuss data usage and appropriate accreditation.
+                        </p>
+                        <div class="form-actions">
+                            <a class="exportButton btn btn-primary" href="${pageContext.request.contextPath}/projects/${project.id}/analysis/posfixstats">Export CSV</a>
+                            <a class="exportButton btn btn-primary" id="chart-img">Export IMG</a>
+                            <button id="export-close" class="btn">Close</button>
+                        </div>
+                    </div>
+                    <div id="chartDiv"><svg id="svgChart"></svg></div>
+                    <div id="legendDiv"></div>
+                    </div>
                 </div>
             </div>
 

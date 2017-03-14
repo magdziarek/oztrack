@@ -1,12 +1,15 @@
 package org.oztrack.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import au.com.bytecode.opencsv.CSVWriter;
 import org.oztrack.data.access.AnalysisDao;
 import org.oztrack.data.access.AnimalDao;
 import org.oztrack.data.access.PositionFixDao;
@@ -91,5 +94,52 @@ public class ProjectAnalysisController {
         model.addAttribute("savedAnalyses", analysisDao.getSavedAnalyses(project));
         model.addAttribute("previousAnalyses", analysisDao.getPreviousAnalyses(project, currentUser, currentSessionId));
         return "project-analysis.html";
+    }
+
+    @RequestMapping(value="/projects/{id}/analysis/temporal", method=RequestMethod.GET)
+    @PreAuthorize("hasPermission(#project, 'read')")
+    public String getTabView(
+            Authentication authentication,
+            HttpServletRequest request,
+            Model model,
+            @ModelAttribute(value="project") Project project
+    ) {
+        projectVisitDao.save(new ProjectVisit(project, ProjectVisitType.ANALYSIS, new Date()));
+        List<Animal> projectAnimalsList = animalDao.getAnimalsByProjectId(project.getId());
+        model.addAttribute("mapLayerTypeList", MapLayerType.values());
+        ArrayList<AnalysisType> analysisTypeList = new ArrayList<AnalysisType>();
+        for (AnalysisType analysisType : AnalysisType.values()) {
+            analysisTypeList.add(analysisType);
+        }
+        model.addAttribute("temporal", true);
+        model.addAttribute("analysisTypeList", analysisTypeList);
+        model.addAttribute("projectAnimalsList", projectAnimalsList);
+        model.addAttribute("projectBoundingBox", projectDao.getBoundingBox(project, false));
+        model.addAttribute("animalBoundingBoxes", projectDao.getAnimalBoundingBoxes(project, false));
+        model.addAttribute("projectDetectionDateRange", projectDao.getDetectionDateRange(project, false));
+        User currentUser = permissionEvaluator.getAuthenticatedUser(authentication);
+        HttpSession currentSession = request.getSession(false);
+        String currentSessionId = (currentSession != null) ? currentSession.getId() : null;
+        model.addAttribute("savedAnalyses", analysisDao.getSavedAnalyses(project));
+        model.addAttribute("previousAnalyses", analysisDao.getPreviousAnalyses(project, currentUser, currentSessionId));
+        return "project-analysis.html";
+    }
+
+    @RequestMapping(value="/projects/{id}/analysis/posfixstats", method=RequestMethod.GET, produces="text/csv")
+    @PreAuthorize("hasPermission(#project, 'read')")
+    public void handleCsvRequest(HttpServletResponse response, @ModelAttribute(value="project") Project project) throws IOException {
+        response.setHeader("Content-Disposition", "attachment; filename=\"posfixstats.csv\"");
+        CSVWriter writer = new CSVWriter(response.getWriter());
+        String [] headers = { "animal_id","detectiontime","detection_index","displacement","cumulative_distance", "step_distance", "step_duration"};
+        writer.writeNext(headers);
+        List<Object[]> resultList = positionFixDao.getProjectPositionFixStats(project.getId());
+        for (Object[] o : resultList) {
+            String [] s = new String[o.length];
+            for (int i=0; i < o.length; i++) {
+                s[i] = o[i].toString();
+            }
+            writer.writeNext(s);
+        }
+        writer.close();
     }
 }
