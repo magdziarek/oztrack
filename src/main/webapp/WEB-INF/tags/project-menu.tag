@@ -11,8 +11,8 @@
         <li id="projectMenuSummary" class="view-project"><a href="${pageContext.request.contextPath}/projects/${project.id}">Project summary</a></li>
         <sec:authorize access="hasPermission(#project, 'read')">
         <c:if test="${not empty project.dataFiles}">
-        <li id="projectMenuAnalysis" class="view-track"><a href="${pageContext.request.contextPath}/projects/${project.id}/analysis">Spatial Analysis</a></li>
-        <li id="projectMenuCharts" class="view-track"><a href="${pageContext.request.contextPath}/projects/${project.id}/temporal">Temporal Analysis</a></li>
+          <li id="projectMenuAnalysis" class="view-track"><a href="${pageContext.request.contextPath}/projects/${project.id}/analysis">Spatial Analysis</a></li>
+          <li id="projectMenuCharts" class="view-track"><a href="${pageContext.request.contextPath}/projects/${project.id}/analysis/temporal">Temporal Analysis</a></li>
         </c:if>
         <c:if test="${not empty project.animals}">
         <li id="projectMenuAnimals" class="view-animal"><a href="${pageContext.request.contextPath}/projects/${project.id}/animals">Animal details</a></li>

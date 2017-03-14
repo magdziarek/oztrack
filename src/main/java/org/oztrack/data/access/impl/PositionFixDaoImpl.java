@@ -515,8 +515,7 @@ public class PositionFixDaoImpl implements PositionFixDao {
                         ? "ST_Distance_Spheroid(ST_Shift_Longitude(first_fix.locationgeometry),ST_Shift_Longitude(all_fixes.locationgeometry)," + spheroidStr + ")"
                         : "ST_Distance_Spheroid(first_fix.locationgeometry,all_fixes.locationgeometry," + spheroidStr + ")";
 
-
-                em.createNativeQuery(
+                String queryString =
                         "insert into positionfixstats(\n" +
                         "    id,\n" +
                         "    project_id,\n" +
@@ -525,7 +524,9 @@ public class PositionFixDaoImpl implements PositionFixDao {
                         "    detectiontime,\n" +
                         "    detection_index,\n" +
                         "    displacement,\n" +
-                        "    cumulative_distance\n" +
+                        "    cumulative_distance,\n" +
+                        "    step_distance,\n" +
+                        "    step_duration\n" +
                         ")\n" +
                         "select all_fixes.id\n" +
                         ", all_fixes.project_id\n" +
@@ -538,6 +539,8 @@ public class PositionFixDaoImpl implements PositionFixDao {
                         "  then 0\n" +
                         "  else sum(ST_Length_Spheroid(trajectory.trajectorygeometry, " + spheroidStr + ")) over (partition by trajectory.project_id, trajectory.animal_id order by trajectory.enddetectiontime)\n" +
                         "  end as cumulative_distance\n" +
+                        ", case when trajectory.enddetectiontime is null then 0 else ST_Length_Spheroid(trajectory.trajectorygeometry, " + spheroidStr + ") end as step_distance\n" +
+                        ", case when trajectory.enddetectiontime is null then 0 else EXTRACT(EPOCH FROM (trajectory.enddetectiontime - trajectory.startdetectiontime)) end as step_duration\n" +
                         "from positionfixnumbered all_fixes\n" +
                         "inner join positionfixnumbered first_fix\n" +
                         "  on first_fix.row_number = 1\n" +
@@ -548,11 +551,11 @@ public class PositionFixDaoImpl implements PositionFixDao {
                         "left outer join trajectorylayer trajectory\n" +
                         "  on all_fixes.project_id=trajectory.project_id\n" +
                         "  and all_fixes.animal_id=trajectory.animal_id\n" +
-                        "  and all_fixes.row_number=trajectory.row_number+1\n")
+                        "  and all_fixes.row_number=trajectory.row_number+1\n";
+                em.createNativeQuery(queryString)
                 .setParameter("projectId", project.getId())
                 .setParameter("animalIds", animalIds)
                 .executeUpdate();
-
             }
         });
     }
@@ -711,6 +714,8 @@ public class PositionFixDaoImpl implements PositionFixDao {
                 ", detection_index\n" +
                 ", displacement\n" +
                 ", cumulative_distance\n" +
+                ", step_distance\n" +
+                ", step_duration\n" +
                 "from positionfixstats\n" +
                 "where project_id = :projectId\n";
 
