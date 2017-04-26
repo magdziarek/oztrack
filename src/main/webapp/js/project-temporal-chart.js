@@ -65,7 +65,8 @@ var clientWidth = d3.select("#projectMapOptions").node().getBoundingClientRect()
          .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")")
          .style("fill", "#d3d392");
 
-     var dataNest,
+     var measure,
+         dataNest,
          animalMetadata,
          extentMap,
          line = d3.line(),
@@ -119,48 +120,41 @@ var clientWidth = d3.select("#projectMapOptions").node().getBoundingClientRect()
          })[0];
      }
 
-//     that.chartTabsSetup = function() {
+     // sort charts by the order given
+     chartMetadata.sort(function (a, b) {
+         return a.ord > b.ord;
+     });
 
-         // sort charts by the order given
-         chartMetadata.sort(function (a, b) {
-             return a.ord > b.ord;
-         });
-
-         // then prepend them in reverse order to leave the export button last
-         chartMetadata.reverse().forEach(function (d, i) {
-             $("#chart-menu-tabs").prepend(
-                 $('<li>').attr('class', 'chart-menu-tab-li')
-                     .attr('class', function (d1, i1) {
-                         if (d.ord == 1) { //(i == chartMetadata.length-1) {
+     // then prepend them in reverse order to leave the export button last
+     chartMetadata.reverse().forEach(function (d, i) {
+         $("#chart-menu-tabs").prepend(
+             $('<li>').attr('class', 'chart-menu-tab-li')
+                 .attr('class', function (d1, i1) {
+                     if (d.ord == 1) { //(i == chartMetadata.length-1) {
+                         $("#chartTitle").html(d.title);
+                         $("#chartDescription").html(d.description);
+                         return 'chart-menu-tab-li active';
+                     }
+                 })
+                 .append(
+                     $('<a>').attr('id', 'chart-tab-' + d.ord)
+                         .attr('data-chart-type', d.measure)
+                         .attr('href', '#tab1')
+                         .append(d.tab_name)
+                         .click(function (e) {
+                             e.preventDefault();
+                             $(".chart-menu-tab-li").removeClass('active');
+                             $(this).parent().addClass('active');
                              $("#chartTitle").html(d.title);
                              $("#chartDescription").html(d.description);
-                             return 'chart-menu-tab-li active';
-                         }
-                     })
-                     .append(
-                         $('<a>').attr('id', 'chart-tab-' + d.ord)
-                             .attr('data-chart-type', d.measure)
-                             .attr('href', '#tab1')
-                             .append(d.tab_name)
-                             .click(function (e) {
-                                 e.preventDefault();
-                                 $(".chart-menu-tab-li").removeClass('active');
-                                 $(this).parent().addClass('active');
-                                 $("#chartTitle").html(d.title);
-                                 $("#chartDescription").html(d.description);
-                                 updateChart(d.measure);
-                             })
-                     )
-             );
-         });
+                             updateChart(d.measure);
+                         })
+                 )
+         );
+     });
 
-
- //    };
-      
-
-      
       that.adjustChartTabs = function () {
-   // find widths
+        // find widths
 
           var allTabsWidth, scrollAmount;
           $('#chart-menu-tabs li').each(function () {
@@ -170,7 +164,6 @@ var clientWidth = d3.select("#projectMapOptions").node().getBoundingClientRect()
           });
           scrollAmount = clientWidth - allTabsWidth - 60;
 
-         console.log("hello from adjustChartTabs(). clientWidth: " + clientWidth + " allTabsWidth: " + allTabsWidth);
          if (clientWidth < that.allTabsWidth) {
              $('.scroller-right').show();
          } else {
@@ -193,28 +186,35 @@ var clientWidth = d3.select("#projectMapOptions").node().getBoundingClientRect()
       };
 
      d3.select("#export-open").on("click", function () {
+         if ($("#exportTraits").is(":visible")) {$("#exportTraits").slideUp();}
          $(".chart-menu-tab-li").removeClass('active');
-         $(this).parent().addClass('active');
-         $("#chartTitle").hide();
-         $("#chartDescription").hide();
-         $("#chartHelp").hide();
-         $("#chartDiv").hide();
-         $("#legendDiv").hide();
-         $("#exportConfirmation").slideDown();
-
+         $("#export-open").parent().addClass('active');
+         hideChart();
+         $("#exportTemporal").slideDown("fast","linear");
      });
 
      d3.select("#export-close").on("click", function () {
          var thisTab = '#chart-tab-' + getChartMetadata(measure).ord;
          $(".chart-menu-tab-li").removeClass('active');
-         $(thisTab).parent().addClass('active');
-         $('#legendDiv').show();
-         $('#chartDiv').show();
-         $("#chartHelp").show();
-         $("#chartDescription").show();
-         $('#chartTitle').show();
-         $("#exportConfirmation").slideUp();
+         $(thisTab).addClass('active');
+         $("#exportTemporal").slideUp("fast","linear",showChart());
      });
+
+     d3.select("#export-traits-open").on("click", function() {
+         if ($("#exportTemporal").is(":visible")) {$("#exportTemporal").slideUp();}
+         $(".chart-menu-tab-li").removeClass('active');
+         $("#export-traits-open").parent().addClass('active');
+         hideChart();
+         $("#exportTraits").slideDown();
+     });
+
+     d3.select("#export-traits-close").on("click", function() {
+         var thisTab = '#chart-tab-' + getChartMetadata(measure).ord;
+         $(".chart-menu-tab-li").removeClass('active');
+         $(thisTab).addClass('active');
+         $("#exportTraits").slideUp("fast","linear",showChart());
+     });
+
 
      d3.select("#chart-img").on("click", function () {
          var style, rules; // grab the css from this page
@@ -565,7 +565,7 @@ var clientWidth = d3.select("#projectMapOptions").node().getBoundingClientRect()
 
 }(window.OzTrack = window.OzTrack || {}));
     
-function  chartTabs() {
+function chartTabs() {
 
     var allTabsWidth=0, scrollAmount=0;
     $('#chart-menu-tabs li').each(function () {
@@ -594,3 +594,19 @@ function  chartTabs() {
     });
 
 };
+
+function hideChart() {
+    $("#chartTitle").hide();
+    $("#chartDescription").hide();
+    $("#chartHelp").hide();
+    $("#chartDiv").hide();
+    $("#legendDiv").hide();
+}
+
+function showChart() {
+    $('#legendDiv').show();
+    $('#chartDiv').show();
+    $("#chartHelp").show();
+    $("#chartDescription").show();
+    $('#chartTitle').show();
+}

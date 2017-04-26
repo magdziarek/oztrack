@@ -33,7 +33,9 @@ public class OzTrackConfigurationImpl implements OzTrackConfiguration {
     private String doiLandingBaseUrl;
     private String googleApiKey;
     private String alaApiKey;
-
+    private String bccvlClientId;
+   private String bccvlAuthUrl;
+    private String bccvlApiUrl;
 
     @Override
     public String getBaseUrl() {
@@ -277,6 +279,31 @@ public class OzTrackConfigurationImpl implements OzTrackConfiguration {
         this.alaApiKey = alaApiKey;
     }
 
+    @Override
+    public String getBccvlClientId() {
+        return bccvlClientId;
+    }
 
+    public void setBccvlClientId(String bccvlClientId) {
+        this.bccvlClientId = bccvlClientId;
+    }
+
+    @Override
+    public String getBccvlAuthUrl() {
+        return bccvlAuthUrl;
+    }
+
+    public void setBccvlAuthUrl(String bccvlAuthUrl) {
+        this.bccvlAuthUrl = bccvlAuthUrl;
+    }
+
+    @Override
+    public String getBccvlApiUrl() {
+        return bccvlApiUrl;
+    }
+
+    public void setBccvlApiUrl(String bccvlApiUrl) {
+        this.bccvlApiUrl = bccvlApiUrl;
+    }
 
 }
