@@ -1,5 +1,7 @@
 package org.oztrack.data.access.impl;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -16,6 +18,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
+import au.com.bytecode.opencsv.CSVWriter;
 import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.log4j.Logger;
@@ -32,6 +35,7 @@ import org.oztrack.data.model.types.ArgosClass;
 import org.oztrack.data.model.types.PositionFixStats;
 import org.oztrack.data.model.types.TrajectoryStats;
 import org.oztrack.util.ProjectAnimalsMutexExecutor;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -531,7 +535,7 @@ public class PositionFixDaoImpl implements PositionFixDao {
                         "select all_fixes.id\n" +
                         ", all_fixes.project_id\n" +
                         ", all_fixes.animal_id\n" +
-                        ", first_fix.locationgeometry\n" +
+                        ", all_fixes.locationgeometry\n" +
                         ", all_fixes.detectiontime\n" +
                         ", all_fixes.row_number-1  as detection_index\n" +
                         "," + displacementExpr + " as displacement\n" +
@@ -707,10 +711,13 @@ public class PositionFixDaoImpl implements PositionFixDao {
     }
 
     @Override
-    public List<Object[]> getProjectPositionFixStats(Long projectId) {
+    public void writePositionFixStatsCsv(Long projectId, CSVWriter csvWriter)  {
 
-        String query =  "select animal_id\n" +
-                        ", to_char(detectiontime, 'yyyy-mm-dd hh24:mi:ss') as detectiontime\n" +
+        String [] headers = { "animal_id","detectiontime","detection_index","displacement","cumulative_distance", "step_distance", "step_duration"};
+        csvWriter.writeNext(headers);
+
+        String queryString =  "select animal_id\n" +
+                ", to_char(detectiontime, 'yyyy-mm-dd hh24:mi:ss') as detectiontime\n" +
                 ", detection_index\n" +
                 ", displacement\n" +
                 ", cumulative_distance\n" +
@@ -718,8 +725,57 @@ public class PositionFixDaoImpl implements PositionFixDao {
                 ", step_duration\n" +
                 "from positionfixstats\n" +
                 "where project_id = :projectId\n";
+        Query query = em.createNativeQuery(queryString).setParameter("projectId", projectId);
+        writeCsv(query, csvWriter);
+    }
 
-        return em.createNativeQuery(query).setParameter("projectId", projectId).getResultList();
+    @Override
+    public void writeTraitsCsv(Long projectId, CSVWriter csvWriter) {
+
+        String [] headers = { "decimalLongitude","decimalLatitude","speciesScientificName",
+                "month","year","eventDate","organismId","eventId","t1_stepDistance","t2_speedOverGround",
+                "t3_sex","t4_weight","t5_dimensions","t6_lifePhase","t7_releaseDate","t8_experimentalContext"};
+        csvWriter.writeNext(headers);
+
+        String queryString = "select ST_X(ps.locationgeometry) as decimalLongitude\n" +
+                ", ST_Y(ps.locationgeometry) as decimalLatitude\n" +
+                ", p.speciesscientificname\n" +
+                ", to_char(ps.detectiontime, 'mm') as eventMonth\n" +
+                ", to_char(ps.detectiontime, 'yyyy') as eventYear\n" +
+                ", to_char(ps.detectiontime, 'yyyy-mm-dd hh24:mi:ss') as eventDate\n" +
+                ", a.projectanimalid as animal_id\n" +
+                ", ps.animal_id as eventId\n" +
+                ", ps.step_distance\n" +
+                ", case when ps.step_duration = 0 then 0 else ps.step_distance/ps.step_duration end\n" +
+                ", a.sex\n" +
+                ", a.weight\n" +
+                ", a.dimensions\n" +
+                ", a.lifephase\n" +
+                ", to_char(a.releasedate, 'yyyy-mm-dd')\n" +
+                ", a.experimentalcontext\n" +
+                "from positionfixstats ps \n" +
+                "inner join animal a\n" +
+                " on ps.animal_id = a.id\n" +
+                " and ps.project_id = a.project_id\n" +
+                "inner join project p\n" +
+                " on ps.project_id=p.id" +
+                " where ps.project_id=:projectId";
+
+        Query query = em.createNativeQuery(queryString).setParameter("projectId", projectId);
+        writeCsv(query, csvWriter);
 
     }
+
+    private void writeCsv(Query query, CSVWriter csvWriter) {
+        @SuppressWarnings("unchecked")
+        List<Object[]> resultList = query.getResultList();
+        for (Object[] o : resultList) {
+            String [] s = new String[o.length];
+            for (int i=0; i < o.length; i++) {
+                s[i] = (o[i] != null) ?  o[i].toString() : "";
+            }
+            csvWriter.writeNext(s);
+        }
+    }
+
 }

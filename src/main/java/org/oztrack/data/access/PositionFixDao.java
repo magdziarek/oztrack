@@ -1,11 +1,13 @@
 package org.oztrack.data.access;
 
+import java.io.File;
 import java.sql.ResultSet;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import au.com.bytecode.opencsv.CSVWriter;
 import org.apache.commons.lang3.Range;
 import org.oztrack.data.model.Analysis;
 import org.oztrack.data.model.PositionFix;
@@ -42,5 +44,6 @@ public interface PositionFixDao {
     Map<Long, PositionFixStats> getAnimalPositionFixStats(Project project, Date fromDate, Date toDate);
     Map<Long, TrajectoryStats> getAnimalTrajectoryStats(Project project, Date fromDate, Date toDate);
     Map<Long, Range<Date>> getAnimalStartEndDates(Project project, Date fromDate, Date toDate);
-    List<Object[]> getProjectPositionFixStats(Long projectId);
+    void writePositionFixStatsCsv(Long projectId, CSVWriter csvWriter);
+    void writeTraitsCsv(Long projectId, CSVWriter csvWriter);
 }
