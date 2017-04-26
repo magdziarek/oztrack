@@ -87,8 +87,8 @@ public class RserveConnectionFactory extends BaseKeyedPoolableObjectFactory<Stri
             "googleVis",
             "spacetime",
             "plotKML",
-            "kftrack",
-            "ukfsst"
+            "kftrack"
+ //           "ukfsst"
         };
         for (String library : libraries) {
             try {

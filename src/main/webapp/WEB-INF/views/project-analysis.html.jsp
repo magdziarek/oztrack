@@ -259,8 +259,7 @@
                 -moz-border-radius: 6px;
                 border-radius: 6px;
                 padding-top: 15px;
-                padding-bottom: 10px;
-                padding-right:5px;
+                padding-bottom: 15px;
             }
             #chartTitle {
                 font-weight: bold;
@@ -277,9 +276,9 @@
                 right: 20px;
                 margin-top:-20px;
             }
-           #exportConfirmation {
-                margin: 5px;
-                padding: 15px;
+           .exportConfirmation {
+                margin: 0 15px;
+                padding: 10px;
             }
             .scroller {
                 text-align:center;
@@ -533,6 +532,56 @@
                 distanceCharts.loadProjectChartData(url, analysisMap.projectMap.animals);
                 <c:if test="${not empty temporal && temporal}">
                     $('a[href="#temporalPanel"]').trigger('click');
+                </c:if>
+                <c:if test="${not empty bccvlApiUrl}">
+                    <c:set var="baseUrl" value="${fn:replace(pageContext.request.requestURL, pageContext.request.requestURI, '')}"/>
+                    $('a[href="#temporalPanel"]').trigger('click');
+                    if ($("#exportTemporal").is(":visible")) {$("#exportTemporal").slideUp();}
+                    $(".chart-menu-tab-li").removeClass('active');
+                    $("#export-traits").parent().addClass('active');
+                    hideChart();
+                    $("#exportTraits").slideDown();
+                 if (window.location.hash.length != 0) {
+                    $("#bccvl-message").html("<p>Successfully connected to BCCVL. Now export the trait data across to your BCCVL session.</p>");
+                    $("#bccvl-button").text('Export Traits to BCCVL')
+                            .attr("href","#")
+                            .on('click', function() {
+                                //var auth = "Bearer " + window.location.hash; //.split('&')[0].split('=')[1]
+                                var json = {
+                                    "source": "zoatrack",
+                                    "species": "${project.speciesScientificName}",
+                                    "url": "${baseUrl}${pageContext.request.contextPath}/projects/${project.id}/analysis/traitexport"};
+                                console.log(json);
+                                console.log(JSON.stringify(json));
+                                $("#bccvl-message").html('<p>Exporting trait data to BCCVL. Wait...</p>');
+                                $("#bccvl-button").hide();
+                                $("#bccvl-loading").show();
+                                $.ajax({
+                                    type: 'POST',
+                                    url: "/proxy/bccvlapi",
+                                    contentType: 'application/json',
+                                    headers: {
+                                        Accept: "application/json",
+                                        Authorization: "Bearer " +  window.location.hash.split('&')[0].split('=')[1]
+                                        },
+                                    data: JSON.stringify(json),
+                                    error: function(xhr, textStatus, errorThrown) {
+                                        $("#bccvl-loading").hide();
+                                        $("#bccvl-message").css({'color':'red'});
+                                        $("#bccvl-message").html('<p>' + xhr.responseText + '</p>');
+                                        $("#refresh-button").show();
+                                    },
+                                    complete: function (xhr, textStatus) {
+                                        if (textStatus == 'success') {
+                                            $("#bccvl-loading").hide();
+                                            var location = xhr.getResponseHeader('Location');
+                                            $("#bccvl-message").html('<p>Export to BCCVL Successful.</p>' +
+                                            '<a class="btn btn-primary" target="_blank" href="' + location + '">Open BCCVL and view the exported data</a>');
+                                        }
+                                    }
+                                })
+                            });
+                 }
                 </c:if>
 
                 <c:forEach items="${savedAnalyses}" var="analysis">
@@ -998,17 +1047,10 @@
                         <div class="scroller scroller-right"><i class="icon-chevron-right"></i></div>
                         <div id="chart-tab-wrapper">
                             <ul id="chart-menu-tabs" class="nav nav-tabs">
-                                <!--
-                                <li class="chart-menu-tab-li dropdown">
-                                    <a href="#" id="export-dropdown" class="dropdown-toggle" data-toggle="dropdown">
-                                        Export<b class="caret" style="border-top-color:#000000;margin-left:5px"></b>&nbsp;</a>
-                                    <ul id="export-options-list" class="dropdown-menu">
-                                        <li><a id="csv-export" href="#" class="export-option">CSV</a></li>
-                                        <li><a id="chart-img" href="#" class="export-option">Chart Image</a></li>
-                                    </ul>
-                                </li>-->
-                                <li class="chart-menu-tab-li"><a id="export-open">
-                                Export <b class="caret" style="border-top-color:#000000;margin:6px"></b>&nbsp;</a></li>
+                                <c:if test="${currentUser.admin}">
+                                    <li class="chart-menu-tab-li"><a id="export-traits-open">Species Traits</a></li>
+                                </c:if>
+                                <li class="chart-menu-tab-li"><a id="export-open">Export</a></li>
                             </ul>
                         </div>
                         <div class="tab-content">
@@ -1031,7 +1073,7 @@
                         </div>
                     </div>
                     <div id="chartDescription"></div>
-                    <div id="exportConfirmation" class="form-bordered exportConfirmation" style="display: none;">
+                    <div id="exportTemporal" class="form-bordered exportConfirmation" style="display: none;">
                         <p>Data in this project are made available under the following licence:</p>
                         <p style="margin-top: 18px;">
                             <a target="_blank" href="${project.dataLicence.infoUrl}"
@@ -1046,11 +1088,41 @@
                             to discuss data usage and appropriate accreditation.
                         </p>
                         <div class="form-actions">
-                            <a class="exportButton btn btn-primary" href="${pageContext.request.contextPath}/projects/${project.id}/analysis/posfixstats">Export CSV</a>
-                            <a class="exportButton btn btn-primary" id="chart-img">Export IMG</a>
+                            <a class="exportButton btn btn-primary" href="${pageContext.request.contextPath}/projects/${project.id}/analysis/posfixexport" download>Export Temporal Data</a>
+                            <a class="exportButton btn btn-primary" id="chart-img">Export Chart Image</a>
                             <button id="export-close" class="btn">Close</button>
                         </div>
                     </div>
+
+                    <c:if test="${currentUser.admin}">
+                        <div id="exportTraits" class="form-bordered exportConfirmation" style="display:none;">
+                            <img src="${pageContext.request.contextPath}/img/logo_bccvl.png" style="margin-bottom:10px;"/>
+
+                            <c:choose>
+                            <c:when test="${project.access == 'OPEN'}">
+                                <c:set var="bccvlMsg" value="<p>The temporal data in this project can be exported as species traits to the BCCVL for use in a GLMM experiment.</p>
+                                    <p>Click the Connect button to login to BCCVL and ZoaTrack will load the data for you.</p>"/>
+                                <c:set var="bccvlButtonText" value="Connect to BCCVL"/>
+                                <c:set var="bccvlButtonUrl" value="${pageContext.request.contextPath}/projects/${project.id}/analysis/bccvl-init"/>
+                            </c:when>
+                            <c:otherwise>
+                                <c:set var="bccvlMsg" value="<p>The temporal data in this project can be used as species trait inputs to the BCCVL for use in a GLMM experiment.</p>
+                                    <p>You can export this data and login to BCCVL to use it in the experiment.</p>"/>
+                                <c:set var="bccvlButtonText" value="Open BCCVL"/>
+                                <c:set var="bccvlButtonUrl" value="http://bccvl.org.au"/>
+                                <c:set var="bccvlNewWindow" value="target='_blank'"/>
+                            </c:otherwise>
+                            </c:choose>
+                            <span id="bccvl-actions">
+                                <span id="bccvl-message">${bccvlMsg}</span>
+                                <div id="bccvl-loading" style="display:none"><img src="${pageContext.request.contextPath}/img/map-loading.gif"/></div>
+                                <a id="traits-button" class="exportButton btn btn-primary" href="${pageContext.request.contextPath}/projects/${project.id}/analysis/traitexport">Download Traits Data</a>
+                                <a id="bccvl-button" class="exportButton btn btn-primary" href="${bccvlButtonUrl}" ${bccvlNewWindow}>${bccvlButtonText}</a>
+                                <a id="refresh-button" class="btn btn-primary" onClick="window.location.reload()" style="display:none">Refresh</a>
+                                <button id="export-traits-close" class="btn">Close</button>
+                            </span>
+                        </div>
+                    </c:if>
                     <div id="chartDiv"><svg id="svgChart"></svg></div>
                     <div id="legendDiv"></div>
                     </div>
