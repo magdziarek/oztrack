@@ -1,6 +1,7 @@
 package org.oztrack.controller;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -8,14 +9,16 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import net.tanesha.recaptcha.ReCaptcha;
-import net.tanesha.recaptcha.ReCaptchaFactory;
-import net.tanesha.recaptcha.ReCaptchaImpl;
-import net.tanesha.recaptcha.ReCaptchaResponse;
-
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.json.JSONWriter;
 import org.oztrack.app.OzTrackConfiguration;
 import org.oztrack.data.access.CountryDao;
@@ -26,6 +29,7 @@ import org.oztrack.data.model.Country;
 import org.oztrack.data.model.Institution;
 import org.oztrack.data.model.Person;
 import org.oztrack.data.model.User;
+import org.oztrack.util.HttpClientUtils;
 import org.oztrack.validator.UserFormValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -44,6 +48,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class UserListController {
+
+    private final Logger logger = Logger.getLogger(getClass());
+
     @Autowired
     private OzTrackConfiguration configuration;
 
@@ -122,24 +129,11 @@ public class UserListController {
         return newUser;
     }
 
-    @ModelAttribute("recaptchaHtml")
-    public String getRecaptcha(HttpServletRequest request) {
-        String recaptchaPrivateKey = configuration.getRecaptchaPrivateKey();
-        String recaptchaPublicKey = configuration.getRecaptchaPublicKey();
-        if (StringUtils.isNotBlank(recaptchaPublicKey) && StringUtils.isNotBlank(recaptchaPrivateKey)) {
-            ReCaptcha c =
-                (request.isSecure() || request.getScheme().equals("https"))
-                ? ReCaptchaFactory.newSecureReCaptcha(recaptchaPublicKey, recaptchaPrivateKey, false)
-                : ReCaptchaFactory.newReCaptcha(recaptchaPublicKey, recaptchaPrivateKey, false);
-            return c.createRecaptchaHtml(null, null);
-        }
-        return null;
-    }
-
     @RequestMapping(value="/users/new", method=RequestMethod.GET)
     @PreAuthorize("permitAll")
     public String getFormView(Model model) {
         addFormAttributes(model);
+        model.addAttribute("recaptchaSiteKey", configuration.getRecaptchaPublicKey());
         return "user-form";
     }
 
@@ -153,6 +147,7 @@ public class UserListController {
         @RequestParam(value="aafId", required=false) String aafIdParam,
         @RequestParam(value="password", required=false) String password,
         @RequestParam(value="password2", required=false) String password2,
+        @RequestParam(value="g-recaptcha-response", required=false) String recaptchaResponse,
         BindingResult bindingResult
     ) {
         if (configuration.isAafEnabled()) {
@@ -178,20 +173,46 @@ public class UserListController {
             return "user-form";
         }
         if (user.getAafId() == null) {
-            String recaptchaPrivateKey = configuration.getRecaptchaPrivateKey();
-            String recaptchaPublicKey = configuration.getRecaptchaPublicKey();
-            if (StringUtils.isNotBlank(recaptchaPublicKey) && StringUtils.isNotBlank(recaptchaPrivateKey)) {
-                ReCaptchaImpl reCaptcha = new ReCaptchaImpl();
-                reCaptcha.setPrivateKey(recaptchaPrivateKey);
-                String recaptchaChallenge = request.getParameter("recaptcha_challenge_field");
-                String recaptchaResponse = request.getParameter("recaptcha_response_field");
-                ReCaptchaResponse reCaptchaResponse = reCaptcha.checkAnswer(request.getRemoteAddr(), recaptchaChallenge, recaptchaResponse);
-                if (!reCaptchaResponse.isValid()) {
-                    addFormAttributes(model);
-                    model.addAttribute("recaptchaError", "Verification incorrect - please try again.");
-                    return "user-form";
+
+           String recaptchaError = "";
+            try {
+                DefaultHttpClient client = HttpClientUtils.createDefaultHttpClient();
+                String ip = request.getRemoteAddr();
+                String ipAddress = request.getHeader("X-FORWARDED-FOR");
+                logger.info("Recaptcha verify from ip " + ip + "(" + ipAddress + ")");
+
+                URI uri = new URIBuilder()
+                        .setScheme("https")
+                        .setHost("www.google.com/recaptcha/api/siteverify")
+                        .setParameter("secret", configuration.getRecaptchaPrivateKey())
+                        .setParameter("response", recaptchaResponse)
+                        .setParameter("remoteip", request.getRemoteAddr())
+                        .build();
+                HttpPost httpPost = new HttpPost(uri);
+                HttpResponse httpResponse = client.execute(httpPost);
+                JSONObject httpResponseJson = new JSONObject(EntityUtils.toString(httpResponse.getEntity()));
+
+                if (!httpResponseJson.getBoolean("success")) {
+                    JSONArray errors = httpResponseJson.getJSONArray("error-codes");
+                    for (int i = 0; i < errors.length(); i++) {
+                        if (errors.getString(i).equals("missing-input-response")) {
+                            recaptchaError = "There's no reCaptcha input. Try again.";
+                        } else {
+                            recaptchaError = "Error from Recaptcha: " + errors.getString(i);
+                        }
+
+                    }
                 }
+            } catch(Exception e) {
+                logger.info("Recaptcha error: " + e.getLocalizedMessage());
+                recaptchaError = "Verification problems. Try again.";
             }
+            if (!recaptchaError.equals(""))  {
+                addFormAttributes(model);
+                model.addAttribute("recaptchaError", recaptchaError);
+                return "user-form";
+            }
+
         }
         if (StringUtils.isNotBlank(password)) {
             user.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
