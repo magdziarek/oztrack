@@ -542,8 +542,8 @@
                     hideChart();
                     $("#exportTraits").slideDown();
                  if (window.location.hash.length != 0) {
-                    $("#bccvl-message").html("<p>Successfully connected to BCCVL. Now export the trait data across to your BCCVL session.</p>");
-                    $("#bccvl-button").text('Export Traits to BCCVL')
+                    $("#bccvl-message").html("<p>You have successfully authorised and connected to the BCCVL. Now you can export your data to your BCCVL account.</p>");
+                    $("#bccvl-button").text('Export data to BCCVL')
                             .attr("href","#")
                             .on('click', function() {
                                 //var auth = "Bearer " + window.location.hash; //.split('&')[0].split('=')[1]
@@ -575,7 +575,7 @@
                                         if (textStatus == 'success') {
                                             $("#bccvl-loading").hide();
                                             var location = xhr.getResponseHeader('Location');
-                                            $("#bccvl-message").html('<p>Export to BCCVL Successful.</p>' +
+                                            $("#bccvl-message").html('<p>Export to BCCVL successful. You can now open the BCCVL and use your data in modelling experiments. Click the button below to launch the BCCVL.</p>' +
                                             '<a class="btn btn-primary" target="_blank" href="' + location + '">Open BCCVL and view the exported data</a>');
                                         }
                                     }
@@ -1087,10 +1087,11 @@
                             published peer-reviewed papers associated with the study. We strongly encourage you to contact the data custodians
                             to discuss data usage and appropriate accreditation.
                         </p>
+                        Download:<br/>
                         <div class="form-actions">
-                            <a class="exportButton btn btn-primary" href="${pageContext.request.contextPath}/projects/${project.id}/analysis/posfixexport" download>Export Temporal Data</a>
-                            <a class="exportButton btn btn-primary" id="chart-img">Export Chart Image</a>
-                            <button id="export-close" class="btn">Close</button>
+                            <a class="exportButton btn btn-primary" href="${pageContext.request.contextPath}/projects/${project.id}/analysis/posfixexport" download>Data</a>
+                            <a class="exportButton btn btn-primary" id="chart-img">Image</a>
+                            <button id="export-close" class="btn" style="position: absolute; right: 50px;">Close</button>
                         </div>
                     </div>
 
@@ -1100,26 +1101,26 @@
 
                             <c:choose>
                             <c:when test="${project.access == 'OPEN'}">
-                                <c:set var="bccvlMsg" value="<p>The temporal data in this project can be exported as species traits to the BCCVL for use in a GLMM experiment.</p>
-                                    <p>Click the Connect button to login to BCCVL and ZoaTrack will load the data for you.</p>"/>
-                                <c:set var="bccvlButtonText" value="Connect to BCCVL"/>
+                                <c:set var="bccvlMsg" value=""/>
+                                <c:set var="bccvlButtonText" value="Authorise BCCVL modelling capability"/>
                                 <c:set var="bccvlButtonUrl" value="${pageContext.request.contextPath}/projects/${project.id}/analysis/bccvl-init"/>
                             </c:when>
                             <c:otherwise>
-                                <c:set var="bccvlMsg" value="<p>The temporal data in this project can be used as species trait inputs to the BCCVL for use in a GLMM experiment.</p>
-                                    <p>You can export this data and login to BCCVL to use it in the experiment.</p>"/>
+                                <c:set var="bccvlMsg" value="<p>To do this you can download the trait data using the link below. Login to BCCVL, upload the dataset then navigate to Experiments to create a new Species Trait Modelling Experiment.</p>"/>
                                 <c:set var="bccvlButtonText" value="Open BCCVL"/>
                                 <c:set var="bccvlButtonUrl" value="http://bccvl.org.au"/>
                                 <c:set var="bccvlNewWindow" value="target='_blank'"/>
                             </c:otherwise>
                             </c:choose>
                             <span id="bccvl-actions">
-                                <span id="bccvl-message">${bccvlMsg}</span>
+                                <span id="bccvl-message"><p>The temporal data in this project can be exported as species traits to the BCCVL for use in a
+                                    Generalized Linear Mixed Model Experiment. This model allows you to test the effect of environmental variables on species traits.</p>
+                                    ${bccvlMsg}</span>
                                 <div id="bccvl-loading" style="display:none"><img src="${pageContext.request.contextPath}/img/map-loading.gif"/></div>
-                                <a id="traits-button" class="exportButton btn btn-primary" href="${pageContext.request.contextPath}/projects/${project.id}/analysis/traitexport">Download Traits Data</a>
                                 <a id="bccvl-button" class="exportButton btn btn-primary" href="${bccvlButtonUrl}" ${bccvlNewWindow}>${bccvlButtonText}</a>
                                 <a id="refresh-button" class="btn btn-primary" onClick="window.location.reload()" style="display:none">Refresh</a>
-                                <button id="export-traits-close" class="btn">Close</button>
+                                <a id="traits-button" class="btn" style="position: absolute; right: 110px;" href="${pageContext.request.contextPath}/projects/${project.id}/analysis/traitexport">Download Traits Data</a>
+                                <button id="export-traits-close" class="btn" style="position: absolute; right: 50px;">Close</button>
                             </span>
                         </div>
                     </c:if>
