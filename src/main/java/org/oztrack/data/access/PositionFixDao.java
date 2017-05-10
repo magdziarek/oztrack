@@ -45,5 +45,6 @@ public interface PositionFixDao {
     Map<Long, TrajectoryStats> getAnimalTrajectoryStats(Project project, Date fromDate, Date toDate);
     Map<Long, Range<Date>> getAnimalStartEndDates(Project project, Date fromDate, Date toDate);
     void writePositionFixStatsCsv(Long projectId, CSVWriter csvWriter);
+    String getTraitsDescr();
     void writeTraitsCsv(Long projectId, CSVWriter csvWriter);
 }

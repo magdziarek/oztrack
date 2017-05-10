@@ -546,13 +546,10 @@
                     $("#bccvl-button").text('Export data to BCCVL')
                             .attr("href","#")
                             .on('click', function() {
-                                //var auth = "Bearer " + window.location.hash; //.split('&')[0].split('=')[1]
                                 var json = {
                                     "source": "zoatrack",
                                     "species": "${project.speciesScientificName}",
                                     "url": "${baseUrl}${pageContext.request.contextPath}/projects/${project.id}/analysis/traitexport"};
-                                console.log(json);
-                                console.log(JSON.stringify(json));
                                 $("#bccvl-message").html('<p>Exporting trait data to BCCVL. Wait...</p>');
                                 $("#bccvl-button").hide();
                                 $("#bccvl-loading").show();
@@ -1119,7 +1116,7 @@
                                 <div id="bccvl-loading" style="display:none"><img src="${pageContext.request.contextPath}/img/map-loading.gif"/></div>
                                 <a id="bccvl-button" class="exportButton btn btn-primary" href="${bccvlButtonUrl}" ${bccvlNewWindow}>${bccvlButtonText}</a>
                                 <a id="refresh-button" class="btn btn-primary" onClick="window.location.reload()" style="display:none">Refresh</a>
-                                <a id="traits-button" class="btn" style="position: absolute; right: 110px;" href="${pageContext.request.contextPath}/projects/${project.id}/analysis/traitexport">Download Traits Data</a>
+                                <a id="traits-button" class="btn" style="position: absolute; right: 110px;" href="${pageContext.request.contextPath}/projects/${project.id}/analysis/traitdownload">Download Traits Data</a>
                                 <button id="export-traits-close" class="btn" style="position: absolute; right: 50px;">Close</button>
                             </span>
                         </div>

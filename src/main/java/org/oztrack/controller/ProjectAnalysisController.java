@@ -96,7 +96,6 @@ public class ProjectAnalysisController {
             if (action.equals("bccvl-export")) {
                 model.addAttribute("temporal", true);
                 model.addAttribute("bccvlApiUrl", configuration.getBccvlApiUrl());
-                logger.info(configuration.getBccvlApiUrl());
             }
         }
         model.addAttribute("analysisTypeList", analysisTypeList);
@@ -124,13 +123,23 @@ public class ProjectAnalysisController {
     @RequestMapping(value="/projects/{id}/analysis/posfixexport", method=RequestMethod.GET, produces="application/zip")
     @PreAuthorize("hasPermission(#project, 'read')")
     public void handlePosFixStatsExport(HttpServletRequest request, HttpServletResponse response, @ModelAttribute(value="project") Project project) throws IOException {
-          handleExport(response, project, "posfix");
+        projectVisitDao.save(new ProjectVisit(project, ProjectVisitType.DATA_DOWNLOAD, new Date()));
+        handleExport(response, project, "posfix");
     }
 
     @RequestMapping(value="/projects/{id}/analysis/traitexport", method=RequestMethod.GET, produces={"application/zip"})
     @PreAuthorize("hasPermission(#project, 'read')")
+    public void handleBccvlExport(HttpServletResponse response, @ModelAttribute(value="project") Project project) throws IOException {
+        projectVisitDao.save(new ProjectVisit(project, ProjectVisitType.BCCVL_EXPORT, new Date()));
+        handleExport(response, project, "traits");
+    }
+
+    //to distinguish bccvl
+    @RequestMapping(value="/projects/{id}/analysis/traitdownload", method=RequestMethod.GET, produces={"application/zip"})
+    @PreAuthorize("hasPermission(#project, 'read')")
     public void handleTraitsExport(HttpServletResponse response, @ModelAttribute(value="project") Project project) throws IOException {
-          handleExport(response, project, "traits");
+        projectVisitDao.save(new ProjectVisit(project, ProjectVisitType.TRAIT_DATA_DOWNLOAD, new Date()));
+        handleExport(response, project, "traits");
     }
 
     private void handleExport(HttpServletResponse response, Project project, String type) {
@@ -141,24 +150,25 @@ public class ProjectAnalysisController {
             File tempDirectory = new File(sysTempDirectory, "export" + UUID.randomUUID().toString());
             tempDirectory.mkdir();
             File tempCsv = new File(tempDirectory, baseFileName + ".csv");
-            logger.info("csv path: " + tempCsv.getPath());
+            File citationFile = new ProjectCitation(project).createCitationAndTermsFile(tempDirectory.getAbsolutePath() + File.separator);
             FileWriter fileWriter = new FileWriter(tempCsv);
             CSVWriter csvWriter = new CSVWriter(fileWriter);
             if (type.equals("traits")) {
                 positionFixDao.writeTraitsCsv(project.getId(), csvWriter);
+                FileWriter fileWriter1 = new FileWriter(citationFile,true); // true:append
+                fileWriter1.write(positionFixDao.getTraitsDescr());
+                fileWriter1.close();
             } else {
                 positionFixDao.writePositionFixStatsCsv(project.getId(), csvWriter);
             }
             fileWriter.close();
             csvWriter.close();
             File zipFile = new File(tempDirectory, baseFileName + ".zip");
-            zipFiles(zipFile, new File[]{tempCsv, new ProjectCitation(project).createCitationAndTermsFile(tempDirectory.getAbsolutePath() + File.separator)});
-
+            zipFiles(zipFile, new File[]{tempCsv,citationFile});
             response.setHeader("Content-Disposition", "attachment; filename=\"" + baseFileName + ".zip\"");
             response.setContentType("application/zip");
             response.setCharacterEncoding("UTF-8");
             IOUtils.copy(new FileInputStream(zipFile), response.getOutputStream());
-            logger.info("zip File: " + zipFile.getPath());
             zipFile.delete();
             tempDirectory.delete();
         } catch (IOException e) {

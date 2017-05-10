@@ -766,6 +766,19 @@ public class PositionFixDaoImpl implements PositionFixDao {
 
     }
 
+    @Override
+    public String getTraitsDescr() {
+        return "Field Descriptions:\n\n" +
+               "t1_stepDistance (km): The calculated minimum distance between consecutive location fixes. Calculated in WGS84.\n" +
+               "t2_speedOverGround (km/hr): The calculated minimum distance between consecutive location fixes divided by the time difference between those location fixes. Calculated in WGS84.\n" +
+               "t3_sex: The sex of the animal\n" +
+               "t4_weight: The weight of the animal\n" +
+               "t5_dimensions: Any relevant dimensions of the animal with units specified\n" +
+               "t6_lifePhase: The life phase of the animal\n" +
+               "t7_releaseDate: The date the animal was released after capture\n" +
+               "t8_experimentalContext: A description of the tagging program for this animal eg translocation, manipulation, reintroduction";
+    }
+
     private void writeCsv(Query query, CSVWriter csvWriter) {
         @SuppressWarnings("unchecked")
         List<Object[]> resultList = query.getResultList();

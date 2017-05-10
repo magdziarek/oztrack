@@ -5,10 +5,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+
 import org.apache.log4j.Logger;
 
 public class ProjectCitation {
@@ -53,8 +51,9 @@ public class ProjectCitation {
             }
 
             SimpleDateFormat sdfYear = new SimpleDateFormat("yyyy");
+            SimpleDateFormat sdfDate = new SimpleDateFormat("dd MMM yyyy");
             stringBuilder.append(authorList + "(" + sdfYear.format(project.getCreateDate()) +
-                    ") Data from: '" + project.getTitle() + ".'" + "ZoaTrack.org\n\n");
+                    ") Data from: '" + project.getTitle() + ".'" + " ZoaTrack.org Date Accessed: " + sdfDate.format(new Date()) +"\n\n");
         }
         stringBuilder.append("If you use these data in any type of publication then you must cite the above and any published " +
                 "peer-reviewed papers associated with the study. We strongly recommend that you contact the data custodians to " +
