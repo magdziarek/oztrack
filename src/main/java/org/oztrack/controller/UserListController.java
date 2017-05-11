@@ -170,23 +170,23 @@ public class UserListController {
         }
         if (bindingResult.hasErrors()) {
             addFormAttributes(model);
+            model.addAttribute("recaptchaSiteKey", configuration.getRecaptchaPublicKey());
+            model.addAttribute("recaptchaReset", true);
             return "user-form";
         }
         if (user.getAafId() == null) {
-
-           String recaptchaError = "";
+            String recaptchaError = "";
             try {
                 DefaultHttpClient client = HttpClientUtils.createDefaultHttpClient();
-                String ip = request.getRemoteAddr();
-                String ipAddress = request.getHeader("X-FORWARDED-FOR");
-                logger.info("Recaptcha verify from ip " + ip + "(" + ipAddress + ")");
+                String ip = request.getHeader("X-FORWARDED-FOR");
+                logger.info("Recaptcha verify " + user.getUsername() + "<"+ ip + ">");
 
                 URI uri = new URIBuilder()
                         .setScheme("https")
                         .setHost("www.google.com/recaptcha/api/siteverify")
                         .setParameter("secret", configuration.getRecaptchaPrivateKey())
                         .setParameter("response", recaptchaResponse)
-                        .setParameter("remoteip", request.getRemoteAddr())
+                        .setParameter("remoteip", ip)
                         .build();
                 HttpPost httpPost = new HttpPost(uri);
                 HttpResponse httpResponse = client.execute(httpPost);

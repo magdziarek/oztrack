@@ -108,7 +108,7 @@
 
 
         </script>
-        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+        <!--script src="https://www.google.com/recaptcha/api.js" async defer></script-->
     </jsp:attribute>
     <jsp:attribute name="breadcrumbs">
         <a href="${pageContext.request.contextPath}/">Home</a>
@@ -312,16 +312,19 @@
                         <form:errors path="description" element="div" cssClass="help-block formErrors"/>
                     </div>
                 </div>
-                <c:if test="${not empty recaptchaError}">
-                    <div class="help-block formErrors">
-                            ${recaptchaError}
-                    </div>
-                </c:if>
-                <div class="g-recaptcha controls" data-sitekey="${recaptchaSiteKey}"></div>
-
+                <div id="g-recaptcha" class="controls"></div>
+                <script type="text/javascript">
+                    var onloadCallback = function() {
+                        grecaptcha.render('g-recaptcha', {
+                            'sitekey' : '${recaptchaSiteKey}' ,
+                            'theme' : 'light'
+                        });
+                    }
+                </script>
+                <script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit" async defer></script>
             </fieldset>
             <div class="form-actions">
-                <input class="btn btn-primary g-recaptcha controls" type="submit"  value="${(user.id != null) ? 'Update' : 'Register'}" />
+                <input class="btn btn-primary controls" type="submit"  value="${(user.id != null) ? 'Update' : 'Register'}" />
             </div>
         </form:form>
     </jsp:body>
