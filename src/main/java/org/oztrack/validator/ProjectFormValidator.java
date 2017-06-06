@@ -12,7 +12,6 @@ import org.oztrack.data.access.ProjectDao;
 import org.oztrack.data.model.Institution;
 import org.oztrack.data.model.Project;
 import org.oztrack.data.model.types.ProjectAccess;
-import org.oztrack.util.EmbargoUtils;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
@@ -58,15 +57,8 @@ public class ProjectFormValidator implements Validator {
                 if (project.getEmbargoDate().before(DateUtils.truncate(currentDate, Calendar.DATE))) {
                     errors.rejectValue("embargoDate", "error.embargoDate", "Embargo date must be today's date or later.");
                 }
-                EmbargoUtils.EmbargoInfo embargoInfo = EmbargoUtils.getEmbargoInfo(createDate, prevEmbargoDate);
-                Date nonIncrementalEmbargoDisableDate = OzTrackApplication.getApplicationContext().getNonIncrementalEmbargoDisableDate();
-                if ((nonIncrementalEmbargoDisableDate == null) || createDate.before(nonIncrementalEmbargoDisableDate)) {
-                    if (project.getEmbargoDate().after(embargoInfo.getMaxEmbargoDate())) {
-                        errors.rejectValue("embargoDate", "error.embargoDate", "Embargo date must be " + dateFormat.format(embargoInfo.getMaxEmbargoDate()) + " or earlier.");
-                    }
-                }
                 else {
-                    if (project.getEmbargoDate().after(embargoInfo.getMaxIncrementalEmbargoDate())) {
+                    if (project.getEmbargoDate().after(DateUtils.addYears(currentDate,1))) {
                         errors.rejectValue("embargoDate", "error.embargoDate", "Embargo period can only be extended up to 1 year at a time.");
                     }
                 }

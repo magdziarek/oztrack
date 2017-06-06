@@ -245,7 +245,7 @@
                 $('#otherEmbargoDateInput').datepicker({
                     altField: "#otherEmbargoDate",
                     minDate: new Date(${minEmbargoDate.time}),
-                    maxDate: new Date(${beforeNonIncrementalEmbargoDisableDate ? maxEmbargoDate.time : maxIncrementalEmbargoDate.time})
+                    maxDate: new Date(${maxEmbargoDate.time})
                 });
 
                 var publications = [];
@@ -609,31 +609,23 @@
                                 their projects be published and made available for re-use.
                             </div>
                         </label>
-                        <label for="accessEmbargo" class="radio <c:if test="${maxEmbargoDate.time < minEmbargoDate.time}">disabled</c:if>">
+                        <label for="accessEmbargo" class="radio <c:if test="${openTooLong}">disabled</c:if>">
                             <form:radiobutton id="accessEmbargo" path="access" value="EMBARGO" onclick="
                                 $('#embargo-date-control-group').fadeIn();
                                 $('#data-licences-control-group').fadeIn();
                             ">
-                                <jsp:attribute name="disabled">${maxEmbargoDate.time < minEmbargoDate.time}</jsp:attribute>
+                                <jsp:attribute name="disabled">${openTooLong}</jsp:attribute>
                             </form:radiobutton>
                             <span class="project-access-embargo-title">Delayed Open Access</span>
                             <div style="margin: 0.5em 0;">
-                                Data in this project will be made publicly available in ZoaTrack after an embargo period.
-                                However, note that metadata including title, description, location, and animal species
-                                are made publicly available for all projects in ZoaTrack.
-                            </div>
-                            <div style="margin: 0.5em 0;">
-                                <c:choose>
-                                <c:when test="${beforeNonIncrementalEmbargoDisableDate}">
-                                Note: maximum embargo period is ${maxEmbargoYears} years from the project's creation date.
-                                </c:when>
-                                <c:otherwise>
-                                The embargo period can be renewed annually up to a maximum of ${maxEmbargoYears} years.
-                                </c:otherwise>
-                                </c:choose>
+                                Data in this project will not be publicly available in ZoaTrack during the embargo period. The embargo
+                                can be renewed annually. When the embargo expires, the project will become Open access and the data
+                                publicly available.
+                                <br/><br/>
+                                Note that metadata including title, description, location, animal species, and the contact email for
+                                the creator of the project are made publicly available for all projects in ZoaTrack.
                             </div>
                         </label>
-                        <c:if test="${minEmbargoDate.time <= maxEmbargoDate.time}">
                         <div id="embargo-date-control-group" style="margin: 10px 20px 20px 30px;<c:if test="${project.access != 'EMBARGO'}"> display: none;</c:if>">
                             <c:forEach items="${presetEmbargoDates}" var="presetEmbargoDate" varStatus="status">
                             <label for="presetEmbargoDate${status.index}" class="radio <c:if test="${presetEmbargoDate.value.time < minEmbargoDate.time}">disabled</c:if>">
@@ -643,12 +635,7 @@
                                 </form:radiobutton>
                                 <span>${presetEmbargoDate.key}</span>
                                 <span style="font-size: 11px;">
-                                    (expires <fmt:formatDate pattern="${isoDateFormatPattern}" value="${presetEmbargoDate.value}"
-                                    /><c:if test="${
-                                    !beforeNonIncrementalEmbargoDisableDate &&
-                                    (presetEmbargoDate.value.time < maxEmbargoDate.time)}">;
-                                    renewable up to <fmt:formatDate pattern="${isoDateFormatPattern}" value="${maxEmbargoDate}"/>
-                                    </c:if>)
+                                    (expires <fmt:formatDate pattern="${isoDateFormatPattern}" value="${presetEmbargoDate.value}"/>)
                                 </span>
                             </label>
                             </c:forEach>
@@ -657,30 +644,13 @@
                                     <jsp:attribute name="value"><fmt:formatDate pattern="${isoDateFormatPattern}" value="${otherEmbargoDate}"/></jsp:attribute>
                                 </form:radiobutton>
                                 <span>Other date</span>
-                                <c:if test="${!beforeNonIncrementalEmbargoDisableDate}">
-                                <span style="font-size: 11px;">(before <fmt:formatDate pattern="${isoDateFormatPattern}" value="${maxIncrementalEmbargoDate}"/>)</span>
-                                </c:if>
+                                <span style="font-size: 11px;">(before <fmt:formatDate pattern="${isoDateFormatPattern}" value="${maxEmbargoDate}"/>)</span>
                                 <input id="otherEmbargoDateInput" class="input-small datepicker" type="text"
                                     value="<fmt:formatDate pattern="${isoDateFormatPattern}" value="${otherEmbargoDate}"/>"
                                     onclick="$('#otherEmbargoDate').click(); return false;"/>
                             </label>
                             <form:errors path="embargoDate" element="div" cssClass="help-block formErrors"/>
                         </div>
-                        </c:if>
-                        <c:if test="${beforeClosedAccessDisableDate}">
-                        <label for="accessClosed" class="radio">
-                            <form:radiobutton id="accessClosed" path="access" value="CLOSED" onclick="
-                                $('#embargo-date-control-group').fadeOut();
-                                $('#data-licences-control-group').fadeOut();
-                            "/>
-                            <span class="project-access-closed-title">Closed Access</span>
-                            <div style="margin: 0.5em 0;">
-                                Data in this project will only be accessible to you.
-                                However, note that metadata including title, description, location, and animal species
-                                are made publicly available for all projects in ZoaTrack.
-                            </div>
-                        </label>
-                        </c:if>
                         <form:errors path="access" element="div" cssClass="help-block formErrors"/>
                     </div>
                 </div>
