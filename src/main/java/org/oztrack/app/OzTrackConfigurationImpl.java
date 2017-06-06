@@ -19,8 +19,6 @@ public class OzTrackConfigurationImpl implements OzTrackConfiguration {
     private boolean aafEnabled;
     private String recaptchaPublicKey;
     private String recaptchaPrivateKey;
-    private Date closedAccessDisableDate;
-    private Date nonIncrementalEmbargoDisableDate;
     private Integer projectDeleteRestrictedAfterDays;
     private Integer dataFileDeleteRestrictedAfterDays;
     private String rserveLogFile;
@@ -143,32 +141,6 @@ public class OzTrackConfigurationImpl implements OzTrackConfiguration {
 
     public void setRecaptchaPrivateKey(String recaptchaPrivateKey) {
         this.recaptchaPrivateKey = recaptchaPrivateKey;
-    }
-
-    @Override
-    public Date getClosedAccessDisableDate() {
-        return closedAccessDisableDate;
-    }
-
-    public void setClosedAccessDisableDate(Date closedAccessDisableDate) {
-        this.closedAccessDisableDate = closedAccessDisableDate;
-    }
-
-    public void setClosedAccessDisableDateString(String closedAccessDisableDateString) throws ParseException {
-        this.closedAccessDisableDate = isoDateTimeFormat.parse(closedAccessDisableDateString);
-    }
-
-    @Override
-    public Date getNonIncrementalEmbargoDisableDate() {
-        return nonIncrementalEmbargoDisableDate;
-    }
-
-    public void setNonIncrementalEmbargoDisableDate(Date nonIncrementalEmbargoDisableDate) {
-        this.nonIncrementalEmbargoDisableDate = nonIncrementalEmbargoDisableDate;
-    }
-
-    public void setNonIncrementalEmbargoDisableDateString(String nonIncrementalEmbargoDisableDateString) throws ParseException {
-        this.nonIncrementalEmbargoDisableDate = isoDateTimeFormat.parse(nonIncrementalEmbargoDisableDateString);
     }
 
     @Override

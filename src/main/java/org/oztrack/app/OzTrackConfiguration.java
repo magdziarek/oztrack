@@ -15,8 +15,6 @@ public interface OzTrackConfiguration {
     boolean isAafEnabled();
     String getRecaptchaPublicKey();
     String getRecaptchaPrivateKey();
-    Date getClosedAccessDisableDate();
-    Date getNonIncrementalEmbargoDisableDate();
     Integer getProjectDeleteRestrictedAfterDays();
     Integer getDataFileDeleteRestrictedAfterDays();
     String getRserveLogFile();
