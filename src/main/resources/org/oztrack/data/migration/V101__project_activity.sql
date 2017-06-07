@@ -21,7 +21,7 @@ CREATE SEQUENCE projectactivityid_seq
 
 
 ALTER TABLE public.projectactivityid_seq OWNER TO oztrack;
-ALTER TABLE public.projectactivity OWNER TO oztrack;
+ALTER TABLE public.project_activity OWNER TO oztrack;
 
 /*
 -- embargo expiry

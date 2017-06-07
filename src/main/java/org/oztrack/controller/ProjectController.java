@@ -171,6 +171,7 @@ public class ProjectController {
         String[] publicationReferenceParam = request.getParameterValues("publicationReference");
         String[] publicationUrlParam = request.getParameterValues("publicationUrl");
         String[] contributorIdParam = request.getParameterValues("contributor");
+        String embargoDateChangeStr = "";
 
         Date prevEmbargoDate = project.getEmbargoDate();
         if (project.getAccess().equals(ProjectAccess.EMBARGO) && StringUtils.isNotBlank(embargoDateString)) {
@@ -178,6 +179,8 @@ public class ProjectController {
             if (!embargoDate.equals(project.getEmbargoDate())) {
                 project.setEmbargoDate(embargoDate);
                 project.setEmbargoNotificationDate(null);
+                embargoDateChangeStr = "Update embargo date from " + isoDateFormat.format(prevEmbargoDate)
+                        +  " to " + isoDateFormat.format(embargoDate);
             }
         }
         else {
@@ -241,10 +244,11 @@ public class ProjectController {
         ProjectActivity activity = new ProjectActivity();
         activity.setActivityType("metadata");
         activity.setActivityCode("update");
-        activity.setActivityDescription(contributionsChangeDetails);
+        activity.setActivityDescription(embargoDateChangeStr + (embargoDateChangeStr.length() > 0 ? " || " : "") + contributionsChangeDetails);
         activity.setActivityDate(currentDate);
         activity.setProject(project);
         activity.setUser(currentUser);
+        activity.setUserIp(request.getHeader("X-FORWARDED-FOR"));
         projectActivityDao.save(activity);
 
         return "redirect:/projects/" + project.getId();
@@ -393,7 +397,7 @@ public class ProjectController {
                     emailBuilder.htmlMsgContent(htmlMsgContent.toString());
                     emailBuilder.build().send();
                 }
-                logger.info("Contributor change notification email to: " + notifiedContributor);
+                logger.info("Contributor change notification email to: " + notifiedContributor.getFullName() + " " + notifiedContributor.getEmail());
 
             }
             catch (Exception e) {

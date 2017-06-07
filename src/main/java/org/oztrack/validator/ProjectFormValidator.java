@@ -66,10 +66,7 @@ public class ProjectFormValidator implements Validator {
         }
 
         if (project.getAccess() == ProjectAccess.CLOSED) {
-            Date closedAccessDisableDate = OzTrackApplication.getApplicationContext().getClosedAccessDisableDate();
-            if ((closedAccessDisableDate != null) && !createDate.before(closedAccessDisableDate)) {
                 errors.rejectValue("access", "error.access", "Creation of Closed Access projects has been disabled.");
-            }
         }
 
         try {

@@ -26,7 +26,7 @@
     </bean>
     <bean id="embargoUpdaterTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="embargoUpdaterJobDetailFactory" />
-        <property name="cronExpression" value="0 0/5 * * * ?"/>
+        <property name="cronExpression" value="0 0 1 ? * MON-FRI"/><!-- 1am every weekday -->
     </bean>
     <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
         <property name="jobDetails">
