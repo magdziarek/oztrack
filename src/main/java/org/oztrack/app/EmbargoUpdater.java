@@ -13,27 +13,37 @@ import javax.persistence.PersistenceUnit;
 
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.log4j.Logger;
+import org.oztrack.data.access.ProjectActivityDao;
+import org.oztrack.data.access.ProjectDao;
+import org.oztrack.data.access.UserDao;
 import org.oztrack.data.access.impl.ProjectDaoImpl;
 import org.oztrack.data.model.Project;
+import org.oztrack.data.model.ProjectActivity;
+import org.oztrack.data.model.User;
 import org.oztrack.data.model.types.ProjectAccess;
 import org.oztrack.util.EmailBuilder;
 import org.oztrack.util.EmailBuilderFactory;
-import org.oztrack.util.EmbargoUtils;
-import org.oztrack.util.EmbargoUtils.EmbargoInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class EmbargoUpdater implements Runnable {
-    private final Logger logger = Logger.getLogger(getClass());
 
+    private final Logger logger = Logger.getLogger(getClass());
     private final SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    public static final int embargoNotificationMonths = 2;
 
     @Autowired
     private OzTrackConfiguration configuration;
 
     @Autowired
     private EmailBuilderFactory emailBuilderFactory;
+
+    @Autowired
+    private UserDao userDao;
+
+    @Autowired
+    private ProjectActivityDao projectActivityDao;
 
     @PersistenceUnit
     private EntityManagerFactory entityManagerFactory;
@@ -43,37 +53,28 @@ public class EmbargoUpdater implements Runnable {
 
     @Override
     public void run() {
-        if (!configuration.getTestServer()) {
-            logger.debug("Running embargo updater.");
-            EntityManager entityManager = entityManagerFactory.createEntityManager();
-            ProjectDaoImpl projectDao = new ProjectDaoImpl();
-            projectDao.setEntityManger(entityManager);
-            Date currentDate = new Date();
-            endEmbargo(entityManager, projectDao, currentDate);
-            sendNotifications(entityManager, projectDao, currentDate);
-        }
+        logger.info("running embargoupdater ");
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        ProjectDaoImpl projectDao = new ProjectDaoImpl();
+        projectDao.setEntityManger(entityManager);
+        Date currentDate = new Date();
+        endEmbargo(entityManager, projectDao, currentDate);
+        sendNotifications(entityManager, projectDao, currentDate);
     }
 
     private void endEmbargo(EntityManager entityManager, ProjectDaoImpl projectDao, Date currentDate) {
         List<Project> projects = projectDao.getProjectsWithExpiredEmbargo(currentDate);
         for (Project project : projects) {
-            logger.info(
-                "Making project " + project.getId() + " open access " +
-                "(embargo expired " + isoDateFormat.format(project.getEmbargoDate()) + ")."
-            );
             EntityTransaction transaction = entityManager.getTransaction();
             transaction.begin();
             try {
                 project.setAccess(ProjectAccess.OPEN);
                 project.setUpdateDate(currentDate);
                 project.setUpdateDateForOaiPmh(currentDate);
-                project.setUpdateUser(project.getUpdateUser());
+                //project.setUpdateUser(project.getUpdateUser());
                 projectDao.update(project);
                 transaction.commit();
 
-                EmailBuilder emailBuilder = emailBuilderFactory.getObject();
-                emailBuilder.to(project.getCreateUser());
-                emailBuilder.subject("ZoaTrack project embargo ended");
                 String projectLink = configuration.getBaseUrl() + "/projects/" + project.getId();
                 StringBuilder htmlMsgContent = new StringBuilder();
                 htmlMsgContent.append("<p>\n");
@@ -88,8 +89,26 @@ public class EmbargoUpdater implements Runnable {
                 htmlMsgContent.append("    To view your project, click here:\n");
                 htmlMsgContent.append("    <a href=\"" + projectLink + "\">" + projectLink + "</a>\n");
                 htmlMsgContent.append("</p>\n");
-                emailBuilder.htmlMsgContent(htmlMsgContent.toString());
-                emailBuilder.build().send();
+
+                String emailDetails = "Email to: " + project.getCreateUser().getFullName() + "(" + project.getCreateUser().getEmail() + ")";
+                logger.info("Making project " + project.getId() + " open access " +
+                                "(embargo expired " + isoDateFormat.format(project.getEmbargoDate()) + "). " + emailDetails);
+                if (!configuration.getTestServer()) {
+                    EmailBuilder emailBuilder = emailBuilderFactory.getObject();
+                    emailBuilder.to(project.getCreateUser());
+                    emailBuilder.subject("ZoaTrack project embargo ended");
+                    emailBuilder.htmlMsgContent(htmlMsgContent.toString());
+                    emailBuilder.build().send();
+                }
+
+                ProjectActivity activity = new ProjectActivity();
+                activity.setActivityType("embargo");
+                activity.setActivityCode("expiry");
+                activity.setActivityDescription(emailDetails + "||" + htmlMsgContent.toString());
+                activity.setActivityDate(currentDate);
+                activity.setProject(project);
+                activity.setUser(userDao.getByUsername("admin"));
+                projectActivityDao.save(activity);
             }
             catch (Exception e) {
                 logger.error("Exception in embargo updater", e);
@@ -101,13 +120,13 @@ public class EmbargoUpdater implements Runnable {
     private void sendNotifications(EntityManager entityManager, ProjectDaoImpl projectDao, Date currentDate) {
         Calendar expiryCalendar = new GregorianCalendar();
         expiryCalendar.setTime(currentDate);
-        expiryCalendar.add(Calendar.MONTH, EmbargoUtils.embargoNotificationMonths);
+        expiryCalendar.add(Calendar.MONTH, EmbargoUpdater.embargoNotificationMonths);
         Date expiryDate = DateUtils.truncate(expiryCalendar.getTime(), Calendar.DATE);
         List<Project> projects = projectDao.getProjectsWithExpiredEmbargo(expiryDate);
 
         for (Project project : projects) {
             // Don't send notifications for projects already at end of embargo period.
-            // These should be picked up by the endEmargo updater, which sends its own notification.
+            // These should be picked up by the endEmbargo updater, which sends its own notification.
             if (!currentDate.before(project.getEmbargoDate())) {
                 continue;
             }
@@ -119,18 +138,11 @@ public class EmbargoUpdater implements Runnable {
             if ((project.getEmbargoNotificationDate() != null) && !expiryDate.before(project.getEmbargoNotificationDate())) {
                 continue;
             }
-            logger.info(
-                "Sending notification for project " + project.getId() + " " +
-                "(embargo expires " + isoDateFormat.format(project.getEmbargoDate()) + ")."
-            );
             EntityTransaction transaction = entityManager.getTransaction();
             transaction.begin();
             try {
-                EmailBuilder emailBuilder = emailBuilderFactory.getObject();
-                emailBuilder.to(project.getCreateUser());
-                emailBuilder.subject("ZoaTrack project embargo ending");
                 String projectLink = configuration.getBaseUrl() + "/projects/" + project.getId();
-                String projectEditLink = projectLink + "/edit";
+                String projectEditLink = projectLink + "/edit#accessrights";
 
                 StringBuilder htmlMsgContent = new StringBuilder();
                 htmlMsgContent.append("<p>\n");
@@ -141,56 +153,51 @@ public class EmbargoUpdater implements Runnable {
                 htmlMsgContent.append("<p>\n");
                 htmlMsgContent.append("    Starting from this date, data in the project will be made publicly available in ZoaTrack.\n");
                 htmlMsgContent.append("</p>");
-                EmbargoInfo embargoInfo = EmbargoUtils.getEmbargoInfo(project.getCreateDate(), project.getEmbargoDate());
-                if (project.getEmbargoDate().before(embargoInfo.getMaxEmbargoDate())) {
-                    htmlMsgContent.append("<p style=\"color: #666;\">\n");
-                    htmlMsgContent.append("    <b>Extending the embargo period</b>\n");
-                    htmlMsgContent.append("</p>\n");
-                    if (project.getCreateDate().before(configuration.getNonIncrementalEmbargoDisableDate())) {
-                        htmlMsgContent.append("<p>\n");
-                        htmlMsgContent.append("    If necessary, you can extend the embargo period up to \n");
-                        htmlMsgContent.append("    " + isoDateFormat.format(embargoInfo.getMaxEmbargoDate()) + ".\n");
-                        htmlMsgContent.append("</p>\n");
-                    }
-                    else if (embargoInfo.getMaxIncrementalEmbargoDate().before(embargoInfo.getMaxEmbargoDate())) {
-                        htmlMsgContent.append("<p>\n");
-                        htmlMsgContent.append("    If necessary, you can extend the embargo period by another year \n");
-                        htmlMsgContent.append("    to " + isoDateFormat.format(embargoInfo.getMaxIncrementalEmbargoDate()) + ".\n");
-                        htmlMsgContent.append("</p>\n");
-                        htmlMsgContent.append("<p>\n");
-                        htmlMsgContent.append("    Project embargoes can be renewed annually up to a maximum of 3 years.\n");
-                        htmlMsgContent.append("</p>\n");
-                    }
-                    else {
-                        htmlMsgContent.append("<p>\n");
-                        htmlMsgContent.append("    If necessary, you can extend the embargo period up to \n");
-                        htmlMsgContent.append("    " + isoDateFormat.format(embargoInfo.getMaxEmbargoDate()) + ".\n");
-                        htmlMsgContent.append("</p>\n");
-                        htmlMsgContent.append("<p>\n");
-                        htmlMsgContent.append("    This is the final renewal permitted by ZoaTrack, taking the embargo period up to 3 years.\n");
-                        htmlMsgContent.append("</p>\n");
-                    }
-                }
-                else {
-                    htmlMsgContent.append("<p>\n");
-                    htmlMsgContent.append("    This embargo period has been the maximum permitted by ZoaTrack (3 years),");
-                    htmlMsgContent.append("    so cannot be renewed.\n");
-                    htmlMsgContent.append("</p>\n");
-                }
+                htmlMsgContent.append("<p style=\"color: #666;\">\n");
+                htmlMsgContent.append("    <b>Extending the embargo period</b>\n");
+                htmlMsgContent.append("</p>\n");
+                htmlMsgContent.append("<p>\n");
+                htmlMsgContent.append("    If necessary, you can extend the embargo period by another year \n");
+                htmlMsgContent.append("    to " + isoDateFormat.format(DateUtils.addYears(project.getEmbargoDate(),1)) + ".\n");
+                htmlMsgContent.append("</p>\n");
+                htmlMsgContent.append("<p>\n");
+                htmlMsgContent.append("You can continue to extend the embargo period each year. We will notify you " + embargoNotificationMonths
+                        + " months in advance of the embargo expiry date. If the embargo period is not extended, the project will become open access.");
+                htmlMsgContent.append("</p>\n");
+                htmlMsgContent.append("<p>\n");
+                htmlMsgContent.append("    To update your project, and extend the embargo, click here (you will need to log in):\n");
+                htmlMsgContent.append("    <a href=\"" + projectEditLink + "\">" + projectEditLink + "</a>\n");
+                htmlMsgContent.append("</p>\n");
                 htmlMsgContent.append("<p>\n");
                 htmlMsgContent.append("    To view your project, click here:\n");
                 htmlMsgContent.append("    <a href=\"" + projectLink + "\">" + projectLink + "</a>\n");
                 htmlMsgContent.append("</p>\n");
-                htmlMsgContent.append("<p>\n");
-                htmlMsgContent.append("    To update your project, click here:\n");
-                htmlMsgContent.append("    <a href=\"" + projectEditLink + "\">" + projectEditLink + "</a>\n");
-                htmlMsgContent.append("</p>\n");
-                emailBuilder.htmlMsgContent(htmlMsgContent.toString());
-                emailBuilder.build().send();
+
+                String emailDetails = "Email to: " + project.getCreateUser().getFullName() + "(" + project.getCreateUser().getEmail() + ")";
+                logger.info("Sending notification for project " + project.getId() + " " +
+                                "(embargo expires " + isoDateFormat.format(project.getEmbargoDate()) + "). " + emailDetails);
+
+                if (!configuration.getTestServer()) {
+                    EmailBuilder emailBuilder = emailBuilderFactory.getObject();
+                    emailBuilder.to(project.getCreateUser());
+                    emailBuilder.subject("ZoaTrack project embargo ending");
+                    emailBuilder.htmlMsgContent(htmlMsgContent.toString());
+                    emailBuilder.build().send();
+                }
 
                 project.setEmbargoNotificationDate(expiryDate);
                 projectDao.update(project);
                 transaction.commit();
+
+                ProjectActivity activity = new ProjectActivity();
+                activity.setActivityType("embargo");
+                activity.setActivityCode("notify");
+                activity.setActivityDescription(emailDetails + "||" + htmlMsgContent.toString());
+                activity.setActivityDate(currentDate);
+                activity.setProject(project);
+                activity.setUser(userDao.getByUsername("admin"));
+                projectActivityDao.save(activity);
+
             }
             catch (Exception e) {
                 logger.error("Exception in embargo notifier", e);

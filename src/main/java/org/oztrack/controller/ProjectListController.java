@@ -25,7 +25,6 @@ import org.oztrack.data.model.ProjectContribution;
 import org.oztrack.data.model.User;
 import org.oztrack.data.model.types.ProjectAccess;
 import org.oztrack.util.EmailBuilderFactory;
-import org.oztrack.util.EmbargoUtils;
 import org.oztrack.validator.ProjectFormValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -213,40 +212,18 @@ public class ProjectListController {
         model.addAttribute("currentYear", currentCalendar.get(Calendar.YEAR));
         model.addAttribute("currentDate", currentCalendar.getTime());
         model.addAttribute("institutions", institutionDao.getAllOrderedByTitle());
-        boolean beforeClosedAccessDisableDate =
-            (configuration.getClosedAccessDisableDate() == null) ||
-            (currentCalendar.getTime().before(configuration.getClosedAccessDisableDate()));
-        model.addAttribute("beforeClosedAccessDisableDate", beforeClosedAccessDisableDate);
         addEmbargoDateFormAttributes(model, currentCalendar.getTime());
     }
 
     private void addEmbargoDateFormAttributes(Model model, Date currentDate) {
         final Date truncatedCurrentDate = DateUtils.truncate(currentDate, Calendar.DATE);
         final Date truncatedCreateDate = truncatedCurrentDate;
-
-        EmbargoUtils.EmbargoInfo embargoInfo = EmbargoUtils.getEmbargoInfo(truncatedCreateDate, null);
-
-        boolean beforeNonIncrementalEmbargoDisableDate =
-            (configuration.getNonIncrementalEmbargoDisableDate() == null) ||
-            (currentDate.before(configuration.getNonIncrementalEmbargoDisableDate()));
-        model.addAttribute("beforeNonIncrementalEmbargoDisableDate", beforeNonIncrementalEmbargoDisableDate);
-
+        Date maxEmbargoDate = DateUtils.addYears(truncatedCurrentDate,1);
         model.addAttribute("minEmbargoDate", truncatedCurrentDate);
-        model.addAttribute("maxEmbargoDate", embargoInfo.getMaxEmbargoDate());
-        model.addAttribute("maxEmbargoYears", embargoInfo.getMaxEmbargoYears());
-        model.addAttribute("maxIncrementalEmbargoDate", embargoInfo.getMaxIncrementalEmbargoDate());
+        model.addAttribute("maxEmbargoDate", maxEmbargoDate);
 
         LinkedHashMap<String, Date> presetEmbargoDates = new LinkedHashMap<String, Date>();
-        if (beforeNonIncrementalEmbargoDisableDate) {
-            for (int years = 1; years <= embargoInfo.getMaxEmbargoYears(); years++) {
-                String key = years + " " + ((years == 1) ? "year" : "years");
-                Date value = DateUtils.addYears(truncatedCreateDate, years);
-                presetEmbargoDates.put(key, value);
-            }
-        }
-        else {
-            presetEmbargoDates.put("Annual renewal", embargoInfo.getMaxIncrementalEmbargoDate());
-        }
+        presetEmbargoDates.put("Annual renewal", maxEmbargoDate);
         model.addAttribute("presetEmbargoDates", presetEmbargoDates);
         model.addAttribute("otherEmbargoDate", null);
     }

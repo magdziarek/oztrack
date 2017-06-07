@@ -25,33 +25,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.log4j.Logger;
 import org.oztrack.app.OzTrackConfiguration;
-import org.oztrack.data.access.AnimalDao;
-import org.oztrack.data.access.DataFileDao;
-import org.oztrack.data.access.DataLicenceDao;
-import org.oztrack.data.access.InstitutionDao;
-import org.oztrack.data.access.OaiPmhRecordDao;
-import org.oztrack.data.access.PersonDao;
-import org.oztrack.data.access.PositionFixDao;
-import org.oztrack.data.access.ProjectDao;
-import org.oztrack.data.access.ProjectVisitDao;
-import org.oztrack.data.access.SrsDao;
-import org.oztrack.data.access.UserDao;
-import org.oztrack.data.model.Animal;
-import org.oztrack.data.model.DataFile;
-import org.oztrack.data.model.Institution;
-import org.oztrack.data.model.Person;
-import org.oztrack.data.model.Project;
-import org.oztrack.data.model.ProjectContribution;
-import org.oztrack.data.model.ProjectUser;
-import org.oztrack.data.model.ProjectVisit;
-import org.oztrack.data.model.Publication;
-import org.oztrack.data.model.User;
+import org.oztrack.data.access.*;
+import org.oztrack.data.model.*;
 import org.oztrack.data.model.types.ProjectAccess;
 import org.oztrack.data.model.types.ProjectVisitType;
 import org.oztrack.data.model.types.Role;
 import org.oztrack.util.EmailBuilder;
 import org.oztrack.util.EmailBuilderFactory;
-import org.oztrack.util.EmbargoUtils;
 import org.oztrack.validator.ProjectFormValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -82,6 +62,9 @@ public class ProjectController {
 
     @Autowired
     private ProjectVisitDao projectVisitDao;
+
+    @Autowired
+    private ProjectActivityDao projectActivityDao;
 
     @Autowired
     private PositionFixDao positionFixDao;
@@ -188,12 +171,7 @@ public class ProjectController {
         String[] publicationReferenceParam = request.getParameterValues("publicationReference");
         String[] publicationUrlParam = request.getParameterValues("publicationUrl");
         String[] contributorIdParam = request.getParameterValues("contributor");
-
-        if (project.getInstitution() == null) {
-            logger.info("no primary institution info returned in project object");
-        } else {
-            logger.info("primary institution returned: " + project.getInstitution().getId() + "," + project.getInstitution());
-        }
+        String embargoDateChangeStr = "";
 
         Date prevEmbargoDate = project.getEmbargoDate();
         if (project.getAccess().equals(ProjectAccess.EMBARGO) && StringUtils.isNotBlank(embargoDateString)) {
@@ -201,6 +179,8 @@ public class ProjectController {
             if (!embargoDate.equals(project.getEmbargoDate())) {
                 project.setEmbargoDate(embargoDate);
                 project.setEmbargoNotificationDate(null);
+                embargoDateChangeStr = "Update embargo date from " + isoDateFormat.format(prevEmbargoDate)
+                        +  " to " + isoDateFormat.format(embargoDate);
             }
         }
         else {
@@ -251,7 +231,7 @@ public class ProjectController {
             positionFixDao.renumberPositionFixes(project, animalIds);
         }
 
-        respondToContributionsChange(
+        String contributionsChangeDetails = respondToContributionsChange(
             configuration,
             emailBuilderFactory,
             logger,
@@ -261,11 +241,21 @@ public class ProjectController {
             project.getProjectContributions()
         );
 
+        ProjectActivity activity = new ProjectActivity();
+        activity.setActivityType("metadata");
+        activity.setActivityCode("update");
+        activity.setActivityDescription(embargoDateChangeStr + (embargoDateChangeStr.length() > 0 ? " || " : "") + contributionsChangeDetails);
+        activity.setActivityDate(currentDate);
+        activity.setProject(project);
+        activity.setUser(currentUser);
+        activity.setUserIp(request.getHeader("X-FORWARDED-FOR"));
+        projectActivityDao.save(activity);
+
         return "redirect:/projects/" + project.getId();
     }
 
     @SuppressWarnings("unchecked")
-    public static void respondToContributionsChange(
+    public static String respondToContributionsChange(
         OzTrackConfiguration configuration,
         EmailBuilderFactory emailBuilderFactory,
         Logger logger,
@@ -283,7 +273,7 @@ public class ProjectController {
         Collection<Person> previousContributors = CollectionUtils.collect(previousContributions, contributionToContributorTransformer);
         Collection<Person> currentContributors = CollectionUtils.collect(currentContributions, contributionToContributorTransformer);
         if (previousContributors.equals(currentContributors)) {
-            return;
+            return "";
         }
 
         StringBuilder message = new StringBuilder();
@@ -399,17 +389,24 @@ public class ProjectController {
                     htmlMsgContent.append("    <a href=\"" + rejectionLink + "\">" + rejectionLink + "</a>\n");
                     htmlMsgContent.append("<p>\n");
                 }
-                EmailBuilder emailBuilder = emailBuilderFactory.getObject();
-                emailBuilder.to(notifiedContributor);
-                emailBuilder.subject("ZoaTrack project contributor change");
-                emailBuilder.htmlMsgContent(htmlMsgContent.toString());
-                emailBuilder.build().send();
-            }
-            catch (Exception e) {
-                logger.error("Error sending notification to " + notifiedContributor.getFullName() + " " + notifiedContributor.getEmail(), e);
+
+                if (!configuration.getTestServer()) {
+                    EmailBuilder emailBuilder = emailBuilderFactory.getObject();
+                    emailBuilder.to(notifiedContributor);
+                    emailBuilder.subject("ZoaTrack project contributor change");
+                    emailBuilder.htmlMsgContent(htmlMsgContent.toString());
+                    emailBuilder.build().send();
+                }
+                logger.info("Contributor change notification email to: " + notifiedContributor.getFullName() + " " + notifiedContributor.getEmail());
 
             }
+            catch (Exception e) {
+                String errorMessage = "Error sending notification to " + notifiedContributor.getFullName() + " " + notifiedContributor.getEmail();
+                logger.error(errorMessage, e);
+                message.append(errorMessage);
+            }
         }
+        return message.toString();
     }
 
     private static void appendContributorsList(Collection<Person> previousContributors, StringBuilder htmlMsgContent) {
@@ -520,10 +517,6 @@ public class ProjectController {
         model.addAttribute("currentYear", currentCalendar.get(Calendar.YEAR));
         model.addAttribute("currentDate", currentCalendar.getTime());
         model.addAttribute("institutions", institutionDao.getAllOrderedByTitle());
-        boolean beforeClosedAccessDisableDate =
-            (configuration.getClosedAccessDisableDate() == null) ||
-            (project.getCreateDate().before(configuration.getClosedAccessDisableDate()));
-        model.addAttribute("beforeClosedAccessDisableDate", beforeClosedAccessDisableDate);
         addEmbargoDateFormAttributes(model, project, currentCalendar.getTime());
     }
 
@@ -531,53 +524,45 @@ public class ProjectController {
         final Date truncatedCurrentDate = DateUtils.truncate(currentDate, Calendar.DATE);
         final Date truncatedCreateDate = DateUtils.truncate(project.getCreateDate(), Calendar.DATE);
 
-        EmbargoUtils.EmbargoInfo embargoInfo = EmbargoUtils.getEmbargoInfo(project.getCreateDate(), project.getEmbargoDate());
-
-        boolean beforeNonIncrementalEmbargoDisableDate =
-            (configuration.getNonIncrementalEmbargoDisableDate() == null) ||
-            (project.getCreateDate().before(configuration.getNonIncrementalEmbargoDisableDate()));
-        model.addAttribute("beforeNonIncrementalEmbargoDisableDate", beforeNonIncrementalEmbargoDisableDate);
-
         model.addAttribute("minEmbargoDate", truncatedCurrentDate);
-        model.addAttribute("maxEmbargoDate", embargoInfo.getMaxEmbargoDate());
-        model.addAttribute("maxEmbargoYears", embargoInfo.getMaxEmbargoYears());
-        model.addAttribute("maxIncrementalEmbargoDate", embargoInfo.getMaxIncrementalEmbargoDate());
 
         LinkedHashMap<String, Date> presetEmbargoDates = new LinkedHashMap<String, Date>();
         Date otherEmbargoDate = null;
-        if (beforeNonIncrementalEmbargoDisableDate) {
-            for (int years = 1; years <= embargoInfo.getMaxEmbargoYears(); years++) {
-                String key = years + " " + ((years == 1) ? "year" : "years");
-                Date value = DateUtils.addYears(truncatedCreateDate, years);
-                presetEmbargoDates.put(key, value);
-            }
-            // Set otherEmbargoDate field if it doesn't match any of the presets
-            if (project.getEmbargoDate() != null) {
-                otherEmbargoDate = project.getEmbargoDate();
-                DateUtils.truncate(project.getEmbargoDate(), Calendar.DATE);
-                for (Date presetEmbargoDate : presetEmbargoDates.values()) {
-                    if (otherEmbargoDate.getTime() == presetEmbargoDate.getTime()) {
-                        otherEmbargoDate = null;
-                        break;
-                    }
-                }
+
+        // if the project is OPEN with an embargo date, it became open on the embargo date
+        // if the project is OPEN without an embargo date, it became open on the create date
+        // if the project became OPEN > 1 year ago, disable the option to embargo
+        Date maxExpiryDate = DateUtils.addYears(truncatedCurrentDate,1);
+        boolean openTooLong = false;
+        if (project.getAccess().equals(ProjectAccess.OPEN))  {
+            Date openDate = (project.getEmbargoDate() != null) ? project.getEmbargoDate() : project.getCreateDate();
+            if (openDate.after(DateUtils.addYears(truncatedCurrentDate,-1))) {
+                presetEmbargoDates.put("Embargo for 1 year", DateUtils.addYears(truncatedCurrentDate,1));
+            } else {
+                openTooLong = true;
             }
         }
-        else {
-            if (project.getEmbargoDate() != null) {
-                presetEmbargoDates.put("Current embargo", project.getEmbargoDate());
+
+        // At any time, a user can extend a project's embargo period by 1 year from the current date.
+        // As a special case, if the user has received a notification about an embargo period ending,
+        // then they can extend the embargo period by 1 year from the current embargo end date. This
+        // allows extension of the embargo period by slightly more than 1 year (an extra N months,
+        // depending on the EmbargoUpdater.embargoNotificationMonths setting).
+        else if (project.getAccess().equals(ProjectAccess.EMBARGO)) {
+            //Date expiryDate;
+            // special case
+            if ((project.getEmbargoNotificationDate() != null) && project.getEmbargoNotificationDate().after(truncatedCurrentDate)) {
+                maxExpiryDate = DateUtils.addYears(project.getEmbargoNotificationDate(),1);
+            } else { // no notification sent yet, or notification is passed (in which case OPEN logic will apply)
+                maxExpiryDate = DateUtils.addYears(truncatedCurrentDate,1);
             }
-            if ((project.getEmbargoDate() == null) || project.getEmbargoDate().before(embargoInfo.getMaxIncrementalEmbargoDate())) {
-                if (embargoInfo.getMaxIncrementalEmbargoDate().before(embargoInfo.getMaxEmbargoDate())) {
-                    presetEmbargoDates.put("Extend by 1 year", embargoInfo.getMaxIncrementalEmbargoDate());
-                }
-                else {
-                    presetEmbargoDates.put("Extend to " + embargoInfo.getMaxEmbargoYears() + " year limit", embargoInfo.getMaxEmbargoDate());
-                }
-            }
+            presetEmbargoDates.put("Current embargo", project.getEmbargoDate());
+            presetEmbargoDates.put("Extend by 1 year",  maxExpiryDate);
         }
+        model.addAttribute("maxEmbargoDate", maxExpiryDate);
+        model.addAttribute("openTooLong", openTooLong);
         model.addAttribute("presetEmbargoDates", presetEmbargoDates);
-        model.addAttribute("otherEmbargoDate", otherEmbargoDate);
+        model.addAttribute("otherEmbargoDate", maxExpiryDate);
     }
 
     @RequestMapping(value="/projects/{id}", method=RequestMethod.DELETE)
