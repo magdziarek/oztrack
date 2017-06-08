@@ -1044,9 +1044,7 @@
                         <div class="scroller scroller-right"><i class="icon-chevron-right"></i></div>
                         <div id="chart-tab-wrapper">
                             <ul id="chart-menu-tabs" class="nav nav-tabs">
-                                <c:if test="${currentUser.admin}">
                                     <li class="chart-menu-tab-li"><a id="export-traits-open">Species Traits</a></li>
-                                </c:if>
                                 <li class="chart-menu-tab-li"><a id="export-open">Export</a></li>
                             </ul>
                         </div>
@@ -1092,10 +1090,8 @@
                         </div>
                     </div>
 
-                    <c:if test="${currentUser.admin}">
                         <div id="exportTraits" class="form-bordered exportConfirmation" style="display:none;">
                             <img src="${pageContext.request.contextPath}/img/logo_bccvl.png" style="margin-bottom:10px;"/>
-
                             <c:choose>
                             <c:when test="${project.access == 'OPEN'}">
                                 <c:set var="bccvlMsg" value=""/>
@@ -1120,7 +1116,6 @@
                                 <button id="export-traits-close" class="btn" style="position: absolute; right: 50px;">Close</button>
                             </span>
                         </div>
-                    </c:if>
                     <div id="chartDiv"><svg id="svgChart"></svg></div>
                     <div id="legendDiv"></div>
                     </div>
