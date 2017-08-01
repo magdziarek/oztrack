@@ -100,4 +100,15 @@ public class OzTrackUtils {
         }
         return value;
     }
+
+    public static String getDatafeedProperty(String uuid) throws IOException, FileNotFoundException {
+        String dataFeedPropertiesFile = System.getProperty("org.oztrack.conf.dataFeedPropertiesFile");
+        String value = "";
+        if (StringUtils.isNotBlank(dataFeedPropertiesFile)) {
+            Properties properties = new Properties();
+            properties.load(new FileInputStream(dataFeedPropertiesFile));
+            value = properties.getProperty(uuid);
+        }
+        return value;
+    }
 }
