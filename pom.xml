@@ -14,7 +14,7 @@
     <groupId>org.oztrack</groupId>
     <artifactId>oztrack</artifactId>
     <packaging>war</packaging>
-    <version>4.15-SNAPSHOT</version>
+    <version>4.16-SNAPSHOT</version>
     <name>OzTrack</name>
     <url>http://zoatrack.org/</url>
     <scm>

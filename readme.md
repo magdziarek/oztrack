@@ -1,16 +1,12 @@
-# OzTrack
+# ZoaTrack
 
-OzTrack is a free-to-use web-based platform for the analysis and visualisation of animal tracking data.
+ZoaTrack is a free-to-use web-based platform for the analysis and visualisation of animal tracking data.
 It was developed for the Australian animal tracking community but can be used to determine, measure and
 plot home-ranges for animals anywhere in the world.
 
-This software is copyright The University of Queensland.
-
-This software is distributed under the GNU GENERAL PUBLIC LICENSE Version 2. See the COPYING file for detail.
-
 ## Installing on Ubuntu
 
-The following instructions have been tested on Ubuntu 13.04 and 13.10.
+The following instructions have been tested on Ubuntu 13.10 and 14.04.
 
 ### Setting up the database
 
@@ -34,7 +30,7 @@ Sort out PostgreSQL authentication:
 
 <pre>sudo service postgresql reload</pre>
 
-Setup the OzTrack database, including PostGIS and UUID module:
+Setup the database, including PostGIS and UUID module:
 
     sudo -u postgres psql -c "create user oztrack with password 'changeme';"
     sudo -u postgres psql -c "create database oztrack with owner oztrack;"
@@ -104,8 +100,8 @@ downloads, compiles, tests, and installs a large number of dependencies.
 
 The `kftrack` and `ukfsst` packages need to be downloaded and installed from files.
 
-    wget -P /tmp 'https://geolocation.googlecode.com/files/kftrack_0.70-x64.tar.gz'
-    wget -P /tmp 'https://geolocation.googlecode.com/files/ukfsst_0.3-x64.tar.gz'
+    wget -P /tmp https://github.com/positioning/kalmanfilter/raw/master/downloads/R3x/64bit/kftrack_0.70-x64.tar.gz
+    wget -P /tmp https://github.com/positioning/kalmanfilter/raw/master/downloads/R3x/64bit/ukfsst_0.3-x64.tar.gz
     sudo R --no-save << EOF
     install.packages('/tmp/kftrack_0.70-x64.tar.gz', repos=NULL)
     install.packages(c('date', 'ncdf'), repos='http://cran.csiro.au/')
@@ -176,8 +172,8 @@ that listens on ports 80/443 and terminates SSL. See Apache installation/config 
 
 ### Installing GeoServer
 
-[GeoServer](http://geoserver.org/) is an open-source GIS server used to render map layers in OzTrack.
-OzTrack has been tested with [GeoServer version 2.3.1](http://geoserver.org/display/GEOS/GeoServer+2.3.1).
+[GeoServer](http://geoserver.org/) is an open-source GIS server used to render map layers in ZoaTrack.
+ZoaTrack has been tested with [GeoServer version 2.3.1](http://geoserver.org/display/GEOS/GeoServer+2.3.1).
 For complete installation instructions, see the [GeoServer user manual](http://docs.geoserver.org/stable/en/user/).
 
 The following commands install the GeoServer WAR distribution to Tomcat:
@@ -356,15 +352,15 @@ Restart all the services.
 
 ### Installing OzTrack
 
-OzTrack can be compiled from source into a WAR file by running `mvn package`.
+ZoaTrack can be compiled from source into a WAR file by running `mvn package`.
 
-The OzTrack WAR file can be run using any Java Servlet container.
+The WAR file can be run using any Java Servlet container.
 
 Alternatively, it can be run as a normal Java application via the `org.oztrack.app.OzTrackJettyServer` class.
 
 ### Configuring OzTrack
 
-OzTrack can be configured via a range of properties. The properties files included in the
+ZoaTrack can be configured via a range of properties. The properties files included in the
 distribution under `/WEB-INF/classes/org/oztrack/conf/` contain default settings.
 
 To override these default values, you have three options (in increasing order of precedence):
@@ -413,21 +409,21 @@ The following are key properties that should be configured for all applications:
     # Number of Rserve processes to run on each host
     org.oztrack.conf.numRConnections=4
 
-### Administering OzTrack
+### Administering ZoaTrack
 
-OzTrack defines a default admin user with the username/password "admin"/"oztrack".
-To log into OzTrack, click the 'Login' button at the top-right of screen. You should change the default
+ZoaTrack defines a default admin user with the username/password "admin"/"oztrack".
+To log into ZoaTrack, click the 'Login' button at the top-right of screen. You should change the default
 admin password immediately by selecting 'Edit profile' from within the user menu at the top-right of screen.
 
-The admin user, unlike ordinary users in OzTrack, also has a 'Settings' link under the user menu;
-the settings page allows various aspects of the OzTrack application to be configured.
+The admin user, unlike ordinary users in ZoaTrack, also has a 'Settings' link under the user menu;
+the settings page allows various aspects of the ZoaTrack application to be configured.
 
 ### Installing external environmental layers
 
-The environmental data layers included in OzTrack come from external sources and are covered by
+The environmental data layers included in ZoaTrack come from external sources and are covered by
 specific licence agreements. Due to their large file size and licencing restrictions, layer files are
-not packaged with OzTrack and must be obtained under a new licence agreement by parties deploying their
-own instance of OzTrack. Note that OzTrack can be run without these layers but their associated menu
+not packaged with ZoaTrack and must be obtained under a new licence agreement by parties deploying their
+own instance of ZoaTrack. Note that ZoaTrack can be run without these layers but their associated menu
 items in the map interface won't do anything when clicked.
 
 #### GEBCO (bathymetry, elevation)
@@ -640,7 +636,7 @@ The resulting files should be placed in
 
 ### Configuring GeoServer layers
 
-OzTrack automatically creates and updates layers in GeoServer. To configure layers in GeoServer, log in to OzTrack as admin, click the 'GeoServer' link on the Settings page, and click the 'Update GeoServer' button. Any errors encountered updating GeoServer will be listed on the response page; in particular, you will see errors if creation of external environmental layers fail due to missing layer files.
+ZoaTrack automatically creates and updates layers in GeoServer. To configure layers in GeoServer, log in to ZoaTrack as admin, click the 'GeoServer' link on the Settings page, and click the 'Update GeoServer' button. Any errors encountered updating GeoServer will be listed on the response page; in particular, you will see errors if creation of external environmental layers fail due to missing layer files.
 
 ## Developer notes
 
@@ -653,3 +649,8 @@ ThemeRoller-generated CSS file to pre-fill settings in the theme creation form.
     grep 'jqueryui\.com\/themeroller\/?' src/main/webapp/css/jquery-ui/*.css
 
 ### oztrack   [![Build Status](https://travis-ci.org/AtlasOfLivingAustralia/oztrack.svg?branch=master)](https://travis-ci.org/AtlasOfLivingAustralia/oztrack)
+
+
+This software is copyright The University of Queensland.
+
+This software is distributed under the GNU GENERAL PUBLIC LICENSE Version 2. See the COPYING file for detail.
