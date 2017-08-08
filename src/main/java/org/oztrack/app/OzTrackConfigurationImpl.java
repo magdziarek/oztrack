@@ -34,6 +34,7 @@ public class OzTrackConfigurationImpl implements OzTrackConfiguration {
     private String bccvlClientId;
    private String bccvlAuthUrl;
     private String bccvlApiUrl;
+    private Integer whaleSharkRaceId;
 
     @Override
     public String getBaseUrl() {
@@ -276,6 +277,15 @@ public class OzTrackConfigurationImpl implements OzTrackConfiguration {
 
     public void setBccvlApiUrl(String bccvlApiUrl) {
         this.bccvlApiUrl = bccvlApiUrl;
+    }
+
+    @Override
+    public Integer getWhaleSharkRaceId() {
+        return whaleSharkRaceId;
+    }
+
+    public void setWhaleSharkRaceId(Integer whaleSharkRaceId) {
+        this.whaleSharkRaceId = whaleSharkRaceId;
     }
 
 }

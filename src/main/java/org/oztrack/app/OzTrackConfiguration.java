@@ -30,5 +30,6 @@ public interface OzTrackConfiguration {
     String getBccvlClientId();
     String getBccvlApiUrl();
     String getBccvlAuthUrl();
+    Integer getWhaleSharkRaceId();
 
 }
