@@ -3,7 +3,10 @@ package org.oztrack.controller;
 import java.io.IOException;
 
 import org.oztrack.app.OzTrackConfiguration;
+import org.oztrack.data.access.ProjectDao;
+import org.oztrack.data.access.impl.ProjectDaoImpl;
 import org.oztrack.data.model.Project;
+import org.oztrack.data.model.types.ProjectAccess;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,6 +27,9 @@ public class RedirectController {
     @Autowired
     private OzTrackConfiguration configuration;
 
+    @Autowired
+    private ProjectDao projectDao;
+
     @RequestMapping(value="/home", method=RequestMethod.GET)
     public RedirectView redirectOldHomeUrl() throws IOException {
         return redirectTo("/");
@@ -37,7 +43,11 @@ public class RedirectController {
     @RequestMapping(value="/whalesharkrace", method=RequestMethod.GET)
     public RedirectView redirectWhaleSharkRace() {
         Long project_id = configuration.getWhaleSharkRaceId().longValue();
-        String url = "/projects/" + project_id.toString() + "/analysis";
+        Project whaleSharkProject = projectDao.getProjectById(project_id);
+        String url = "/projects/" + project_id.toString();
+        if (whaleSharkProject.getAccess().equals(ProjectAccess.OPEN)) {
+            url += "/analysis";
+        }
         RedirectView redirectView = new RedirectView(url,true);
         redirectView.setExposeModelAttributes(false);
         redirectView.setExposePathVariables(false);

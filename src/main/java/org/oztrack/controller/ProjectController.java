@@ -171,21 +171,25 @@ public class ProjectController {
         String[] publicationReferenceParam = request.getParameterValues("publicationReference");
         String[] publicationUrlParam = request.getParameterValues("publicationUrl");
         String[] contributorIdParam = request.getParameterValues("contributor");
-        String embargoDateChangeStr = "";
+        String embargoDateChangeStr =  "";
 
         Date prevEmbargoDate = project.getEmbargoDate();
         if (project.getAccess().equals(ProjectAccess.EMBARGO) && StringUtils.isNotBlank(embargoDateString)) {
             Date embargoDate = isoDateFormat.parse(embargoDateString);
-            if (!embargoDate.equals(project.getEmbargoDate())) {
+            if (!embargoDate.equals(prevEmbargoDate)) {
                 project.setEmbargoDate(embargoDate);
                 project.setEmbargoNotificationDate(null);
-                embargoDateChangeStr = "Update embargo date from " + isoDateFormat.format(prevEmbargoDate)
-                        +  " to " + isoDateFormat.format(embargoDate);
+                embargoDateChangeStr = "Access:" + project.getAccess() +
+                        " Embargo Date: Previous= " + (prevEmbargoDate != null ? isoDateFormat.format(prevEmbargoDate) : "null") +
+                        " New= " + (embargoDate != null ? isoDateFormat.format(embargoDate) : "null");
             }
         }
         else {
             project.setEmbargoDate(null);
             project.setEmbargoNotificationDate(null);
+            embargoDateChangeStr = "Access:" + project.getAccess() +
+                    " Embargo Date: Previous= " + (prevEmbargoDate != null ? isoDateFormat.format(prevEmbargoDate) : "null") +
+                    " New=null";
         }
 
         if ((project.getAccess() != ProjectAccess.CLOSED) && StringUtils.isNotBlank(dataLicenceIdentifier)) {
@@ -244,7 +248,7 @@ public class ProjectController {
         ProjectActivity activity = new ProjectActivity();
         activity.setActivityType("metadata");
         activity.setActivityCode("update");
-        activity.setActivityDescription(embargoDateChangeStr + (embargoDateChangeStr.length() > 0 ? " || " : "") + contributionsChangeDetails);
+        activity.setActivityDescription(embargoDateChangeStr + (contributionsChangeDetails.length() > 0 ? " || " : "") + contributionsChangeDetails);
         activity.setActivityDate(currentDate);
         activity.setProject(project);
         activity.setUser(currentUser);
