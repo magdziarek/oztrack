@@ -211,11 +211,56 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
+                            <generateDirectory>target/generated-sources/datacite</generateDirectory>
                             <schemas>
                                 <schema>
+                                    <!-- too many dependencies to do this locally -->
                                     <url>http://schema.datacite.org/meta/kernel-3.1/metadata.xsd</url>
                                 </schema>
                             </schemas>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>argos-ws</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <generateDirectory>target/generated-sources/argos/datamodel</generateDirectory>
+                            <generatePackage>fr.cls.argos</generatePackage>
+                            <schemas>
+                                <schema>
+                                    <fileset>
+                                        <directory>${basedir}/src/main/resources/org/oztrack/xsd</directory>
+                                        <includes>
+                                            <include>argos.xsd</include>
+                                        </includes>
+                                        <excludes>
+                                            <exclude>*.xs</exclude>
+                                        </excludes>
+                                    </fileset>
+                                </schema>
+                            </schemas>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jvnet.jax-ws-commons</groupId>
+                <artifactId>jaxws-maven-plugin</artifactId>
+                <version>2.3</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>wsimport</goal>
+                        </goals>
+                        <configuration>
+                            <wsdlUrls>
+                                <wsdlUrl>http://ws-argos.clsamerica.com/argosDws/services/DixService?wsdl</wsdlUrl>
+                            </wsdlUrls>
+                            <sourceDestDir>target/generated-sources/argos/soap</sourceDestDir>
+                            <extension>true</extension>
+                            <xnocompile>false</xnocompile>
                         </configuration>
                     </execution>
                 </executions>

@@ -51,4 +51,19 @@ public class MapUtils {
         url += "&HEIGHT=" + mapDimension.height;
         return ImageIO.read(new URL(url));
     }
+
+    public static String[] animalColours = new String[]{
+            "#8DD3C7",
+            "#FFFFB3",
+            "#BEBADA",
+            "#FB8072",
+            "#80B1D3",
+            "#FDB462",
+            "#B3DE69",
+            "#FCCDE5",
+            "#D9D9D9",
+            "#BC80BD",
+            "#CCEBC5",
+            "#FFED6F"
+    };
 }
