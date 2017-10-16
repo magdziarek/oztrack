@@ -1,32 +1,38 @@
 package org.oztrack.data.model;
 
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import org.oztrack.data.model.types.DataFeedSourceSystem;
 
-@Entity(name="datafeed")
+import javax.persistence.*;
+import java.util.Calendar;
+import java.util.Date;
+
+import static javax.persistence.EnumType.STRING;
+
+@Entity
+@Table(name = "datafeed")
 public class DataFeed extends OzTrackBaseEntity {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.SEQUENCE, generator="datafeedid_seq")
-    @SequenceGenerator(name="datafeedid_seq", sequenceName="datafeedid_seq",allocationSize=1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "datafeed_id_seq")
+    @SequenceGenerator(name = "datafeed_id_seq", sequenceName = "datafeed_id_seq", allocationSize = 1)
     @Column(nullable=false)
     private Long id;
 
-    @ManyToOne(fetch=FetchType.LAZY, cascade={}) //persist project yourself
+    @ManyToOne
     @JoinColumn(nullable=false)
     private Project project;
 
-    // a feed could have more than one animal; could change tags
-    @OneToMany(mappedBy="dataFeed", cascade={CascadeType.ALL}, orphanRemoval=true, fetch=FetchType.EAGER)
-    @OrderColumn(name="createdate", nullable=false)
-    private List<Animal> animals = new ArrayList<Animal>();
+    @Enumerated(STRING)
+    @Column(name = "source_system")
+    private DataFeedSourceSystem dataFeedSourceSystem;
 
-    private String sourceSystem;
-    private String sourceSystemIdentifier;
-    private String sourceSystemUser;
-    private String sourceSystemUuid;
+    private transient String sourceSystemCredentials;
+
+    @Column(name = "poll_frequency_hours")
+    private Long pollFrequencyHours;
+
+    @Column(name = "active_flag")
+    private boolean activeFlag;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name="active_date")
@@ -35,6 +41,10 @@ public class DataFeed extends OzTrackBaseEntity {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name="deactive_date")
     private Date deactiveDate;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "last_poll_date")
+    private Date lastPollDate;
 
     public Long getId() {
         return id;
@@ -52,44 +62,36 @@ public class DataFeed extends OzTrackBaseEntity {
         this.project = project;
     }
 
-    public List<Animal> getAnimals() {
-        return animals;
+    public DataFeedSourceSystem getDataFeedSourceSystem() {
+        return dataFeedSourceSystem;
     }
 
-    public void setAnimals(List<Animal> animals) {
-        this.animals = animals;
+    public void setDataFeedSourceSystem(DataFeedSourceSystem dataFeedSourceSystem) {
+        this.dataFeedSourceSystem = dataFeedSourceSystem;
     }
 
-    public String getSourceSystem() {
-        return sourceSystem;
+    public String getSourceSystemCredentials() {
+        return sourceSystemCredentials;
     }
 
-    public void setSourceSystem(String sourceSystem) {
-        this.sourceSystem = sourceSystem;
+    public void setSourceSystemCredentials(String sourceSystemCredentials) {
+        this.sourceSystemCredentials = sourceSystemCredentials;
     }
 
-    public String getSourceSystemIdentifier() {
-        return sourceSystemIdentifier;
+    public Long getPollFrequencyHours() {
+        return pollFrequencyHours;
     }
 
-    public void setSourceSystemIdentifier(String sourceSystemIdentifier) {
-        this.sourceSystemIdentifier = sourceSystemIdentifier;
+    public void setPollFrequencyHours(Long pollFrequencyHours) {
+        this.pollFrequencyHours = pollFrequencyHours;
     }
 
-    public String getSourceSystemUser() {
-        return sourceSystemUser;
+    public boolean isActiveFlag() {
+        return activeFlag;
     }
 
-    public void setSourceSystemUser(String sourceSystemUser) {
-        this.sourceSystemUser = sourceSystemUser;
-    }
-
-    public String getSourceSystemUuid() {
-        return sourceSystemUuid;
-    }
-
-    public void setSourceSystemUuid(String sourceSystemUuid) {
-        this.sourceSystemUuid = sourceSystemUuid;
+    public void setActiveFlag(boolean activeFlag) {
+        this.activeFlag = activeFlag;
     }
 
     public Date getActiveDate() {
@@ -106,6 +108,47 @@ public class DataFeed extends OzTrackBaseEntity {
 
     public void setDeactiveDate(Date deactiveDate) {
         this.deactiveDate = deactiveDate;
+    }
+
+    public Date getLastPollDate() {
+        return lastPollDate;
+    }
+
+    public void setLastPollDate(Date lastPollDate) {
+        this.lastPollDate = lastPollDate;
+    }
+
+    public boolean isReadyToPoll() {
+        boolean readyToPoll = false;
+        Calendar c = Calendar.getInstance();
+        c.setTime(this.lastPollDate);
+        c.add(Calendar.HOUR, this.pollFrequencyHours.intValue());
+        if (c.getTime().before(new java.util.Date())) {
+            readyToPoll = true;
+        }
+        return readyToPoll;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (!(obj instanceof DataFeed)) {
+            return false;
+        }
+        DataFeed other = (DataFeed) obj;
+        return getId().equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        if (id != null) {
+            return id.hashCode();
+        } else {
+            return super.hashCode();
+        }
     }
 
 }

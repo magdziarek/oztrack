@@ -18,6 +18,19 @@
         <property name="startDelay" value="10000" />
     </bean>
 
+    <bean id="dataFeedPollRunner" class="org.oztrack.data.loader.DataFeedPollRunner"/>
+    <bean id="dataFeedJobDetailFactory"
+          class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="dataFeedPollRunner"/>
+        <property name="targetMethod" value="pollAllDataFeeds"/>
+        <property name="concurrent" value="false"/>
+    </bean>
+    <bean id="dataFeedTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+        <property name="jobDetail" ref="dataFeedJobDetailFactory"/>
+        <property name="repeatInterval" value="3600000"/>
+        <property name="startDelay" value="10000"/>
+    </bean>
+
     <bean id="embargoUpdater" class="org.oztrack.app.EmbargoUpdater"/>
     <bean id="embargoUpdaterJobDetailFactory" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
       <property name="targetObject" ref="embargoUpdater" />
@@ -32,12 +45,14 @@
         <property name="jobDetails">
             <list>
                 <ref bean="dataFileJobDetailFactory" />
+                <ref bean="dataFeedJobDetailFactory"/>
                 <ref bean="embargoUpdaterJobDetailFactory" />
             </list>
         </property>
         <property name="triggers">
             <list>
                 <ref bean="dataFileTrigger" />
+                <ref bean="dataFeedTrigger"/>
                 <ref bean="embargoUpdaterTrigger" />
             </list>
         </property>

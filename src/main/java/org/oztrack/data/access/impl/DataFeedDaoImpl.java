@@ -1,10 +1,9 @@
 package org.oztrack.data.access.impl;
 
 import org.oztrack.data.access.DataFeedDao;
-import org.oztrack.data.model.Animal;
 import org.oztrack.data.model.DataFeed;
+import org.oztrack.data.model.types.DataFeedSourceSystem;
 import org.springframework.stereotype.Service;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
@@ -19,12 +18,24 @@ public class DataFeedDaoImpl implements DataFeedDao {
         this.em = em;
     }
 
-    public List<DataFeed> getAllActiveDataFeeds() {
+    @Override
+    public String getSourceSystemCredentials(Long dataFeedId) {
+        // these are not persisted in the datafeed object
+        return (String) em.createNativeQuery("select source_system_credentials from datafeed where id = :id")
+                .setParameter("id", dataFeedId)
+                .getSingleResult();
+    }
+
+    ;
+
+    @Override
+    public List<DataFeed> getAllActiveDataFeeds(DataFeedSourceSystem sourceSystem) {
         List<DataFeed> resultList = em.createQuery(
-                                "select distinct datafeed\n" +
-                                "from DataFeed as datafeed\n" +
-                                "where datafeed.activeFlag = true"
-                )
+                "select o \n" +
+                        "from DataFeed o \n" +
+                        "where activeFlag = true \n" +
+                        "and dataFeedSourceSystem = :sourceSystem"
+        ).setParameter("sourceSystem", sourceSystem)
                 .getResultList();
         return resultList;
     };
