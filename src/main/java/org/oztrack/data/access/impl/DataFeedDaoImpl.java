@@ -2,8 +2,11 @@ package org.oztrack.data.access.impl;
 
 import org.oztrack.data.access.DataFeedDao;
 import org.oztrack.data.model.DataFeed;
+import org.oztrack.data.model.Project;
 import org.oztrack.data.model.types.DataFeedSourceSystem;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
@@ -26,7 +29,7 @@ public class DataFeedDaoImpl implements DataFeedDao {
                 .getSingleResult();
     }
 
-    ;
+
 
     @Override
     public List<DataFeed> getAllActiveDataFeeds(DataFeedSourceSystem sourceSystem) {
@@ -38,5 +41,35 @@ public class DataFeedDaoImpl implements DataFeedDao {
         ).setParameter("sourceSystem", sourceSystem)
                 .getResultList();
         return resultList;
-    };
+    }
+
+
+//    @Override
+//    public List<DataFeed> getAllProjectDataFeeds(Project project) {
+//        List<DataFeed> resultList = em.createQuery(
+//                "select o \n" +
+//                        "from DataFeed o \n" +
+//                        "where project = :project"
+//        ).setParameter("project", project)
+//                .getResultList();
+//        return resultList;
+//    }
+
+    @Override
+    @Transactional
+    public void save(DataFeed object) {
+        em.persist(object);
+    }
+
+    @Override
+    @Transactional
+    public DataFeed update(DataFeed object) {
+        return em.merge(object);
+    }
+
+    @Override
+    @Transactional
+    public void delete(DataFeed dataFeed) {
+        em.remove(dataFeed);
+    }
 }

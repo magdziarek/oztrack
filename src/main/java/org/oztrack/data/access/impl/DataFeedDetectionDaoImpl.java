@@ -52,15 +52,6 @@ public class DataFeedDetectionDaoImpl implements DataFeedDetectionDao {
         return r;
     }
 
-    public String getRawArgosData(Long platformId) {
-
-        String sql = "select o.satellite_pass_xml " +
-                "from datafeed_raw_argos o " +
-                "where o.platform_id = :platformId ;";
-        String xml = (String) em.createNativeQuery(sql).setParameter("platformId", platformId).getSingleResult();
-        return xml;
-    }
-
     @Override
     @Transactional
     public void save(DataFeedDetection object) {

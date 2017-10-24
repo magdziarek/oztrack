@@ -10,7 +10,7 @@ public interface DataFeedDetectionDao {
 
     int saveRawArgosData(Long detectionId, Long programNumber, Long platformId, Date bestMessageDate, String satellitePassXml);
 
-    String getRawArgosData(Long platformId);
+    //String getRawArgosData(Long platformId);
 
     void save(DataFeedDetection object);
 

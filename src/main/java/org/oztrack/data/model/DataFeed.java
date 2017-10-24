@@ -3,8 +3,10 @@ package org.oztrack.data.model;
 import org.oztrack.data.model.types.DataFeedSourceSystem;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import static javax.persistence.EnumType.STRING;
 
@@ -45,6 +47,9 @@ public class DataFeed extends OzTrackBaseEntity {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "last_poll_date")
     private Date lastPollDate;
+
+    @OneToMany(mappedBy = "dataFeed", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<DataFeedDevice> devices = new ArrayList<DataFeedDevice>();
 
     public Long getId() {
         return id;
@@ -118,15 +123,23 @@ public class DataFeed extends OzTrackBaseEntity {
         this.lastPollDate = lastPollDate;
     }
 
-    public boolean isReadyToPoll() {
-        boolean readyToPoll = false;
+    public List<DataFeedDevice> getDevices() {
+        return devices;
+    }
+
+    public void setDevices(List<DataFeedDevice> devices) {
+        this.devices = devices;
+    }
+
+    public Date getNextPollDate() {
         Calendar c = Calendar.getInstance();
-        c.setTime(this.lastPollDate);
-        c.add(Calendar.HOUR, this.pollFrequencyHours.intValue());
-        if (c.getTime().before(new java.util.Date())) {
-            readyToPoll = true;
+        if (this.lastPollDate != null) {
+            c.setTime(this.lastPollDate);
+            c.add(Calendar.HOUR, this.pollFrequencyHours.intValue());
+        } else {
+            c.setTime(new java.util.Date());
         }
-        return readyToPoll;
+        return c.getTime();
     }
 
     @Override

@@ -13,6 +13,7 @@ import java.util.*;
 import fr.cls.argos.*;
 import org.oztrack.data.model.*;
 import org.oztrack.data.model.types.ArgosClass;
+import org.oztrack.util.GeometryUtils;
 
 import javax.persistence.EntityManager;
 
@@ -28,13 +29,15 @@ public class ArgosPoller extends DataFeedPoller {
         Calendar pollStart = Calendar.getInstance();
         pollStart.setTime(new java.util.Date());
         pollStart.add(Calendar.DATE, ArgosClient.nbrDaysFromNowDefault * -1); // get the period we're polling for
+        logger.info("Running ArgosPoller");
 
         List<DataFeed> dataFeeds = getAllDataFeeds(DataFeedSourceSystem.ARGOS);
         List<DataFeed> notReady = new ArrayList<DataFeed>(); // get rid of those that are not ready
 
         for (DataFeed dataFeed : dataFeeds) {
-            if (!dataFeed.isReadyToPoll()) {
+            if (new java.util.Date().before(dataFeed.getNextPollDate())) {
                 notReady.add(dataFeed);
+
             }
         }
         dataFeeds.removeAll(notReady);
@@ -44,6 +47,9 @@ public class ArgosPoller extends DataFeedPoller {
             String credentials = getSourceSystemCredentials(dataFeed);
             ArgosClient argosClient = new ArgosClient(credentials);
             List<ArgosPlatformSummary> platformList = argosClient.getPlatformList();
+            setLastPollDate(dataFeed);
+            logger.info("ArgosPoller running for project " + dataFeed.getProject().getId());
+
             boolean detectionsFound = false;
 
             for (ArgosPlatformSummary platformSummary : platformList) {             // loop through each platform
@@ -61,12 +67,6 @@ public class ArgosPoller extends DataFeedPoller {
                         for (SatellitePass satellitePass : satellitePassList) {
                             Date bestMessageDate = satellitePass.getBestMsgDate().toGregorianCalendar().getTime();
                             if ((maxBestMessageDate == null) || (bestMessageDate.after(maxBestMessageDate))) {
-                                String dt = "";
-                                if (maxBestMessageDate != null) {
-                                    dt = maxBestMessageDate.toString();
-                                }
-                                String lastMsg = "lastMessageDate: " + dt;
-                                //logger.info("new detection found for bestMessageDate: " + bestMessageDate.toString());
                                 detectionsFound = true;
                                 maxBestMessageDate = bestMessageDate;
                                 DataFeedDetection detection = createNewDetection(device);
@@ -81,22 +81,26 @@ public class ArgosPoller extends DataFeedPoller {
                                     positionFix.setDetectionTime(locationTime);
                                     positionFix.setLatitude(location.getLatitude().toString());
                                     positionFix.setLongitude(location.getLongitude().toString());
-                                    positionFix.setLocationGeometry(getLocationGeometry(location.getLatitude().toString()
-                                            , location.getLongitude().toString()));
+                                    try {
+                                        positionFix.setLocationGeometry(GeometryUtils.findLocationGeometry(location.getLatitude().toString()
+                                                , location.getLongitude().toString()));
+                                    } catch (Exception e) {
+                                        throw new DataFeedException("Error translating coordinates: " + e.getLocalizedMessage());
+                                    }
                                     positionFix.setDeleted(false);
                                     positionFix.setProbable(false);
                                     positionFix.setDop(Double.parseDouble(location.getDiagnostic().getHdop()));
                                     positionFix.setArgosClass(ArgosClass.fromCode(location.getLocationClass()));
+                                    positionFix.setDataFeedDetection(detection);
                                     detection.setLocationDate(locationTime);
                                 }
-                                saveDetectionWithPositionFix(detection, positionFix);
+                                saveDetectionWithPositionFix(detection, positionFix); //positionfix might be empty, save detection anyway
+
                                 detectionDao.saveRawArgosData(detection.getId()
                                         , programNumber
                                         , platformId
                                         , bestMessageDate
                                         , argosClient.getXml(satellitePass));
-                            } else {
-                                logger.info("detection already exists for bestMessageDate " + bestMessageDate.toString());
                             }
                         }
                     } else {
@@ -106,14 +110,18 @@ public class ArgosPoller extends DataFeedPoller {
                             stringBuilder.append(errorsList.get(i));
                             if (i < errorsList.size() - 1) stringBuilder.append(";");
                         }
-                        logger.info("platform " + platformId + " errors: " + stringBuilder.toString());
+                        throw new DataFeedException("platform " + platformId + " errors: " + stringBuilder.toString());
                     }
                     device.setLastDetectionDate(lastCollectionDate);
                     deviceDao.save(device);
                 }
 
             }
-            if (detectionsFound) renumberPositionFixes(dataFeed);
+            if (detectionsFound) {
+                renumberPositionFixes(dataFeed);
+                logger.info("New detections downloaded");
+            }
+
         }
 
     }

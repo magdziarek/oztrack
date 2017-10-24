@@ -1,5 +1,6 @@
 package org.oztrack.util;
 
+import au.com.bytecode.opencsv.CSVWriter;
 import fr.cls.argos.Data;
 import fr.cls.argos.SatellitePass;
 import fr.cls.argos.dataxmldistribution.service.DixException;
@@ -54,6 +55,9 @@ public class ArgosClient {
         } catch (Exception e) {
             throw new DataFeedException("Could not usefully read credentials", e);
         }
+    }
+
+    public ArgosClient() {
     }
 
     private String getPlatformListXml() throws DataFeedException {
@@ -152,7 +156,6 @@ public class ArgosClient {
         return xml;
     }
 
-
     // used to get resources/org/oztrack/xsd/argos.xsd
     public String getXsd() {
         XsdRequestType params = new XsdRequestType();
@@ -165,5 +168,29 @@ public class ArgosClient {
         }
         return xsd;
     }
+
+    public SatellitePass getSatellitePass(String xml) {
+
+        SatellitePass satellitePass = null;
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance(SatellitePass.class);
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+            XMLInputFactory factory = XMLInputFactory.newInstance();
+            XMLStreamReader streamReader = factory.createXMLStreamReader(new StringReader(xml));
+            JAXBElement<SatellitePass> satellitePassElement = unmarshaller.unmarshal(streamReader, SatellitePass.class);
+            satellitePass = satellitePassElement.getValue();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return satellitePass;
+    }
+
+//    public CSVWriter writeSatellitePassCsvHeaders(CSVWriter writer) {
+//
+//    }
+//
+//    public CSVWriter appendSatellitePassToCsv(CSVWriter writer, SatellitePass satellitePass) {
+//
+//    }
 
 }

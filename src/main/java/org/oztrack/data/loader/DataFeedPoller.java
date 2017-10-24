@@ -53,6 +53,11 @@ public abstract class DataFeedPoller {
         return dataFeedDao.getSourceSystemCredentials(datafeed.getId());
     }
 
+    void setLastPollDate(DataFeed dataFeed) {
+        dataFeed.setLastPollDate(new java.util.Date());
+        dataFeedDao.update(dataFeed);
+    }
+
     // create a new device if this one doesn't exist
     DataFeedDevice getDevice(DataFeed dataFeed, String deviceIdentifier) {
         DataFeedDevice device = deviceDao.getDataFeedDeviceByIdentifier(dataFeed.getId(), deviceIdentifier);
@@ -83,9 +88,6 @@ public abstract class DataFeedPoller {
             device.setCreateDate(new java.util.Date());
             deviceDao.save(device);
             transaction.commit();
-
-        } else {
-            logger.info("Device already exists (" + deviceIdentifier + ")");
         }
         return device;
     }
@@ -106,28 +108,18 @@ public abstract class DataFeedPoller {
 
     void saveDetectionWithPositionFix(DataFeedDetection detection, PositionFix positionFix) {
         EntityTransaction transaction = entityManager.getTransaction();
-        if (positionFix.getDetectionTime() != null) {
-            transaction.begin();
-            positionFixDao.save(positionFix);
-            transaction.commit();
-            detection.setPositionFix(positionFix);
-        }
-        transaction.begin();
+        Animal animal = positionFix.getAnimal();
+        animal.setUpdateDate(detection.getPollDate());
+        transaction.begin(); // dance
         detectionDao.save(detection);
         transaction.commit();
-    }
-
-    Point getLocationGeometry(String latitude, String longitude) throws DataFeedException {
-        GeometryFactory geometryFactory;
-        Coordinate coordinate;
-
-        try {
-            geometryFactory = new GeometryFactory(new PrecisionModel(1000000), 4326);
-            coordinate = new Coordinate(parseCoordinate(longitude), parseCoordinate(latitude));
-        } catch (Exception e) {
-            throw new DataFeedException("Difficulty translating location: " + e.getLocalizedMessage());
+        if (positionFix.getDetectionTime() != null) {
+            transaction.begin();
+            positionFix.setDataFeedDetection(detection);
+            positionFixDao.save(positionFix);
+            animalDao.update(animal);
+            transaction.commit();
         }
-        return geometryFactory.createPoint(coordinate);
     }
 
     void renumberPositionFixes(DataFeed dataFeed) {

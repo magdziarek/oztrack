@@ -1,5 +1,6 @@
 package org.oztrack.data.access.impl;
 
+import fr.cls.argos.SatellitePass;
 import org.oztrack.data.access.DataFeedDeviceDao;
 import org.oztrack.data.access.DataFileDao;
 import org.oztrack.data.model.DataFeed;
@@ -56,6 +57,40 @@ public class DataFeedDeviceDaoImpl implements DataFeedDeviceDao {
             return null;
         }
     }
+
+    @Override
+    public DataFeedDevice getDeviceById(Long id) {
+        Query query = em.createQuery("select o from DataFeedDevice o \n" +
+                "where o.id = :id");
+        query.setParameter("id", id);
+        try {
+            return (DataFeedDevice) query.getSingleResult();
+        } catch (NoResultException ex) {
+            return null;
+        }
+    }
+
+    @Override
+    public List<String> getRawArgosData(DataFeedDevice device) {
+        Query query = em.createNativeQuery("select satellite_pass_xml from datafeed_raw_argos \n" +
+                " where datafeed_detection_id in (select id from datafeed_detection \n" +
+                "where datafeed_device_id = :deviceId)");
+        query.setParameter("deviceId", device.getId());
+        try {
+            return query.getResultList();
+        } catch (NoResultException ex) {
+            return null;
+        }
+    }
+
+//    public String getRawArgosData(Long platformId) {
+//
+//        String sql = "select o.satellite_pass_xml " +
+//                "from datafeed_raw_argos o " +
+//                "where o.platform_id = :platformId ;";
+//        String xml = (String) em.createNativeQuery(sql).setParameter("platformId", platformId).getSingleResult();
+//        return xml;
+//    }
 
 
     @Override

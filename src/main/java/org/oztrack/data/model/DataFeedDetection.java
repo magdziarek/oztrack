@@ -1,7 +1,9 @@
 package org.oztrack.data.model;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "datafeed_detection", uniqueConstraints = @UniqueConstraint(columnNames = {"project_id", "datafeed_device_id", "detection_date"}))
@@ -33,14 +35,12 @@ public class DataFeedDetection {
     @Column(name = "location_date")
     private Date locationDate;
 
-    // a detection from argos may just be a detection time without a position fix
-    @OneToOne
-    @JoinColumn(name = "positionfix_id", nullable = true)
-    private PositionFix positionFix;
-
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "poll_date")
     private Date pollDate;
+
+//    @OneToMany(mappedBy="dataFeedDetection", cascade=CascadeType.ALL, orphanRemoval=true, fetch=FetchType.LAZY)
+//    private List<> devices = new ArrayList<DataFeedDevice>();
 
     public Long getId() {
         return id;
@@ -90,14 +90,6 @@ public class DataFeedDetection {
         this.locationDate = locationDate;
     }
 
-    public PositionFix getPositionFix() {
-        return positionFix;
-    }
-
-    public void setPositionFix(PositionFix positionFix) {
-        this.positionFix = positionFix;
-    }
-
     public Date getPollDate() {
         return pollDate;
     }
@@ -105,6 +97,7 @@ public class DataFeedDetection {
     public void setPollDate(Date pollDate) {
         this.pollDate = pollDate;
     }
+
 
     @Override
     public boolean equals(Object obj) {

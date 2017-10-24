@@ -50,6 +50,10 @@ public class PositionFix {
     @JoinColumn(name="datafile_id", nullable=true)
     private DataFile dataFile;
 
+    @ManyToOne
+    @JoinColumn(name = "datafeed_detection_id", nullable = true)
+    private DataFeedDetection dataFeedDetection;
+
     @Column(name="locationgeometry", columnDefinition="GEOMETRY", nullable=false)
     @Type(type="org.hibernatespatial.GeometryUserType")
     private Point locationGeometry;
@@ -124,6 +128,14 @@ public class PositionFix {
 
     public void setDataFile(DataFile dataFile) {
         this.dataFile = dataFile;
+    }
+
+    public DataFeedDetection getDataFeedDetection() {
+        return dataFeedDetection;
+    }
+
+    public void setDataFeedDetection(DataFeedDetection dataFeedDetection) {
+        this.dataFeedDetection = dataFeedDetection;
     }
 
     public Point getLocationGeometry() {

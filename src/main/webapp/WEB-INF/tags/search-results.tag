@@ -162,15 +162,17 @@
             <td><c:out value="${not empty detection.argosClass ? detection.argosClass.code : ''}"/></td>
             </c:if>
             <c:if test="${inclDop}">
-            <td><fmt:formatNumber pattern="0.000" value="${detection.dop}"/></td>
+                <td><fmt:formatNumber pattern="0" value="${detection.dop}"/></td>
             </c:if>
             <c:if test="${inclSst}">
             <td><fmt:formatNumber pattern="0.000" value="${detection.sst}"/></td>
             </c:if>
             <sec:authorize access="hasPermission(#project, 'write')">
             <td>
-                <a href="${pageContext.request.contextPath}/projects/${detection.project.id}/datafiles/${detection.dataFile.id}"
-                ><fmt:formatDate pattern="${dateFormatPattern}" value="${detection.dataFile.createDate}"/></a>
+                <a href="${pageContext.request.contextPath}/projects/${detection.project.id}/datafiles/${detection.dataFile.id}">
+                    <fmt:formatDate pattern="${dateFormatPattern}" value="${detection.dataFile.createDate}"/></a>
+                <a href="${pageContext.request.contextPath}/projects/${detection.project.id}/datafeed">
+                    <fmt:formatDate pattern="${dateFormatPattern}" value="${detection.dataFeedDetection.pollDate}"/></a>
             </td>
             <c:if test="${includeDeleted}">
             <td>

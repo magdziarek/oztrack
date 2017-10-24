@@ -394,6 +394,7 @@ public class PositionFixDaoImpl implements PositionFixDao {
                         "    animal_id,\n" +
                         "    detectiontime,\n" +
                         "    locationgeometry,\n" +
+                                "    argosclass,\n" +
                         "    deleted,\n" +
                         "    probable,\n" +
                         "    colour\n" +
@@ -404,6 +405,7 @@ public class PositionFixDaoImpl implements PositionFixDao {
                         "    positionfix.animal_id as animal_id,\n" +
                         "    positionfix.detectiontime as detectiontime,\n" +
                         "    " + pointExpr + " as locationgeometry,\n" +
+                                "    positionfix.argosclass as deleted,\n" +
                         "    positionfix.deleted as deleted,\n" +
                         "    positionfix.probable as probable,\n" +
                         "    animal.colour as colour\n" +
@@ -611,7 +613,8 @@ public class PositionFixDaoImpl implements PositionFixDao {
             "    animal_id,\n" +
             "    max(count(date_trunc('day', detectiontime))) over (partition by animal_id)\n" +
             "from positionfixlayer\n" +
-            "where project_id = :projectId\n";
+                    "where project_id = :projectId\n" +
+                    "and not deleted\n";
         if (fromDate != null) {
             Date fromDateTrunc = DateUtils.truncate(fromDate, Calendar.DATE);
             dailyQueryString += " and detectiontime >= DATE '" + isoDateFormat.format(fromDateTrunc) + "'\n";

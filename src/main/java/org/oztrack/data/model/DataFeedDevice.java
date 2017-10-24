@@ -1,7 +1,9 @@
 package org.oztrack.data.model;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "datafeed_device")
@@ -34,6 +36,9 @@ public class DataFeedDevice {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "create_date")
     private Date createDate;
+
+    @OneToMany(mappedBy = "dataFeedDevice", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<DataFeedDetection> detections = new ArrayList<DataFeedDetection>();
 
     public Long getId() {
         return id;
@@ -89,6 +94,14 @@ public class DataFeedDevice {
 
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
+    }
+
+    public List<DataFeedDetection> getDetections() {
+        return detections;
+    }
+
+    public void setDetections(List<DataFeedDetection> detections) {
+        this.detections = detections;
     }
 
     @Override

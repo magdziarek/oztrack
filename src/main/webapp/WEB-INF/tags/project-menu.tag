@@ -10,14 +10,16 @@
 </c:if>
         <li id="projectMenuSummary" class="view-project"><a href="${pageContext.request.contextPath}/projects/${project.id}">Project summary</a></li>
         <sec:authorize access="hasPermission(#project, 'read')">
-        <c:if test="${not empty project.dataFiles}">
-          <li id="projectMenuAnalysis" class="view-track"><a href="${pageContext.request.contextPath}/projects/${project.id}/analysis">Spatial Analysis</a></li>
+            <c:if test="${not empty project.animals}">
+                <li id="projectMenuAnalysis" class="analysis"><a
+                        href="${pageContext.request.contextPath}/projects/${project.id}/analysis">Spatial Analysis</a>
+                </li>
           <li id="projectMenuCharts" class="view-track"><a href="${pageContext.request.contextPath}/projects/${project.id}/analysis?a=temporal">Temporal Analysis</a></li>
         </c:if>
         <c:if test="${not empty project.animals}">
         <li id="projectMenuAnimals" class="view-animal"><a href="${pageContext.request.contextPath}/projects/${project.id}/animals">Animal details</a></li>
         </c:if>
-        <c:if test="${not empty project.dataFiles}">
+            <c:if test="${not empty project.animals}">
         <li id="projectMenuSearch" class="view-data"><a href="${pageContext.request.contextPath}/projects/${project.id}/search">Raw data</a></li>
         </c:if>
         <c:if test="${project.id == 298}">

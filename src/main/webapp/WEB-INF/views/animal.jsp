@@ -34,6 +34,7 @@
     </jsp:attribute>
     <jsp:attribute name="sidebar">
         <tags:project-menu project="${project}"/>
+        <tags:project-actions project="${project}"/>
         <tags:animal-actions animal="${animal}"/>
     </jsp:attribute>
     <jsp:body>

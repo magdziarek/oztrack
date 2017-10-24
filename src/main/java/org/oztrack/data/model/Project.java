@@ -84,6 +84,9 @@ public class Project extends OzTrackBaseEntity {
     private List<DataFile> dataFiles = new ArrayList<DataFile>();
 
     @OneToMany(mappedBy="project", cascade=CascadeType.ALL, orphanRemoval=true, fetch=FetchType.LAZY)
+    private List<DataFeed> dataFeeds = new ArrayList<DataFeed>();
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Doi> dois = new ArrayList<Doi>();
 
     private String speciesCommonName;
@@ -202,6 +205,14 @@ public class Project extends OzTrackBaseEntity {
 
     public void setDataFiles(List<DataFile> dataFiles) {
         this.dataFiles = dataFiles;
+    }
+
+    public List<DataFeed> getDataFeeds() {
+        return dataFeeds;
+    }
+
+    public void setDataFeeds(List<DataFeed> dataFeeds) {
+        this.dataFeeds = dataFeeds;
     }
 
     public List<Doi> getDois() { return dois; }

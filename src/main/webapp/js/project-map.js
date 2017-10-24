@@ -1274,13 +1274,19 @@
                     propertyNames: [
                         'animal_id',
                         'detectiontime',
-                        'locationgeometry'
+                        'locationgeometry',
+                        'argosclass'
                     ],
                     summary: function(feature) {
+                        var argosStr;
+                        if (feature.attributes.argosclass) {
+                            argosStr = " Argos Class:" + feature.attributes.argosclass;
+                        }
                         return $('<span>')
                             .append(getAnimal(feature.attributes.animal_id).name)
                             .append(' at ' + moment(feature.attributes.detectiontime, 'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DD HH:mm:ss'))
-                            .append(' ' + coordString(feature.geometry));
+                            .append(' ' + coordString(feature.geometry))
+                            .append(argosStr);
                     }
                 },
                 {
