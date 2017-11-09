@@ -90,15 +90,20 @@ public class PositionFixDaoImpl implements PositionFixDao {
     @Override
     public Page<PositionFix> getPage(SearchQuery searchQuery, int offset, int nbrObjectsPerPage) {
        try {
-            Query query = buildQuery(searchQuery, false);
-            logger.debug(query.toString());
-            query.setFirstResult(offset);
-            query.setMaxResults(nbrObjectsPerPage);
-            @SuppressWarnings("unchecked")
-            List<PositionFix> positionFixList = query.getResultList();
-            Query countQuery = buildQuery(searchQuery, true);
-            int count = Integer.parseInt(countQuery.getSingleResult().toString());
-            return new Page<PositionFix>(positionFixList,offset,nbrObjectsPerPage, count);
+           if (offset >= 0) {
+               Query query = buildQuery(searchQuery, false);
+               logger.debug(query.toString());
+               query.setFirstResult(offset);
+               query.setMaxResults(nbrObjectsPerPage);
+               @SuppressWarnings("unchecked")
+               List<PositionFix> positionFixList = query.getResultList();
+               Query countQuery = buildQuery(searchQuery, true);
+               int count = Integer.parseInt(countQuery.getSingleResult().toString());
+               return new Page<PositionFix>(positionFixList, offset, nbrObjectsPerPage, count);
+           } else {
+               logger.error("Negative value passed to getPage again: " + offset);
+               return null;
+           }
        } catch (NoResultException ex) {
            em.getTransaction().rollback();
            return null;

@@ -44,33 +44,36 @@ public class ArgosPoller extends DataFeedPoller {
 
         for (DataFeed dataFeed : dataFeeds) {
 
+            logger.info("ArgosPoller running for project " + dataFeed.getProject().getId());
             String credentials = getSourceSystemCredentials(dataFeed);
             ArgosClient argosClient = new ArgosClient(credentials);
             List<ArgosPlatformSummary> platformList = argosClient.getPlatformList();
             setLastPollDate(dataFeed);
-            logger.info("ArgosPoller running for project " + dataFeed.getProject().getId());
-
             boolean detectionsFound = false;
 
             for (ArgosPlatformSummary platformSummary : platformList) {             // loop through each platform
                 long platformId = platformSummary.getPlatformId();
                 Date lastCollectionDate = platformSummary.getLastCollectDate().toGregorianCalendar().getTime();
 
-                if (lastCollectionDate.after(pollStart.getTime())) { // if there is data here for this device, add the device/animal
-                    DataFeedDevice device = getDevice(dataFeed, Long.toString(platformId));
-                    Date maxBestMessageDate = deviceDao.getDeviceLatestDetectionDate(device);
+                if (lastCollectionDate.after(pollStart.getTime())) {
                     Data platformData = argosClient.getPlatformData(platformId);
                     if (platformData.getErrors() == null) {
+                        DataFeedDevice device = getDevice(dataFeed, Long.toString(platformId)); // if there is data here for this device, add the device/animal
+                        Date maxBestMessageDate = deviceDao.getDeviceLatestDetectionDate(device);
+                        //logger.info("timezone: " + maxBestMessageDate.getTimeZone().toString());
                         long programNumber = platformData.getProgram().get(0).getProgramNumber();
                         List<SatellitePass> satellitePassList = platformData.getProgram().get(0).getPlatform().get(0).getSatellitePass();
 
                         for (SatellitePass satellitePass : satellitePassList) {
-                            Date bestMessageDate = satellitePass.getBestMsgDate().toGregorianCalendar().getTime();
-                            if ((maxBestMessageDate == null) || (bestMessageDate.after(maxBestMessageDate))) {
+                            //Date bestMessageDate = satellitePass.getBestMsgDate().toGregorianCalendar().getTime();
+                            Calendar bestMessageDate = satellitePass.getBestMsgDate().toGregorianCalendar();
+                            //TimeZone tz = satellitePass.getBestMsgDate().toGregorianCalendar().getTimeZone();
+                            if ((maxBestMessageDate == null) || (bestMessageDate.getTime().after(maxBestMessageDate))) {
                                 detectionsFound = true;
-                                maxBestMessageDate = bestMessageDate;
+                                maxBestMessageDate = bestMessageDate.getTime();
                                 DataFeedDetection detection = createNewDetection(device);
-                                detection.setDetectionDate(bestMessageDate);
+                                detection.setDetectionDate(bestMessageDate.getTime());
+                                detection.setTimezoneId(bestMessageDate.getTimeZone().getID());
                                 PositionFix positionFix = new PositionFix();
                                 Location location = satellitePass.getLocation();
 
@@ -95,7 +98,6 @@ public class ArgosPoller extends DataFeedPoller {
                                     detection.setLocationDate(locationTime);
                                 }
                                 saveDetectionWithPositionFix(detection, positionFix); //positionfix might be empty, save detection anyway
-
                                 detectionDao.saveRawArgosData(detection.getId()
                                         , programNumber
                                         , platformId
@@ -103,17 +105,22 @@ public class ArgosPoller extends DataFeedPoller {
                                         , argosClient.getXml(satellitePass));
                             }
                         }
+                        //device.setLastDetectionDate(lastCollectionDate);
+                        //deviceDao.save(device);
                     } else {
                         List<String> errorsList = platformData.getErrors().getError();
                         StringBuilder stringBuilder = new StringBuilder(errorsList.size());
                         for (int i = 0; i < errorsList.size(); i++) {
-                            stringBuilder.append(errorsList.get(i));
+                            String thisErrorStr = errorsList.get(i);
+                            stringBuilder.append(thisErrorStr);
                             if (i < errorsList.size() - 1) stringBuilder.append(";");
+                            if (thisErrorStr.equals("no data")) { //ignore this error
+                                logger.error("platform " + platformId + " no data");
+                            } else {
+                                throw new DataFeedException("platform " + platformId + " errors: " + stringBuilder.toString()); //others are a problem though
+                            }
                         }
-                        throw new DataFeedException("platform " + platformId + " errors: " + stringBuilder.toString());
                     }
-                    device.setLastDetectionDate(lastCollectionDate);
-                    deviceDao.save(device);
                 }
 
             }

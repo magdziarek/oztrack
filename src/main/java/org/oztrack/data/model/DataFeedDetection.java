@@ -1,9 +1,7 @@
 package org.oztrack.data.model;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Table(name = "datafeed_detection", uniqueConstraints = @UniqueConstraint(columnNames = {"project_id", "datafeed_device_id", "detection_date"}))
@@ -34,6 +32,9 @@ public class DataFeedDetection {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "location_date")
     private Date locationDate;
+
+    @Column(name = "timezone_id")
+    private String timezoneId;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "poll_date")
@@ -88,6 +89,14 @@ public class DataFeedDetection {
 
     public void setLocationDate(Date locationDate) {
         this.locationDate = locationDate;
+    }
+
+    public String getTimezoneId() {
+        return timezoneId;
+    }
+
+    public void setTimezoneId(String timezoneId) {
+        this.timezoneId = timezoneId;
     }
 
     public Date getPollDate() {

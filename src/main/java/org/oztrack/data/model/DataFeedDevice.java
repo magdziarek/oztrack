@@ -30,10 +30,6 @@ public class DataFeedDevice {
     private String deviceIdentifier;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "last_detection_date")
-    private Date lastDetectionDate;
-
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "create_date")
     private Date createDate;
 
@@ -78,14 +74,6 @@ public class DataFeedDevice {
 
     public void setDeviceIdentifier(String deviceIdentifier) {
         this.deviceIdentifier = deviceIdentifier;
-    }
-
-    public Date getLastDetectionDate() {
-        return lastDetectionDate;
-    }
-
-    public void setLastDetectionDate(Date lastDetectionDate) {
-        this.lastDetectionDate = lastDetectionDate;
     }
 
     public Date getCreateDate() {

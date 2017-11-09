@@ -16,6 +16,7 @@ import javax.persistence.PersistenceContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.Query;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 

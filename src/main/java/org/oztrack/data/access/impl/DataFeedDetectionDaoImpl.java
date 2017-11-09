@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
+import java.util.Calendar;
 import java.util.Date;
 
 @Service
@@ -20,7 +21,7 @@ public class DataFeedDetectionDaoImpl implements DataFeedDetectionDao {
 
     @Override
     @Transactional
-    public int saveRawArgosData(Long detectionId, Long programNumber, Long platformId, Date bestMessageDate, String satellitePassXml) {
+    public int saveRawArgosData(Long detectionId, Long programNumber, Long platformId, Calendar bestMessageDate, String satellitePassXml) {
 
         String sql = "insert into datafeed_raw_argos(" +
                 " id " +

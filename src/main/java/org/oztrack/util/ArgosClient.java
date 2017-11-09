@@ -76,6 +76,7 @@ public class ArgosClient {
 
     public List<ArgosPlatformSummary> getPlatformList() throws DataFeedException {
         String xml = getPlatformListXml();
+        //logger.info(xml);
         List<ArgosPlatformSummary> platformList = new ArrayList<ArgosPlatformSummary>();
         try {
             Document document = builder.parse(new InputSource(new StringReader(xml)));
@@ -102,6 +103,7 @@ public class ArgosClient {
         params.setDisplayRawData(true);
         params.setDisplayDiagnostic(true);
         params.setDisplaySensor(true);
+        params.setDisplayImageLocation(true);
 
         StreamResponseType streamResponseType = null;
         String xml = "";
@@ -115,6 +117,7 @@ public class ArgosClient {
         } catch (Exception e) {
             throw new DataFeedException("Error retrieving xml for platform " + platformId + " from Argos: " + e.getMessage());
         }
+        //logger.info(xml);
         return xml;
     }
 

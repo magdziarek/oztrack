@@ -15,6 +15,7 @@ import org.oztrack.util.ProjectAnimalsMutexExecutor;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import static org.oztrack.util.GeometryUtils.parseCoordinate;
@@ -55,7 +56,10 @@ public abstract class DataFeedPoller {
 
     void setLastPollDate(DataFeed dataFeed) {
         dataFeed.setLastPollDate(new java.util.Date());
+        EntityTransaction transaction = entityManager.getTransaction();
+        transaction.begin();
         dataFeedDao.update(dataFeed);
+        transaction.commit();
     }
 
     // create a new device if this one doesn't exist
@@ -108,8 +112,6 @@ public abstract class DataFeedPoller {
 
     void saveDetectionWithPositionFix(DataFeedDetection detection, PositionFix positionFix) {
         EntityTransaction transaction = entityManager.getTransaction();
-        Animal animal = positionFix.getAnimal();
-        animal.setUpdateDate(detection.getPollDate());
         transaction.begin(); // dance
         detectionDao.save(detection);
         transaction.commit();
@@ -117,6 +119,8 @@ public abstract class DataFeedPoller {
             transaction.begin();
             positionFix.setDataFeedDetection(detection);
             positionFixDao.save(positionFix);
+            Animal animal = positionFix.getAnimal();
+            animal.setUpdateDate(detection.getPollDate());
             animalDao.update(animal);
             transaction.commit();
         }

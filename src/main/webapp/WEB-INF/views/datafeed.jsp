@@ -5,17 +5,44 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="tags" %>
-<c:set var="dateTimeFormatPattern" value="dd/MM/yyyy HH:mm:ss z"/>
+<jsp:useBean id="now" class="java.util.Date"/>
+<c:set var="dateTimeFormatPattern" value="dd/MM/yyyy HH:mm:ss"/>
+<c:set var="momentDateTimeFormatPattern" value="yyyy-MM-dd HH:mm:ss Z"/>
+<c:set var="rightNow" value="${now}"/>
 <tags:page title="${project.title}: Automated Downloads">
     <jsp:attribute name="description">
         Automated downloads into the ${project.title} project.
+    </jsp:attribute>
+    <jsp:attribute name="head">
+        <style type="text/css">
+            .table-condensed td {
+                vertical-align: middle;
+            }
+        </style>
     </jsp:attribute>
     <jsp:attribute name="tail">
         <script type="text/javascript">
             $(document).ready(function () {
                 $('#navTrack').addClass('active');
                 $('#dataActionsDataFeeds').addClass('active');
+                updateMomentTime();
+                setInterval(function () {
+                    updateMomentTime();
+                }, 60000);
+
             });
+
+            function updateMomentTime() {
+                $('.lastPollDate').each(function (index) {
+                    var lastPollDate = moment($(this).attr("value"));
+                    console.log("lastPollDate provided: " + $(this).attr("value"))
+                    var nowTime = moment();
+                    var diffString = lastPollDate.from(nowTime);
+                    var span = $(this).next();
+                    span.text("Last Polled: " + moment(lastPollDate).format("DD/MM/YYYY HH:mm:ss Z") + " (" + diffString + ")");
+                });
+            }
+
         </script>
     </jsp:attribute>
     <jsp:attribute name="breadcrumbs">
@@ -35,43 +62,64 @@
         <c:forEach items="${dataFeeds}" var="dataFeed">
             <c:if test="${dataFeed.dataFeedSourceSystem.name == 'Argos'}">
                 <h3>Argos</h3>
-                <p>Last Polled: <fmt:formatDate pattern="${dateTimeFormatPattern}"
-                                                value="${dataFeed.lastPollDate}"/></p>
-                <p>Next Poll: <fmt:formatDate type="date" pattern="${dateTimeFormatPattern}"
-                                              value="${dataFeed.nextPollDate}"/></p>
+                <p>
+                    <input type="hidden" class="lastPollDate"
+                           value='<fmt:formatDate pattern="${momentDateTimeFormatPattern}" value="${dataFeed.lastPollDate}"/>'/>
+                    <span class="lastPollInfo"></span>
+                </p>
+                <p>This data feed is set to poll every ${dataFeed.pollFrequencyHours} hour(s).</p>
                 <c:if test="${not empty dataFeed.devices}">
                     <table class="table table-bordered table-condensed">
                         <thead>
                         <tr>
-                            <th></th>
                             <th>Platform</th>
-                            <th># Detections</th>
-                            <th># Locations</th>
-                            <th>Last Detection Date</th>
-                            <th>Raw Data</th>
+                            <th># Detections
+                                <div class="help-inline">
+                                    <div class="help-popover" title="Argos Detections">Argos sends detection information
+                                        from the sensor even if no location was calculated.
+                                    </div>
+                                </div>
+                            </th>
+                            <th># Argos Locations
+                            </th>
+                            <th>Last Detection</th>
+                            <th>Raw Data
+                                <div class="help-inline">
+                                    <div class="help-popover" title="Raw Data from Argos">
+                                        The <b>Diagnostic</b> file contains extra information eg nbrMessages,
+                                        errorRadius, semiMinor, semiMajor, orientation, hdop (1 row for each detection).<br/>
+                                        The <b>Messages</b> file contains raw data for each message and encoded sensor
+                                        data (many rows per detection).<br/>
+                                        See the Argos User Manual for definitions of the fields in these files.
+                                    </div>
+                                </div>
+                            </th>
                         </tr>
                         </thead>
-                        <tbody>
-                        <c:forEach items="${dataFeed.devices}" var="device">
 
+                        <c:forEach items="${dataFeed.devices}" var="device">
                             <c:set var="locationsCount" value="0"/>
+                            <c:set var="lastDetectionDate" value="${device.detections.get(0).detectionDate}"/>
                             <c:forEach items="${device.detections}" var="detection">
                                 <c:if test="${not empty detection.locationDate}">
                                     <c:set var="locationsCount" value="${locationsCount + 1}"/>
                                 </c:if>
+                                <c:set var="timezone" value=" (${detection.timezoneId})"/>
+                                <c:if test="${detection.detectionDate > lastDetectionDate}">
+                                    <c:set var="lastDetectionDate" value="${detection.detectionDate}"/>
+                                </c:if>
                             </c:forEach>
-
                             <tr>
+
                                 <td>
-                                    <div style="width: 15px; height: 15px; background-color: ${device.animal.colour};"></div>
-                                </td>
-                                <td>
-                                    <a href="${pageContext.request.contextPath}/projects/${project.id}/animals/${device.animal.id}">${device.deviceIdentifier}</a>
+                                    <div style="width: 12px; height: 12px; background-color: ${device.animal.colour};"/>
+                                    <a style="margin-left:20px;"
+                                       href="${pageContext.request.contextPath}/projects/${project.id}/animals/${device.animal.id}">${device.deviceIdentifier}</a>
                                 </td>
                                 <td>${device.detections.size()}</td>
                                 <td>${locationsCount}</td>
-                                <td><fmt:formatDate type="date" pattern="${dateTimeFormatPattern}"
-                                                    value="${device.lastDetectionDate}"/></td>
+                                <td><fmt:formatDate pattern="${dateTimeFormatPattern}"
+                                                    value="${lastDetectionDate}"/> ${timezone}</td>
                                 <td>
                                     <a href="${pageContext.request.contextPath}/projects/${project.id}/argosraw?deviceId=${device.id}&rtype=diagnostic">Diagnostic</a>
                                     <a href="${pageContext.request.contextPath}/projects/${project.id}/argosraw?deviceId=${device.id}&rtype=messages">Messages</a>
