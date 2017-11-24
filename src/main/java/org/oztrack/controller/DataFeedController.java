@@ -1,5 +1,7 @@
 package org.oztrack.controller;
 
+import au.com.bytecode.opencsv.CSVWriter;
+import org.json.JSONObject;
 import org.oztrack.data.access.DataFeedDeviceDao;
 import org.oztrack.data.access.ProjectDao;
 import org.oztrack.data.model.DataFeedDevice;
@@ -12,7 +14,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.View;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 
 @Controller
@@ -42,11 +49,60 @@ public class DataFeedController {
             , @ModelAttribute(value = "project") Project project
             , @RequestParam(value = "deviceId") final String deviceId
             , @RequestParam(value = "rtype") final String rtype) {
-
         DataFeedDevice device = dataFeedDeviceDao.getDeviceById(Long.parseLong(deviceId));
         List<String> rawDataXml = dataFeedDeviceDao.getRawArgosData(device);
         return new ArgosCsvView(device, rawDataXml, rtype);
     }
+
+    @RequestMapping(value = "/projects/{projectId}/spotraw", method = RequestMethod.GET)
+    @PreAuthorize("hasPermission(#project, 'write')")
+    public void handleSpotRequest(Model model
+            , HttpServletResponse response
+            , @ModelAttribute(value = "project") Project project
+            , @RequestParam(value = "deviceId") final String deviceId) throws Exception {
+        DataFeedDevice device = dataFeedDeviceDao.getDeviceById(Long.parseLong(deviceId));
+        response.setHeader("Content-Disposition", "attachment; filename=spot-" + device.getDeviceIdentifier() + ".csv");
+        CSVWriter writer = new CSVWriter(response.getWriter());
+        String[] headers = {"id"
+                , "messengerId"
+                , "messengerName"
+                , "unixTime"
+                , "messageType"
+                , "latitude"
+                , "longitude"
+                , "modelId"
+                , "showCustomMsg"
+                , "dateTime"
+                , "messageDetail"
+                , "batteryState"
+                , "hidden"
+                , "altitude"};
+        writer.writeNext(headers);
+        List<String> rawDataJson = dataFeedDeviceDao.getRawSpotData(device);
+        for (String jsonString : rawDataJson) {
+            JSONObject json = new JSONObject(jsonString);
+            ArrayList<String> nextLine = new ArrayList<String>(headers.length);
+            nextLine.add(Objects.toString(json.getString("id"), ""));
+            nextLine.add(Objects.toString(json.getString("messengerId"), ""));
+            nextLine.add(Objects.toString(json.getString("messengerName"), ""));
+            nextLine.add(Objects.toString(json.getString("unixTime"), ""));
+            nextLine.add(Objects.toString(json.getString("messageType"), ""));
+            nextLine.add(Objects.toString(json.getString("latitude"), ""));
+            nextLine.add(Objects.toString(json.getString("longitude"), ""));
+            nextLine.add(Objects.toString(json.getString("modelId"), ""));
+            nextLine.add(Objects.toString(json.getString("showCustomMsg"), ""));
+            nextLine.add(Objects.toString(json.getString("dateTime"), ""));
+            nextLine.add(Objects.toString(json.getString("messageDetail"), ""));
+            nextLine.add(Objects.toString(json.getString("batteryState"), ""));
+            nextLine.add(Objects.toString(json.getString("hidden"), ""));
+            nextLine.add(Objects.toString(json.getString("altitude"), ""));
+            writer.writeNext(nextLine.toArray(new String[]{}));
+        }
+        writer.close();
+    }
+
+
+
 
 
 }
