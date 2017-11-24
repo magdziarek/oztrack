@@ -5,7 +5,7 @@ public enum DataFeedSourceSystem {
 
     // the source systems that are handled in zoatrack
     ARGOS("Argos", "API", "argos-system.cls.fr", "{username:username, password:password}", "platform", ""),
-    SPOT("Spot", "API", "findmespot.com", "{feed-id:feed-id}", "device", "");
+    SPOT("Spot", "API", "api.findmespot.com/spot-main-web/consumer/rest-api/2.0/public/feed/", "{feed-id:feed-id, password:password}", "device", "");
 
     private final String name;              // name for this datafeed
     private final String sourceSystemType;  // API, EMAIL

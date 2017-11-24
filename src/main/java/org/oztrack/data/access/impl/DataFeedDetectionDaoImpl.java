@@ -53,6 +53,40 @@ public class DataFeedDetectionDaoImpl implements DataFeedDetectionDao {
         return r;
     }
 
+
+    @Transactional
+    public int saveRawSpotData(Long detectionId, String messengerId, String messengerName, Calendar dateTime, String messageJson) {
+
+        String sql = "insert into datafeed_raw_spot(" +
+                " id " +
+                ",datafeed_detection_id " +
+                ",messenger_id " +
+                ",messenger_name " +
+                ",message_date_time " +
+                ",message_json)" +
+                "select nextval('datafeed_raw_spot_id_seq') " +
+                ", :detectionId " +
+                ", :messengerId " +
+                ", :messengerName " +
+                ", :dateTime" +
+                ", :messageJson ;";
+
+        EntityTransaction transaction = em.getTransaction();
+        transaction.begin();
+
+        int r = em.createNativeQuery(sql)
+                .setParameter("detectionId", detectionId)
+                .setParameter("messengerId", messengerId)
+                .setParameter("messengerName", messengerName)
+                .setParameter("dateTime", dateTime, TemporalType.TIMESTAMP)
+                .setParameter("messageJson", messageJson)
+                .executeUpdate();
+
+        transaction.commit();
+
+        return r;
+    }
+
     @Override
     @Transactional
     public void save(DataFeedDetection object) {

@@ -19,6 +19,8 @@ public interface DataFeedDeviceDao {
 
     List<String> getRawArgosData(DataFeedDevice device);
 
+    List<String> getRawSpotData(DataFeedDevice device);
+
     void save(DataFeedDevice object);
 
     DataFeedDevice update(DataFeedDevice object);

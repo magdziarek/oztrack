@@ -24,7 +24,7 @@ public class ArgosPoller extends DataFeedPoller {
     }
 
     @Override
-    public void poll() throws DataFeedException {
+    public void poll() { //throws DataFeedException {
 
         Calendar pollStart = Calendar.getInstance();
         pollStart.setTime(new java.util.Date());
@@ -44,93 +44,103 @@ public class ArgosPoller extends DataFeedPoller {
 
         for (DataFeed dataFeed : dataFeeds) {
 
-            logger.info("ArgosPoller running for project " + dataFeed.getProject().getId());
-            String credentials = getSourceSystemCredentials(dataFeed);
-            ArgosClient argosClient = new ArgosClient(credentials);
-            List<ArgosPlatformSummary> platformList = argosClient.getPlatformList();
-            setLastPollDate(dataFeed);
-            boolean detectionsFound = false;
+            try {
+                logger.info("ArgosPoller running for project " + dataFeed.getProject().getId());
+                String credentials = getSourceSystemCredentials(dataFeed);
+                ArgosClient argosClient = new ArgosClient(credentials);
+                List<ArgosPlatformSummary> platformList = argosClient.getPlatformList();
+                setLastPollDate(dataFeed);
+                boolean detectionsFound = false;
 
-            for (ArgosPlatformSummary platformSummary : platformList) {             // loop through each platform
-                long platformId = platformSummary.getPlatformId();
-                Date lastCollectionDate = platformSummary.getLastCollectDate().toGregorianCalendar().getTime();
+                for (ArgosPlatformSummary platformSummary : platformList) {             // loop through each platform
+                    long platformId = platformSummary.getPlatformId();
+                    Date lastCollectionDate = platformSummary.getLastCollectDate().toGregorianCalendar().getTime();
 
-                if (lastCollectionDate.after(pollStart.getTime())) {
-                    Data platformData = argosClient.getPlatformData(platformId);
-                    if (platformData.getErrors() == null) {
-                        DataFeedDevice device = getDevice(dataFeed, Long.toString(platformId)); // if there is data here for this device, add the device/animal
-                        Date maxBestMessageDate = deviceDao.getDeviceLatestDetectionDate(device);
-                        //logger.info("timezone: " + maxBestMessageDate.getTimeZone().toString());
-                        long programNumber = platformData.getProgram().get(0).getProgramNumber();
-                        List<SatellitePass> satellitePassList = platformData.getProgram().get(0).getPlatform().get(0).getSatellitePass();
+                    if (lastCollectionDate.after(pollStart.getTime())) {
 
-                        for (SatellitePass satellitePass : satellitePassList) {
-                            //Date bestMessageDate = satellitePass.getBestMsgDate().toGregorianCalendar().getTime();
-                            Calendar bestMessageDate = satellitePass.getBestMsgDate().toGregorianCalendar();
-                            //TimeZone tz = satellitePass.getBestMsgDate().toGregorianCalendar().getTimeZone();
-                            if ((maxBestMessageDate == null) || (bestMessageDate.getTime().after(maxBestMessageDate))) {
-                                detectionsFound = true;
-                                maxBestMessageDate = bestMessageDate.getTime();
-                                DataFeedDetection detection = createNewDetection(device);
-                                detection.setDetectionDate(bestMessageDate.getTime());
-                                detection.setTimezoneId(bestMessageDate.getTimeZone().getID());
-                                PositionFix positionFix = new PositionFix();
-                                Location location = satellitePass.getLocation();
+                        try { // get the platform data for this
+                            Data platformData = argosClient.getPlatformData(platformId);
+                            if (platformData.getErrors() == null) {
+                                DataFeedDevice device = getDevice(dataFeed, Long.toString(platformId)); // if there is data here for this device, add the device/animal
+                                Date maxBestMessageDate = deviceDao.getDeviceLatestDetectionDate(device);
+                                //logger.info("timezone: " + maxBestMessageDate.getTimeZone().toString());
+                                long programNumber = platformData.getProgram().get(0).getProgramNumber();
+                                List<SatellitePass> satellitePassList = platformData.getProgram().get(0).getPlatform().get(0).getSatellitePass();
 
-                                if (location != null) {
-                                    Date locationTime = location.getLocationDate().toGregorianCalendar().getTime();
-                                    positionFix.setProject(dataFeed.getProject());
-                                    positionFix.setAnimal(device.getAnimal());
-                                    positionFix.setDetectionTime(locationTime);
-                                    positionFix.setLatitude(location.getLatitude().toString());
-                                    positionFix.setLongitude(location.getLongitude().toString());
-                                    try {
-                                        positionFix.setLocationGeometry(GeometryUtils.findLocationGeometry(location.getLatitude().toString()
-                                                , location.getLongitude().toString()));
-                                    } catch (Exception e) {
-                                        throw new DataFeedException("Error translating coordinates: " + e.getLocalizedMessage());
+                                for (SatellitePass satellitePass : satellitePassList) {
+                                    //Date bestMessageDate = satellitePass.getBestMsgDate().toGregorianCalendar().getTime();
+                                    Calendar bestMessageDate = satellitePass.getBestMsgDate().toGregorianCalendar();
+                                    //TimeZone tz = satellitePass.getBestMsgDate().toGregorianCalendar().getTimeZone();
+                                    if ((maxBestMessageDate == null) || (bestMessageDate.getTime().after(maxBestMessageDate))) {
+                                        detectionsFound = true;
+                                        maxBestMessageDate = bestMessageDate.getTime();
+                                        DataFeedDetection detection = createNewDetection(device);
+                                        detectionDao.saveRawArgosData(detection.getId()
+                                                , programNumber
+                                                , platformId
+                                                , bestMessageDate
+                                                , argosClient.getXml(satellitePass));
+                                        detection.setDetectionDate(bestMessageDate.getTime());
+                                        detection.setTimezoneId(bestMessageDate.getTimeZone().getID());
+                                        PositionFix positionFix = new PositionFix();
+                                        Location location = satellitePass.getLocation();
+                                        if (location != null) {
+                                            Date locationTime = location.getLocationDate().toGregorianCalendar().getTime();
+                                            positionFix.setProject(dataFeed.getProject());
+                                            positionFix.setAnimal(device.getAnimal());
+                                            positionFix.setDataFeedDetection(detection);
+                                            detection.setLocationDate(locationTime);
+                                            positionFix.setDetectionTime(locationTime);
+                                            positionFix.setLatitude(location.getLatitude().toString());
+                                            positionFix.setLongitude(location.getLongitude().toString());
+                                            try {
+                                                positionFix.setLocationGeometry(GeometryUtils.findLocationGeometry(location.getLatitude().toString()
+                                                        , location.getLongitude().toString()));
+                                            } catch (Exception e) {
+                                                throw new DataFeedException("Error translating coordinates: " + e.getLocalizedMessage());
+                                            }
+                                            positionFix.setDeleted(false);
+                                            positionFix.setProbable(false);
+                                            positionFix.setDop(Double.parseDouble(location.getDiagnostic().getHdop()));
+                                            positionFix.setArgosClass(ArgosClass.fromCode(location.getLocationClass()));
+                                        }
+                                        saveDetectionWithPositionFix(detection, positionFix); //positionfix might be empty, save detection anyway
                                     }
-                                    positionFix.setDeleted(false);
-                                    positionFix.setProbable(false);
-                                    positionFix.setDop(Double.parseDouble(location.getDiagnostic().getHdop()));
-                                    positionFix.setArgosClass(ArgosClass.fromCode(location.getLocationClass()));
-                                    positionFix.setDataFeedDetection(detection);
-                                    detection.setLocationDate(locationTime);
                                 }
-                                saveDetectionWithPositionFix(detection, positionFix); //positionfix might be empty, save detection anyway
-                                detectionDao.saveRawArgosData(detection.getId()
-                                        , programNumber
-                                        , platformId
-                                        , bestMessageDate
-                                        , argosClient.getXml(satellitePass));
-                            }
-                        }
-                        //device.setLastDetectionDate(lastCollectionDate);
-                        //deviceDao.save(device);
-                    } else {
-                        List<String> errorsList = platformData.getErrors().getError();
-                        StringBuilder stringBuilder = new StringBuilder(errorsList.size());
-                        for (int i = 0; i < errorsList.size(); i++) {
-                            String thisErrorStr = errorsList.get(i);
-                            stringBuilder.append(thisErrorStr);
-                            if (i < errorsList.size() - 1) stringBuilder.append(";");
-                            if (thisErrorStr.equals("no data")) { //ignore this error
-                                logger.error("platform " + platformId + " no data");
+                                //device.setLastDetectionDate(lastCollectionDate);
+                                //deviceDao.save(device);
                             } else {
-                                throw new DataFeedException("platform " + platformId + " errors: " + stringBuilder.toString()); //others are a problem though
+                                List<String> errorsList = platformData.getErrors().getError();
+                                StringBuilder stringBuilder = new StringBuilder(errorsList.size());
+                                for (int i = 0; i < errorsList.size(); i++) {
+                                    String thisErrorStr = errorsList.get(i);
+                                    stringBuilder.append(thisErrorStr);
+                                    if (i < errorsList.size() - 1) stringBuilder.append(";");
+                                    if (thisErrorStr.equals("no data")) { //ignore this error
+                                        logger.error("platform " + platformId + " no data");
+                                    } else {
+                                        throw new DataFeedException("platform " + platformId + " errors: " + stringBuilder.toString()); //others are a problem though
+                                    }
+                                }
                             }
+                        } catch (Exception e) {
+                            String errorText = "Argos poller error platformId: " + platformId + ": " + e.getMessage();
+                            logger.error(errorText);
+                            sendErrorNotification(new DataFeedException(errorText));
                         }
                     }
+
+                }
+                if (detectionsFound) {
+                    renumberPositionFixes(dataFeed);
+                    logger.info("New detections downloaded");
                 }
 
+            } catch (DataFeedException d) {
+                logger.error("Argos Poller error datafeedId:" + dataFeed.getId() + " " + d.getMessage()); // couldn't read platformSummary probably
+                sendErrorNotification(d);
             }
-            if (detectionsFound) {
-                renumberPositionFixes(dataFeed);
-                logger.info("New detections downloaded");
-            }
-
         }
-
     }
 
 }

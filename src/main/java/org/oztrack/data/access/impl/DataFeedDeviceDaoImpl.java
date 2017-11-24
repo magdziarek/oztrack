@@ -84,15 +84,18 @@ public class DataFeedDeviceDaoImpl implements DataFeedDeviceDao {
         }
     }
 
-//    public String getRawArgosData(Long platformId) {
-//
-//        String sql = "select o.satellite_pass_xml " +
-//                "from datafeed_raw_argos o " +
-//                "where o.platform_id = :platformId ;";
-//        String xml = (String) em.createNativeQuery(sql).setParameter("platformId", platformId).getSingleResult();
-//        return xml;
-//    }
-
+    @Override
+    public List<String> getRawSpotData(DataFeedDevice device) {
+        Query query = em.createNativeQuery("select message_json from datafeed_raw_spot \n" +
+                " where datafeed_detection_id in (select id from datafeed_detection \n" +
+                "where datafeed_device_id = :deviceId)");
+        query.setParameter("deviceId", device.getId());
+        try {
+            return query.getResultList();
+        } catch (NoResultException ex) {
+            return null;
+        }
+    }
 
     @Override
     @Transactional

@@ -131,6 +131,61 @@
                     </table>
                 </c:if>
             </c:if>
+            <c:if test="${dataFeed.dataFeedSourceSystem.name == 'Spot'}">
+                <h3>Spot</h3>
+                <p>
+                    <input type="hidden" class="lastPollDate"
+                           value='<fmt:formatDate pattern="${momentDateTimeFormatPattern}" value="${dataFeed.lastPollDate}"/>'/>
+                    <span class="lastPollInfo"></span>
+                </p>
+                <p>This data feed is set to poll every ${dataFeed.pollFrequencyHours} hour(s).</p>
+                <c:if test="${not empty dataFeed.devices}">
+                    <table class="table table-bordered table-condensed">
+                        <thead>
+                        <tr>
+                            <th>Device</th>
+                            <th># Locations</th>
+                            <th>Last Detection</th>
+                            <th>Raw Data
+                                <div class="help-inline">
+                                    <div class="help-popover" title="Raw Data">
+                                        Contains raw json data for each device
+                                    </div>
+                                </div>
+                            </th>
+                        </tr>
+                        </thead>
+
+                        <c:forEach items="${dataFeed.devices}" var="device">
+                            <c:set var="locationsCount" value="0"/>
+                            <c:set var="lastDetectionDate" value="${device.detections.get(0).detectionDate}"/>
+                            <c:forEach items="${device.detections}" var="detection">
+                                <c:if test="${not empty detection.locationDate}">
+                                    <c:set var="locationsCount" value="${locationsCount + 1}"/>
+                                </c:if>
+                                <c:set var="timezone" value=" (${detection.timezoneId})"/>
+                                <c:if test="${detection.detectionDate > lastDetectionDate}">
+                                    <c:set var="lastDetectionDate" value="${detection.detectionDate}"/>
+                                </c:if>
+                            </c:forEach>
+                            <tr>
+                                <td>
+                                    <div style="width: 12px; height: 12px; background-color: ${device.animal.colour};"/>
+                                    <a style="margin-left:20px;"
+                                       href="${pageContext.request.contextPath}/projects/${project.id}/animals/${device.animal.id}">${device.deviceIdentifier}</a>
+                                </td>
+                                <td>${device.detections.size()}</td>
+                                <td><fmt:formatDate pattern="${dateTimeFormatPattern}"
+                                                    value="${lastDetectionDate}"/> ${timezone}</td>
+                                <td>
+                                    <a href="${pageContext.request.contextPath}/projects/${project.id}/spotraw?deviceId=${device.id}">Download</a>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                        </tbody>
+                    </table>
+                </c:if>
+            </c:if>
         </c:forEach>
     </jsp:body>
 </tags:page>

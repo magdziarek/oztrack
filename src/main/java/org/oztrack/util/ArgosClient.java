@@ -69,7 +69,10 @@ public class ArgosClient {
             StringResponseType stringResponse = argosConnection.getPlatformList(params);
             platformListStr = stringResponse.getReturn();
         } catch (Exception e) {
-            throw new DataFeedException("Trouble getting the platform list from Argos: " + e);
+            if (!platformListStr.isEmpty()) {
+                logger.error(platformListStr);
+            }
+            throw new DataFeedException("Error retrieving platform list: " + e.getMessage());
         }
         return platformListStr;
     }
@@ -88,13 +91,15 @@ public class ArgosClient {
                 platformList.add(platformSummary);
             }
         } catch (Exception e) {
-            logger.error(e.toString());
+            if (!xml.isEmpty()) {
+                logger.error(xml);
+            }
+            throw new DataFeedException("Platform list error: " + e.getMessage());
         }
         return platformList;
     }
 
     private String getXmlStream(long platformId) throws DataFeedException {
-
         XmlRequestType params = new XmlRequestType();
         params.setUsername(this.username);
         params.setPassword(this.password);
@@ -115,16 +120,15 @@ public class ArgosClient {
             IOUtils.copy(inputStream, stringWriter);
             xml = stringWriter.toString();
         } catch (Exception e) {
-            throw new DataFeedException("Error retrieving xml for platform " + platformId + " from Argos: " + e.getMessage());
+            logger.error("Error retrieving data for platform " + platformId);
+            throw new DataFeedException("Error retrieving data for platform " + platformId + " from Argos: " + e.getMessage());
         }
         //logger.info(xml);
         return xml;
     }
 
     public Data getPlatformData(long platformId) throws DataFeedException {
-
         String xml = getXmlStream(platformId);
-
         Data data = null;
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(Data.class);
@@ -134,14 +138,13 @@ public class ArgosClient {
             JAXBElement<Data> dataElement = unmarshaller.unmarshal(streamReader, Data.class);
             data = dataElement.getValue();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error unmarshalling xml: " + e.getMessage());
+            throw new DataFeedException("Error unmarshalling xml: " + e.getMessage());
         }
-
         return data;
     }
 
     public String getXml(SatellitePass satellitePass) {
-
         String xml = null;
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(SatellitePass.class);
@@ -154,7 +157,7 @@ public class ArgosClient {
             xml = stringWriter.toString();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error marshalling xml: " + e.getMessage());
         }
         return xml;
     }
