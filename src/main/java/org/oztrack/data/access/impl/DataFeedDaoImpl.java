@@ -29,8 +29,6 @@ public class DataFeedDaoImpl implements DataFeedDao {
                 .getSingleResult();
     }
 
-
-
     @Override
     public List<DataFeed> getAllActiveDataFeeds(DataFeedSourceSystem sourceSystem) {
         List<DataFeed> resultList = em.createQuery(
@@ -42,18 +40,6 @@ public class DataFeedDaoImpl implements DataFeedDao {
                 .getResultList();
         return resultList;
     }
-
-
-//    @Override
-//    public List<DataFeed> getAllProjectDataFeeds(Project project) {
-//        List<DataFeed> resultList = em.createQuery(
-//                "select o \n" +
-//                        "from DataFeed o \n" +
-//                        "where project = :project"
-//        ).setParameter("project", project)
-//                .getResultList();
-//        return resultList;
-//    }
 
     @Override
     @Transactional

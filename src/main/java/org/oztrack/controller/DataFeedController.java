@@ -1,7 +1,9 @@
 package org.oztrack.controller;
 
 import au.com.bytecode.opencsv.CSVWriter;
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
+import org.oztrack.data.access.DataFeedDetectionDao;
 import org.oztrack.data.access.DataFeedDeviceDao;
 import org.oztrack.data.access.ProjectDao;
 import org.oztrack.data.model.DataFeedDevice;
@@ -13,20 +15,20 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.View;
-
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-
 
 @Controller
 public class DataFeedController {
 
     @Autowired
     private DataFeedDeviceDao dataFeedDeviceDao;
+
+    @Autowired
+    private DataFeedDetectionDao dataFeedDetectionDao;
 
     @Autowired
     private ProjectDao projectDao;
@@ -41,6 +43,17 @@ public class DataFeedController {
     public String getHtmlView(Model model, @ModelAttribute(value = "project") Project project) throws Exception {
         model.addAttribute("dataFeeds", project.getDataFeeds());
         return "datafeed";
+    }
+
+    @RequestMapping(value = "/projects/{projectId}/detcsv", method = RequestMethod.GET, produces = "text/csv")
+    @PreAuthorize("hasPermission(#project, 'write')")
+    public void handleDetectionsCsvRequest(HttpServletResponse response
+            , @ModelAttribute(value = "project") Project project
+            , @RequestParam(value = "dataFeedId") final String dataFeedId) throws IOException {
+        response.setHeader("Content-Disposition", "attachment; filename=\"datafeeddetections.csv\"");
+        CSVWriter csvWriter = new CSVWriter(response.getWriter());
+        dataFeedDetectionDao.writeDataFeedDetectionsCsv(Long.parseLong(dataFeedId), csvWriter);
+        csvWriter.close();
     }
 
     @RequestMapping(value = "/projects/{projectId}/argosraw", method = RequestMethod.GET)

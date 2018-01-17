@@ -1,5 +1,6 @@
 package org.oztrack.data.access.impl;
 
+import au.com.bytecode.opencsv.CSVWriter;
 import org.oztrack.data.access.DataFeedDetectionDao;
 import org.oztrack.data.model.DataFeedDetection;
 import org.springframework.stereotype.Service;
@@ -8,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.*;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class DataFeedDetectionDaoImpl implements DataFeedDetectionDao {
@@ -85,6 +87,36 @@ public class DataFeedDetectionDaoImpl implements DataFeedDetectionDao {
         transaction.commit();
 
         return r;
+    }
+
+    @Override
+    public void writeDataFeedDetectionsCsv(Long dataFeedId, CSVWriter csvWriter) {
+        String[] headers = {"animal_id", "device_ident", "detection_date", "location_date", "poll_date"};
+        csvWriter.writeNext(headers);
+
+        String queryString = "select dev.animal_id\n" +
+                ", dev.device_identifier as device_id\n" +
+                ", to_char(detection_date, 'yyyy-mm-dd hh24:mi:ss') as detection_date\n" +
+                ", to_char(location_date, 'yyyy-mm-dd hh24:mi:ss') as location_date\n" +
+                ", to_char(poll_date, 'yyyy-mm-dd hh24') as poll_date\n" +
+                "from datafeed_detection det \n" +
+                "inner join datafeed_device dev \n" +
+                "on det.datafeed_device_id = dev.id \n" +
+                "and dev.datafeed_id = :dataFeedId\n";
+        Query query = em.createNativeQuery(queryString).setParameter("dataFeedId", dataFeedId);
+        writeCsv(query, csvWriter);
+    }
+
+    private void writeCsv(Query query, CSVWriter csvWriter) {
+        @SuppressWarnings("unchecked")
+        List<Object[]> resultList = query.getResultList();
+        for (Object[] o : resultList) {
+            String[] s = new String[o.length];
+            for (int i = 0; i < o.length; i++) {
+                s[i] = (o[i] != null) ? o[i].toString() : "";
+            }
+            csvWriter.writeNext(s);
+        }
     }
 
     @Override

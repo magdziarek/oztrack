@@ -43,7 +43,6 @@ public class SpotClient {
                     .setParameter("feedPassword", this.password)
                     .setParameter("endDate", isoDateTimeFormat.format(new java.util.Date()))
                     .build();
-            logger.info(uri.toString());
             HttpGet httpGet = new HttpGet(uri);
             DefaultHttpClient client = HttpClientUtils.createDefaultHttpClient();
             HttpResponse httpResponse = client.execute(httpGet);

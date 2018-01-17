@@ -11,7 +11,6 @@ import java.util.List;
 public interface DataFeedDao {
     List<DataFeed> getAllActiveDataFeeds(DataFeedSourceSystem sourceSystem);
 
-    // List<DataFeed> getAllProjectDataFeeds(Project project);
     String getSourceSystemCredentials(Long dataFeedId);
 
     void save(DataFeed object);

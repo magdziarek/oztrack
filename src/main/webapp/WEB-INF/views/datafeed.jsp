@@ -18,9 +18,33 @@
             .table-condensed td {
                 vertical-align: middle;
             }
+
+            rect.selection {
+                fill: #c5c56d;
+                stroke: #a4a441;
+                stroke-opacity: 0.5;
+                shape-rendering: auto;
+            }
+
+            div.tooltip {
+                position: absolute;
+                text-align: left;
+                padding: 4px;
+                border-radius: 3px;
+                box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.2);
+                pointer-events: none;
+            }
+
+            .zoom {
+                cursor: move;
+                fill: none;
+                pointer-events: all;
+            }
         </style>
     </jsp:attribute>
     <jsp:attribute name="tail">
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/optimised/d3.js"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/datafeed-chart.js"></script>
         <script type="text/javascript">
             $(document).ready(function () {
                 $('#navTrack').addClass('active');
@@ -30,19 +54,38 @@
                     updateMomentTime();
                 }, 60000);
 
+                $('.dataFeedPlotArea').each(function (index) {
+                    var id = $(this).attr("id").replace("dataFeedPlotArea-", "");
+                    var animalsList = [];
+                    <c:forEach items="${dataFeeds}" var="dataFeed">
+                    if (id == ${dataFeed.id}) {
+                        <c:forEach items="${dataFeed.devices}" var="device">
+                        animalsList.push({
+                            device_ident: "${device.deviceIdentifier}",
+                            device_id: "${device.id}",
+                            animal_id: ${device.animal.id},
+                            name: "${device.animal.animalName}",
+                            colour: "${device.animal.colour}"
+                        });
+                        </c:forEach>
+                    }
+                    </c:forEach>
+                    var source = $(this).find('#source').attr("value");
+                    var project_id = $(this).find('#project_id').attr("value");
+                    var dataFeedChart = new OzTrack.DataFeedChart();
+                    dataFeedChart.loadChartData(id, source, project_id, animalsList);
+                });
             });
 
             function updateMomentTime() {
                 $('.lastPollDate').each(function (index) {
                     var lastPollDate = moment($(this).attr("value"));
-                    console.log("lastPollDate provided: " + $(this).attr("value"))
                     var nowTime = moment();
                     var diffString = lastPollDate.from(nowTime);
                     var span = $(this).next();
-                    span.text("Last Polled: " + moment(lastPollDate).format("DD/MM/YYYY HH:mm:ss Z") + " (" + diffString + ")");
+                    span.html("<strong>Last Polled:</strong> " + moment(lastPollDate).format("DD/MM/YYYY HH:mm:ss Z") + " (" + diffString + "). ");
                 });
             }
-
         </script>
     </jsp:attribute>
     <jsp:attribute name="breadcrumbs">
@@ -57,135 +100,42 @@
         <tags:project-licence project="${project}"/>
     </jsp:attribute>
     <jsp:body>
-        <h1 id="projectTitle"><c:out value="${project.title}"/></h1>
         <h2>Automated Downloads</h2>
+
         <c:forEach items="${dataFeeds}" var="dataFeed">
-            <c:if test="${dataFeed.dataFeedSourceSystem.name == 'Argos'}">
-                <h3>Argos</h3>
-                <p>
-                    <input type="hidden" class="lastPollDate"
+            <div id="dataFeedPlots">
+                <h3>${dataFeed.dataFeedSourceSystem.name} Locations</h3>
+                <input type="hidden" class="lastPollDate"
                            value='<fmt:formatDate pattern="${momentDateTimeFormatPattern}" value="${dataFeed.lastPollDate}"/>'/>
                     <span class="lastPollInfo"></span>
-                </p>
-                <p>This data feed is set to poll every ${dataFeed.pollFrequencyHours} hour(s).</p>
-                <c:if test="${not empty dataFeed.devices}">
-                    <table class="table table-bordered table-condensed">
-                        <thead>
-                        <tr>
-                            <th>Platform</th>
-                            <th># Detections
-                                <div class="help-inline">
-                                    <div class="help-popover" title="Argos Detections">Argos sends detection information
-                                        from the sensor even if no location was calculated.
-                                    </div>
-                                </div>
-                            </th>
-                            <th># Argos Locations
-                            </th>
-                            <th>Last Detection</th>
-                            <th>Raw Data
-                                <div class="help-inline">
-                                    <div class="help-popover" title="Raw Data from Argos">
-                                        The <b>Diagnostic</b> file contains extra information eg nbrMessages,
-                                        errorRadius, semiMinor, semiMajor, orientation, hdop (1 row for each detection).<br/>
-                                        The <b>Messages</b> file contains raw data for each message and encoded sensor
-                                        data (many rows per detection).<br/>
-                                        See the Argos User Manual for definitions of the fields in these files.
-                                    </div>
-                                </div>
-                            </th>
-                        </tr>
-                        </thead>
+                <br/>The most recent data points are highlighted with a dark outline.
+                <br/><b>Poll Frequency: </b> every ${dataFeed.pollFrequencyHours} hour(s).<br/><br/>
 
-                        <c:forEach items="${dataFeed.devices}" var="device">
-                            <c:set var="locationsCount" value="0"/>
-                            <c:set var="lastDetectionDate" value="${device.detections.get(0).detectionDate}"/>
-                            <c:forEach items="${device.detections}" var="detection">
-                                <c:if test="${not empty detection.locationDate}">
-                                    <c:set var="locationsCount" value="${locationsCount + 1}"/>
-                                </c:if>
-                                <c:set var="timezone" value=" (${detection.timezoneId})"/>
-                                <c:if test="${detection.detectionDate > lastDetectionDate}">
-                                    <c:set var="lastDetectionDate" value="${detection.detectionDate}"/>
-                                </c:if>
-                            </c:forEach>
-                            <tr>
+                <div id="chartHelp"><span style="float:left">Help using this chart&nbsp;</span>
+                    <div class="help-popover" title="Data Feed Chart" style="float:left">
+                        This is an interactive chart - the smaller chart at the bottom is a navigator window for the
+                        larger area. You can:
+                        <ul>
+                            <li>Zoom in by double-clicking on the graph canvas, or by using a mouse scroll</li>
+                            <li>Zoom out by shift-double-clicking</li>
+                            <li>Drag on either canvas to pan the chart</li>
+                            <li>Hover over a data point to see detail</li>
+                            <li>Data points with a black outline were harvested in the last poll</li>
+                            <c:if test="${dataFeed.dataFeedSourceSystem.name == 'Argos'}">
+                                <li>Lighter coloured data points are detections from Argos that contain no location
+                                    information
+                                </li>
+                            </c:if>
+                        </ul>
+                    </div>
+                </div>
 
-                                <td>
-                                    <div style="width: 12px; height: 12px; background-color: ${device.animal.colour};"/>
-                                    <a style="margin-left:20px;"
-                                       href="${pageContext.request.contextPath}/projects/${project.id}/animals/${device.animal.id}">${device.deviceIdentifier}</a>
-                                </td>
-                                <td>${device.detections.size()}</td>
-                                <td>${locationsCount}</td>
-                                <td><fmt:formatDate pattern="${dateTimeFormatPattern}"
-                                                    value="${lastDetectionDate}"/> ${timezone}</td>
-                                <td>
-                                    <a href="${pageContext.request.contextPath}/projects/${project.id}/argosraw?deviceId=${device.id}&rtype=diagnostic">Diagnostic</a>
-                                    <a href="${pageContext.request.contextPath}/projects/${project.id}/argosraw?deviceId=${device.id}&rtype=messages">Messages</a>
-                                </td>
-
-                            </tr>
-                        </c:forEach>
-                        </tbody>
-                    </table>
-                </c:if>
-            </c:if>
-            <c:if test="${dataFeed.dataFeedSourceSystem.name == 'Spot'}">
-                <h3>Spot</h3>
-                <p>
-                    <input type="hidden" class="lastPollDate"
-                           value='<fmt:formatDate pattern="${momentDateTimeFormatPattern}" value="${dataFeed.lastPollDate}"/>'/>
-                    <span class="lastPollInfo"></span>
-                </p>
-                <p>This data feed is set to poll every ${dataFeed.pollFrequencyHours} hour(s).</p>
-                <c:if test="${not empty dataFeed.devices}">
-                    <table class="table table-bordered table-condensed">
-                        <thead>
-                        <tr>
-                            <th>Device</th>
-                            <th># Locations</th>
-                            <th>Last Detection</th>
-                            <th>Raw Data
-                                <div class="help-inline">
-                                    <div class="help-popover" title="Raw Data">
-                                        Contains raw json data for each device
-                                    </div>
-                                </div>
-                            </th>
-                        </tr>
-                        </thead>
-
-                        <c:forEach items="${dataFeed.devices}" var="device">
-                            <c:set var="locationsCount" value="0"/>
-                            <c:set var="lastDetectionDate" value="${device.detections.get(0).detectionDate}"/>
-                            <c:forEach items="${device.detections}" var="detection">
-                                <c:if test="${not empty detection.locationDate}">
-                                    <c:set var="locationsCount" value="${locationsCount + 1}"/>
-                                </c:if>
-                                <c:set var="timezone" value=" (${detection.timezoneId})"/>
-                                <c:if test="${detection.detectionDate > lastDetectionDate}">
-                                    <c:set var="lastDetectionDate" value="${detection.detectionDate}"/>
-                                </c:if>
-                            </c:forEach>
-                            <tr>
-                                <td>
-                                    <div style="width: 12px; height: 12px; background-color: ${device.animal.colour};"/>
-                                    <a style="margin-left:20px;"
-                                       href="${pageContext.request.contextPath}/projects/${project.id}/animals/${device.animal.id}">${device.deviceIdentifier}</a>
-                                </td>
-                                <td>${device.detections.size()}</td>
-                                <td><fmt:formatDate pattern="${dateTimeFormatPattern}"
-                                                    value="${lastDetectionDate}"/> ${timezone}</td>
-                                <td>
-                                    <a href="${pageContext.request.contextPath}/projects/${project.id}/spotraw?deviceId=${device.id}">Download</a>
-                                </td>
-                            </tr>
-                        </c:forEach>
-                        </tbody>
-                    </table>
-                </c:if>
-            </c:if>
+                <div id="dataFeedPlotArea-${dataFeed.id}" class="dataFeedPlotArea">
+                    <svg id="svg-${dataFeed.id}"></svg>
+                    <input id="source" type="hidden" value="${dataFeed.dataFeedSourceSystem.name}"/>
+                    <input id="project_id" type="hidden" value="${dataFeed.project.id}"/>
+                </div>
+            </div>
         </c:forEach>
     </jsp:body>
 </tags:page>
