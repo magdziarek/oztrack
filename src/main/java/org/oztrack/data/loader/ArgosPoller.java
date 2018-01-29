@@ -13,7 +13,9 @@ import java.util.*;
 import fr.cls.argos.*;
 import org.oztrack.data.model.*;
 import org.oztrack.data.model.types.ArgosClass;
+import org.oztrack.util.EmailBuilderFactory;
 import org.oztrack.util.GeometryUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityManager;
 
@@ -22,6 +24,9 @@ public class ArgosPoller extends DataFeedPoller {
     public ArgosPoller(EntityManager em) {
         super(em);
     }
+
+    @Autowired
+    private EmailBuilderFactory emailBuilderFactory;
 
     @Override
     public void poll() { //throws DataFeedException {
@@ -54,9 +59,9 @@ public class ArgosPoller extends DataFeedPoller {
 
                 for (ArgosPlatformSummary platformSummary : platformList) {             // loop through each platform
                     long platformId = platformSummary.getPlatformId();
-                    Date lastCollectionDate = platformSummary.getLastCollectDate().toGregorianCalendar().getTime();
 
-                    if (lastCollectionDate.after(pollStart.getTime())) {
+                    if (platformSummary.getLastCollectDate() != null) {
+                        //Date lastCollectionDate = platformSummary.getLastCollectDate().toGregorianCalendar().getTime();
 
                         try { // get the platform data for this
                             Data platformData = argosClient.getPlatformData(platformId);
@@ -126,7 +131,7 @@ public class ArgosPoller extends DataFeedPoller {
                         } catch (Exception e) {
                             String errorText = "Argos poller error platformId: " + platformId + ": " + e.getMessage();
                             logger.error(errorText);
-                            sendErrorNotification(new DataFeedException(errorText));
+                            sendErrorNotification(emailBuilderFactory,new DataFeedException(errorText));
                         }
                     }
 
@@ -138,7 +143,7 @@ public class ArgosPoller extends DataFeedPoller {
 
             } catch (DataFeedException d) {
                 logger.error("Argos Poller error datafeedId:" + dataFeed.getId() + " " + d.getMessage()); // couldn't read platformSummary probably
-                sendErrorNotification(d);
+                sendErrorNotification(emailBuilderFactory, d);
             }
         }
     }

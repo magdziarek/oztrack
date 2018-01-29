@@ -9,7 +9,9 @@ import org.oztrack.data.model.DataFeedDevice;
 import org.oztrack.data.model.PositionFix;
 import org.oztrack.data.model.types.DataFeedSourceSystem;
 import org.oztrack.error.DataFeedException;
+import org.oztrack.util.EmailBuilderFactory;
 import org.oztrack.util.SpotClient;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityManager;
 import java.text.ParseException;
@@ -22,6 +24,9 @@ import java.util.List;
 public class SpotPoller extends DataFeedPoller {
 
     private SimpleDateFormat isoDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+
+    @Autowired
+    private EmailBuilderFactory emailBuilderFactory;
 
     public SpotPoller(EntityManager em) {
         super(em);
@@ -87,9 +92,9 @@ public class SpotPoller extends DataFeedPoller {
                             PositionFix positionFix = createPositionFix(detection, spotMessage.latitude, spotMessage.longitude);
                             saveDetectionWithPositionFix(detection, positionFix);
                         } catch (DataFeedException d) {
-                            String errorText = "Problem creating positionfix record for a detection dated: " + isoDateTimeFormat.format(spotMessage.dateTime.getTime());
+                            String errorText = "Spot poller: Problem creating positionfix record for a detection dated: " + isoDateTimeFormat.format(spotMessage.dateTime.getTime());
                             logger.error(errorText + d.getMessage());
-                            sendErrorNotification(new DataFeedException(errorText + d.getMessage())); // keep going though
+                            sendErrorNotification(emailBuilderFactory, new DataFeedException(errorText + d.getMessage())); // keep going though
                         }
                         detectionsFound = true;
                     }
@@ -100,7 +105,7 @@ public class SpotPoller extends DataFeedPoller {
                 }
             } catch (DataFeedException d) {
                 logger.error("Spot Poller error on project:" + dataFeed.getProject().getId() + " datafeed:" + dataFeed.getId());
-                sendErrorNotification(d);
+                sendErrorNotification(emailBuilderFactory, d);
             }
         }
     }

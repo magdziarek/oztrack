@@ -1,10 +1,6 @@
 package org.oztrack.data.loader;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.PrecisionModel;
-import fr.cls.argos.Data;
+
 import org.apache.log4j.Logger;
 import org.oztrack.app.OzTrackApplication;
 import org.oztrack.app.OzTrackConfiguration;
@@ -17,10 +13,8 @@ import org.oztrack.util.*;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
-import static org.oztrack.util.GeometryUtils.parseCoordinate;
 
 public abstract class DataFeedPoller {
 
@@ -160,12 +154,12 @@ public abstract class DataFeedPoller {
         transaction.commit();
     }
 
-    protected void sendErrorNotification(DataFeedException dfe) {
+    protected void sendErrorNotification(EmailBuilderFactory emailBuilderFactory, DataFeedException dfe) {
         DoiDaoImpl doiDao = new DoiDaoImpl();
         doiDao.setEntityManger(entityManager);
-        EmailBuilderFactory emailBuilderFactory = new EmailBuilderFactory();
+        //EmailBuilderFactory emailBuilderFactory = new EmailBuilderFactory();
         StringBuilder htmlMsgContent = new StringBuilder();
-        htmlMsgContent.append("<p>Argos poll error thrown:</p>");
+        htmlMsgContent.append("<p>Datafeed poll error:</p>");
         htmlMsgContent.append(dfe.getMessage());
         User adminUser = doiDao.getAdminUsers().get(0);
         OzTrackConfiguration configuration = OzTrackApplication.getApplicationContext();
@@ -175,12 +169,12 @@ public abstract class DataFeedPoller {
             try {
                 EmailBuilder emailBuilder = emailBuilderFactory.getObject();
                 emailBuilder.to(adminUser);
-                emailBuilder.subject("Argos Poller error");
+                emailBuilder.subject("Datafeed poll error");
                 emailBuilder.htmlMsgContent(htmlMsgContent.toString());
                 emailBuilder.build().send();
-                logger.info("Argos Poll error email sent to admin");
+                logger.info("Datafeed poll error email sent to admin");
             } catch (Exception e) {
-                logger.error("Argos poller error email to admin failed.", e);
+                logger.error("Datafeed poll error email to admin failed.", e);
             }
         }
     }
