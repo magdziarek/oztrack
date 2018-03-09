@@ -79,7 +79,7 @@ public class ArgosClient {
 
     public List<ArgosPlatformSummary> getPlatformList() throws DataFeedException {
         String xml = getPlatformListXml();
-        //logger.info(xml);
+        logger.info(xml);
         List<ArgosPlatformSummary> platformList = new ArrayList<ArgosPlatformSummary>();
         try {
             Document document = builder.parse(new InputSource(new StringReader(xml)));
@@ -123,7 +123,7 @@ public class ArgosClient {
             logger.error("Error retrieving data for platform " + platformId);
             throw new DataFeedException("Error retrieving data for platform " + platformId + " from Argos: " + e.getMessage());
         }
-        //logger.info(xml);
+      //  logger.info(xml);
         return xml;
     }
 
@@ -186,17 +186,10 @@ public class ArgosClient {
             JAXBElement<SatellitePass> satellitePassElement = unmarshaller.unmarshal(streamReader, SatellitePass.class);
             satellitePass = satellitePassElement.getValue();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error unmarshalling sat pass: " + e.getMessage());
         }
         return satellitePass;
     }
 
-//    public CSVWriter writeSatellitePassCsvHeaders(CSVWriter writer) {
-//
-//    }
-//
-//    public CSVWriter appendSatellitePassToCsv(CSVWriter writer, SatellitePass satellitePass) {
-//
-//    }
 
 }
