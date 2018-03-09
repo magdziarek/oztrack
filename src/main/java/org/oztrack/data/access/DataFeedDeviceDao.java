@@ -14,6 +14,7 @@ public interface DataFeedDeviceDao {
     DataFeedDevice getDataFeedDeviceByIdentifier(Long datafeed_id, String deviceIdentifier);
 
     Date getDeviceLatestDetectionDate(DataFeedDevice device);
+    boolean checkDetectionExists(DataFeedDevice device, Date detectionDate);
 
     DataFeedDevice getDeviceById(Long id);
 

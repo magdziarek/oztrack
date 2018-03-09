@@ -60,6 +60,24 @@ public class DataFeedDeviceDaoImpl implements DataFeedDeviceDao {
     }
 
     @Override
+    public boolean checkDetectionExists(DataFeedDevice device, Date detectionDate){
+        Query query = em.createQuery("select count(o) from org.oztrack.data.model.DataFeedDetection o \n" +
+                "WHERE o.project = :project \n" +
+                "AND o.dataFeedDevice = :device \n" +
+                "AND o.detectionDate = :detectionDate ");
+        query.setParameter("project", device.getProject());
+        query.setParameter("device",device);
+        query.setParameter("detectionDate",detectionDate);
+        Long count = (Long) query.getSingleResult();
+        try {
+            return count.intValue() == 0 ? false : true;
+        } catch (NoResultException ex) {
+            return false;
+        }
+
+    }
+
+    @Override
     public DataFeedDevice getDeviceById(Long id) {
         Query query = em.createQuery("select o from DataFeedDevice o \n" +
                 "where o.id = :id");

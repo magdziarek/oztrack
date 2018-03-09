@@ -61,24 +61,16 @@ public class ArgosPoller extends DataFeedPoller {
                     long platformId = platformSummary.getPlatformId();
 
                     if (platformSummary.getLastCollectDate() != null) {
-                        //Date lastCollectionDate = platformSummary.getLastCollectDate().toGregorianCalendar().getTime();
-
                         try { // get the platform data for this
                             Data platformData = argosClient.getPlatformData(platformId);
                             if (platformData.getErrors() == null) {
                                 DataFeedDevice device = getDevice(dataFeed, Long.toString(platformId)); // if there is data here for this device, add the device/animal
-                                Date maxBestMessageDate = deviceDao.getDeviceLatestDetectionDate(device);
-                                //logger.info("timezone: " + maxBestMessageDate.getTimeZone().toString());
                                 long programNumber = platformData.getProgram().get(0).getProgramNumber();
                                 List<SatellitePass> satellitePassList = platformData.getProgram().get(0).getPlatform().get(0).getSatellitePass();
-
                                 for (SatellitePass satellitePass : satellitePassList) {
-                                    //Date bestMessageDate = satellitePass.getBestMsgDate().toGregorianCalendar().getTime();
                                     Calendar bestMessageDate = satellitePass.getBestMsgDate().toGregorianCalendar();
-                                    //TimeZone tz = satellitePass.getBestMsgDate().toGregorianCalendar().getTimeZone();
-                                    if ((maxBestMessageDate == null) || (bestMessageDate.getTime().after(maxBestMessageDate))) {
+                                    if (!deviceDao.checkDetectionExists(device,bestMessageDate.getTime())) {
                                         detectionsFound = true;
-                                        maxBestMessageDate = bestMessageDate.getTime();
                                         DataFeedDetection detection = createNewDetection(device);
                                         detectionDao.saveRawArgosData(detection.getId()
                                                 , programNumber
@@ -112,6 +104,7 @@ public class ArgosPoller extends DataFeedPoller {
                                         saveDetectionWithPositionFix(detection, positionFix); //positionfix might be empty, save detection anyway
                                     }
                                 }
+                                if (detectionsFound) logger.info("platform " + platformId + " new detections");
                                 //device.setLastDetectionDate(lastCollectionDate);
                                 //deviceDao.save(device);
                             } else {
@@ -138,7 +131,7 @@ public class ArgosPoller extends DataFeedPoller {
                 }
                 if (detectionsFound) {
                     renumberPositionFixes(dataFeed);
-                    logger.info("New detections downloaded");
+                    logger.info("New detections downloaded - running renumber");
                 }
 
             } catch (DataFeedException d) {
