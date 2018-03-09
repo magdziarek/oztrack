@@ -79,7 +79,7 @@ public class ArgosClient {
 
     public List<ArgosPlatformSummary> getPlatformList() throws DataFeedException {
         String xml = getPlatformListXml();
-        logger.info(xml);
+        //logger.info(xml);
         List<ArgosPlatformSummary> platformList = new ArrayList<ArgosPlatformSummary>();
         try {
             Document document = builder.parse(new InputSource(new StringReader(xml)));
