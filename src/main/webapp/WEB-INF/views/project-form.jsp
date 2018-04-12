@@ -593,8 +593,8 @@
             <fieldset>
                 <div class="legend">Data Availability</div>
                 <div class="control-group required">
-                    <label class="control-label" for="publicationUrl">Access Rights</label>
-                    <div class="controls">
+                    <label class="control-label" for="accessRightsControls">Access Rights</label>
+                    <div id="accessRightsControls" class="controls">
                         <label for="accessOpen" class="radio">
                             <form:radiobutton id="accessOpen" path="access" value="OPEN" onclick="
                                 $('#embargo-date-control-group').fadeOut();
@@ -649,10 +649,40 @@
                                     value="<fmt:formatDate pattern="${isoDateFormatPattern}" value="${otherEmbargoDate}"/>"
                                     onclick="$('#otherEmbargoDate').click(); return false;"/>
                             </label>
+
                             <form:errors path="embargoDate" element="div" cssClass="help-block formErrors"/>
+
+                            <div class="project-access-embargo">
+                            <label for="simpleMapAccess" class="checkbox">
+                                <span style="font-weight:bold">Allow limited public visibility</span>
+                                <form:checkbox id="simpleMapAccess" path="simpleMapAccess"></form:checkbox>
+
+                                <div style="margin: 0.5em 0;">
+                                    While your project is under embargo, you can check this box to allow public visibility of:
+                                    <ul>
+                                        <li>a map containing raster images of animal detections and trajectories</li>
+                                        <li>images of animals that you submit</li>
+                                        <li>interpretation text that you provide</li>
+                                    </ul>
+                                    Users will not have access to raw data or downloads for the duration of the embargo.
+                                </div>
+
+                            </label>
+                            </div>
+
+
                         </div>
+
+
                         <form:errors path="access" element="div" cssClass="help-block formErrors"/>
+
+
+
                     </div>
+
+
+
+
                 </div>
                 <a name="datalicence"></a>
                 <div id="data-licences-control-group" class="control-group required" style="<c:if test="${project.access == 'CLOSED'}">display: none;</c:if>">

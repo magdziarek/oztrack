@@ -111,7 +111,8 @@ public class ProjectController {
             "access",
             "rightsStatement",
             "licencingAndEthics",
-                "institution"
+            "institution",
+            "simpleMapAccess"
         );
         binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("yyyy-MM-dd"), true));
         binder.registerCustomEditor(Institution.class, "institution", new InstitutionPropertyEditor(institutionDao));
