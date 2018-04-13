@@ -135,6 +135,7 @@
             sphericalMercator: true,
             maxExtent: that.maxExtent,
             wrapDateLine: true,
+            useTiltImages: true,
             numZoomLevels: 20,
             metadata: {
                 category: 'base',

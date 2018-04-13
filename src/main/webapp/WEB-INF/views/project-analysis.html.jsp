@@ -298,7 +298,7 @@
         </style>
     </jsp:attribute>
     <jsp:attribute name="tail">
-        <script src="${pageContext.request.scheme}://maps.google.com/maps/api/js?v=3.9&sensor=false"></script>
+        <script async defer src="${pageContext.request.scheme}://maps.googleapis.com/maps/api/js?v=3&key=${googleApiKey}&callback=initMap"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/optimised/openlayers.js"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/project-map.js"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/project-analysis.js"></script>
@@ -401,9 +401,37 @@
                     $(this).prev().prop('disabled', false);
                     $('#projectMapCancel').fadeOut();
                 });
+
+                <c:forEach items="${savedAnalyses}" var="analysis">
+                addAnalysis(
+                    '${analysis.analysisType.displayName}',
+                    '${pageContext.request.contextPath}/projects/${analysis.project.id}/analyses/${analysis.id}',
+                    new Date(${analysis.createDate.time}),
+                    true
+                );
+                </c:forEach>
+                <c:forEach items="${previousAnalyses}" var="analysis">
+                addAnalysis(
+                    '${analysis.analysisType.displayName}',
+                    '${pageContext.request.contextPath}/projects/${analysis.project.id}/analyses/${analysis.id}',
+                    new Date(${analysis.createDate.time}),
+                    false
+                );
+                </c:forEach>
+                $(window).resize(onResize);
+                $('#toggleSidebar').click(function(e) {
+                    e.preventDefault();
+                    $(this).find('i').toggleClass('icon-chevron-left').toggleClass('icon-chevron-right');
+                    $('#projectMapOptions').toggleClass('minimised');
+                    onResize();
+                });
+
+            });
+
+            function initMap() {
                 var projectBounds = new OpenLayers.Bounds(
-                    ${projectBoundingBox.envelopeInternal.minX}, ${projectBoundingBox.envelopeInternal.minY},
-                    ${projectBoundingBox.envelopeInternal.maxX}, ${projectBoundingBox.envelopeInternal.maxY}
+                        ${projectBoundingBox.envelopeInternal.minX}, ${projectBoundingBox.envelopeInternal.minY},
+                        ${projectBoundingBox.envelopeInternal.maxX}, ${projectBoundingBox.envelopeInternal.maxY}
                 );
                 analysisMap = null;
                 onResize();
@@ -452,7 +480,7 @@
                         $('a[href="#animalPanel"]').trigger('click');
                     },
                     onLayerSuccess: function() {
-                      //  $('a[href="#animalPanel"]').trigger('click'); // not ideal
+                        //  $('a[href="#animalPanel"]').trigger('click'); // not ideal
                     },
                     onUpdateAnimalInfoFromLayer: function(layerName, layerId, animalId, animalIds, fromDate, toDate, layerAttrs) {
                         var html = '<div class="layerInfoHeader">';
@@ -476,12 +504,12 @@
                         var exportHtml = '';
                         if ((layerName == 'Detections') || (layerName == 'Trajectory')) {
                             var exportBaseUrl =
-                                '${pageContext.request.contextPath}/' +
-                                ((layerName == 'Detections') ? 'detections' : 'trajectory') +
-                                '?projectId=' + ${project.id} +
-                                '&animalIds=' + animalId + // animalIds.join(',') +
-                                '&fromDate=' + fromDate +
-                                '&toDate=' + toDate;
+                                    '${pageContext.request.contextPath}/' +
+                                    ((layerName == 'Detections') ? 'detections' : 'trajectory') +
+                                    '?projectId=' + ${project.id} +
+                                            '&animalIds=' + animalId + // animalIds.join(',') +
+                                    '&fromDate=' + fromDate +
+                                    '&toDate=' + toDate;
                             exportHtml += '<a class="icon kml" href="' + exportBaseUrl + '&format=kml">KML</a> ';
                             exportHtml += '<a class="icon shp" href="' + exportBaseUrl + '&format=shp">SHP</a>';
                         }
@@ -527,22 +555,27 @@
                             analysisTypeList="${analysisTypeList}"/>
                     }
                 });
+                initCharts();
+            }
+
+            function initCharts() {
+
                 distanceCharts = null;
                 distanceCharts = new OzTrack.DistanceCharts();
                 var url = "${pageContext.request.contextPath}/projects/${project.id}/analysis/posfixstats";
                 distanceCharts.loadProjectChartData(url, analysisMap.projectMap.animals);
                 <c:if test="${not empty temporal && temporal}">
-                    $('a[href="#temporalPanel"]').trigger('click');
+                $('a[href="#temporalPanel"]').trigger('click');
                 </c:if>
                 <c:if test="${not empty bccvlApiUrl}">
-                    <c:set var="baseUrl" value="${fn:replace(pageContext.request.requestURL, pageContext.request.requestURI, '')}"/>
-                    $('a[href="#temporalPanel"]').trigger('click');
-                    if ($("#exportTemporal").is(":visible")) {$("#exportTemporal").slideUp();}
-                    $(".chart-menu-tab-li").removeClass('active');
-                    $("#export-traits").parent().addClass('active');
-                    hideChart();
-                    $("#exportTraits").slideDown();
-                 if (window.location.hash.length != 0) {
+                <c:set var="baseUrl" value="${fn:replace(pageContext.request.requestURL, pageContext.request.requestURI, '')}"/>
+                $('a[href="#temporalPanel"]').trigger('click');
+                if ($("#exportTemporal").is(":visible")) {$("#exportTemporal").slideUp();}
+                $(".chart-menu-tab-li").removeClass('active');
+                $("#export-traits").parent().addClass('active');
+                hideChart();
+                $("#exportTraits").slideDown();
+                if (window.location.hash.length != 0) {
                     $("#bccvl-message").html("<p>You have successfully authorised and connected to the BCCVL. Now you can export your data to your BCCVL account.</p>");
                     $("#bccvl-button").text('Export data to BCCVL')
                             .attr("href","#")
@@ -561,7 +594,7 @@
                                     headers: {
                                         Accept: "application/json",
                                         Authorization: "Bearer " +  window.location.hash.split('&')[0].split('=')[1]
-                                        },
+                                    },
                                     data: JSON.stringify(json),
                                     error: function(xhr, textStatus, errorThrown) {
                                         $("#bccvl-loading").hide();
@@ -574,39 +607,14 @@
                                             $("#bccvl-loading").hide();
                                             var location = xhr.getResponseHeader('Location');
                                             $("#bccvl-message").html('<p>Export to BCCVL successful. You can now open the BCCVL and use your data in modelling experiments. Click the button below to launch the BCCVL.</p>' +
-                                            '<a class="btn btn-primary" target="_blank" href="' + location + '">Open BCCVL and view the exported data</a>');
+                                                    '<a class="btn btn-primary" target="_blank" href="' + location + '">Open BCCVL and view the exported data</a>');
                                         }
                                     }
                                 })
                             });
-                 }
+                }
                 </c:if>
-
-                <c:forEach items="${savedAnalyses}" var="analysis">
-                addAnalysis(
-                    '${analysis.analysisType.displayName}',
-                    '${pageContext.request.contextPath}/projects/${analysis.project.id}/analyses/${analysis.id}',
-                    new Date(${analysis.createDate.time}),
-                    true
-                );
-                </c:forEach>
-                <c:forEach items="${previousAnalyses}" var="analysis">
-                addAnalysis(
-                    '${analysis.analysisType.displayName}',
-                    '${pageContext.request.contextPath}/projects/${analysis.project.id}/analyses/${analysis.id}',
-                    new Date(${analysis.createDate.time}),
-                    false
-                );
-                </c:forEach>
-                $(window).resize(onResize);
-                $('#toggleSidebar').click(function(e) {
-                    e.preventDefault();
-                    $(this).find('i').toggleClass('icon-chevron-left').toggleClass('icon-chevron-right');
-                    $('#projectMapOptions').toggleClass('minimised');
-                    onResize();
-                });
-
-            });
+            }
 
             function addAnalysis(layerName, analysisUrl, analysisCreateDate, saved) {
                 var analysisContainer = $('<li class="analysis">');

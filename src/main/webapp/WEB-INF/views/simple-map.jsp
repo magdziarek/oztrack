@@ -60,11 +60,12 @@
         </style>
     </jsp:attribute>
     <jsp:attribute name="tail">
-        <script src="${pageContext.request.scheme}://maps.google.com/maps/api/js?v=3.9&sensor=false"></script>
+        <script async defer src="${pageContext.request.scheme}://maps.googleapis.com/maps/api/js?v=3&key=${googleApiKey}&callback=initMap"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/optimised/openlayers.js"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/project-map.js"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/simple-map.js"></script>
         <script type="text/javascript">
+
             $(document).ready(function() {
 
                 $('#navTrack').addClass('active');
@@ -83,6 +84,20 @@
                 $('#select-animal-all').change(function (e) {
                     $('.select-animal').prop('checked', $(this).prop('checked')).trigger('change');
                 });
+
+                <c:if test="${projectAnimalsList.size() == 1}">
+                    analysisMap.zoomToAnimal("${projectAnimalsList[0].id}");
+                </c:if>
+                $(window).resize(onResize);
+                $('#toggleSidebar').click(function(e) {
+                    e.preventDefault();
+                    $(this).find('i').toggleClass('icon-chevron-left').toggleClass('icon-chevron-right');
+                    $('#projectMapOptions').toggleClass('minimised');
+                    onResize();
+                });
+            });
+
+            function initMap() {
                 var projectBounds = new OpenLayers.Bounds(
                         ${projectBoundingBox.envelopeInternal.minX}, ${projectBoundingBox.envelopeInternal.minY},
                         ${projectBoundingBox.envelopeInternal.maxX}, ${projectBoundingBox.envelopeInternal.maxY}
@@ -142,17 +157,9 @@
                         $('#animalInfo-' + animalId).append(html);
                     }
                 });
-                <c:if test="${projectAnimalsList.size() == 1}">
-                    analysisMap.zoomToAnimal("${projectAnimalsList[0].id}");
-                </c:if>
-                $(window).resize(onResize);
-                $('#toggleSidebar').click(function(e) {
-                    e.preventDefault();
-                    $(this).find('i').toggleClass('icon-chevron-left').toggleClass('icon-chevron-right');
-                    $('#projectMapOptions').toggleClass('minimised');
-                    onResize();
-                });
-            });
+
+            }
+
             function onResize() {
                 var mainHeight = $(window).height() - $('#header').outerHeight();
                 $('#projectMapOptions').height(mainHeight);
@@ -174,6 +181,7 @@
                     analysisMap.updateSize();
                 }
             }
+
         </script>
     </jsp:attribute>
     <jsp:body>

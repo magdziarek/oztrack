@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.oztrack.app.OzTrackConfiguration;
 import org.oztrack.data.access.AnimalDao;
 import org.oztrack.data.access.PositionFixDao;
 import org.oztrack.data.access.ProjectDao;
@@ -54,6 +55,9 @@ public class ProjectCleanseController {
     private final DateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     @Autowired
+    private OzTrackConfiguration configuration;
+
+    @Autowired
     private ProjectDao projectDao;
 
     @Autowired
@@ -87,6 +91,7 @@ public class ProjectCleanseController {
         model.addAttribute("kalmanAnalysisType", AnalysisType.KALMAN);
         model.addAttribute("kalmanSstAnalysisType", AnalysisType.KALMAN_SST);
         model.addAttribute("argosClasses", ArgosClass.values());
+        model.addAttribute("googleApiKey", configuration.getGoogleApiKey());
         return "project-cleanse.html";
     }
 

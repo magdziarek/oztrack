@@ -1,5 +1,6 @@
 package org.oztrack.controller;
 
+import org.oztrack.app.OzTrackConfiguration;
 import org.oztrack.data.access.AnimalDao;
 
 import org.oztrack.data.access.ProjectDao;
@@ -19,6 +20,9 @@ import java.util.List;
 
 @Controller
 public class SimpleMapController {
+
+    @Autowired
+    private OzTrackConfiguration configuration;
 
     @Autowired
     private AnimalDao animalDao;
@@ -74,6 +78,7 @@ public class SimpleMapController {
             model.addAttribute("projectBoundingBox", projectDao.getBoundingBox(project, false));
             model.addAttribute("animalBoundingBoxes", projectDao.getAnimalBoundingBoxes(project, false));
             model.addAttribute("projectDetectionDateRange", projectDao.getDetectionDateRange(project, false));
+            model.addAttribute("googleApiKey", configuration.getGoogleApiKey());
             return "simple-map";
         } else {
             return "redirect:" + "/projects/{id}";
