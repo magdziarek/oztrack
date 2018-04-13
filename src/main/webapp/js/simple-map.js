@@ -42,8 +42,8 @@
                 that.projectMap.addLayer(detectionLayer.getWMSLayer());
             }
             else if (layerTypeValue == 'START_END') {
-                var startEndLayer = that.projectMap.createStartEndLayer(params, 'analysis');
-                that.projectMap.addLayer(startEndLayer);
+                var startEndLayer = that.projectMap.createStartEndWmsLayer(params, 'analysis');
+                that.projectMap.addLayer(startEndLayer.getWMSLayer());
             }
             else {
                 params.analysisType = layerTypeValue;

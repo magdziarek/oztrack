@@ -46,6 +46,7 @@
 
         that.detectionLayers = [];
         that.trajectoryLayers = [];
+        that.startEndLayers = [];
         that.projectMapLayerIdSeq = 0;
         that.projectMapLayers = {};
         that.analyses = {};
@@ -665,16 +666,19 @@
             return that.analyses[id];
         }
 
-        that.startEndStyleMap = createStartEndStyleMap();
+        //that.startEndStyleMap = createStartEndStyleMap();
         that.polygonStyleMap = createPolygonStyleMap();
 
+
+
         that.createDetectionLayer = function(params, category) {
+            var title = 'Detections';
             function buildFilter(params) {
                 // If supplied, use param to filter animals; otherwise, include
                 // all animals.
                 var cqlFilterAnimalIds =
                     params.animalIds ? params.animalIds.split(',')
-                    : $.map(that.animals, function(animal) {return animal.id});
+                        : $.map(that.animals, function(animal) {return animal.id});
 
                 // Exclude animals not currently visible on the map.
                 cqlFilterAnimalIds = $.grep(cqlFilterAnimalIds, function(id) {return getAnimal(id).visible;});
@@ -696,7 +700,7 @@
                 cqlFilter += ' and detectiontime < \'' + moment(new Date(toDate)).add('days', 1).format('YYYY-MM-DD') + '\'';
                 return cqlFilter;
             }
-            var title = 'Detections';
+
             var wmsLayer = new OpenLayers.Layer.WMS(
                 title,
                 '/geoserver/wms',
@@ -804,13 +808,14 @@
         }
 
         that.createTrajectoryLayer = function(params, category) {
+            var title = 'Trajectory';
             function buildFilter(params) {
                 // If supplied, use param to filter animals; otherwise, include
                 // all animals.
                 var cqlFilterAnimalIds =
                     params.animalIds
-                    ? params.animalIds.split(',')
-                    : $.map(that.animals, function(animal) {return animal.id;});
+                        ? params.animalIds.split(',')
+                        : $.map(that.animals, function(animal) {return animal.id;});
 
                 // Exclude animals not currently visible on the map.
                 cqlFilterAnimalIds = $.grep(cqlFilterAnimalIds, function(id) {return getAnimal(id).visible;});
@@ -829,7 +834,6 @@
                 cqlFilter += ' and enddetectiontime < \'' + moment(new Date(toDate)).add('days', 1).format('YYYY-MM-DD') + '\'';
                 return cqlFilter;
             }
-            var title = 'Trajectory';
             var wmsLayer = new OpenLayers.Layer.WMS(
                 title,
                 '/geoserver/wms',
@@ -938,59 +942,106 @@
                 that.trajectoryLayers[i].getWMSLayer().redraw(true);
             }
         }
+        
+        that.createStartEndWmsLayer = function(params, category) {
+            var title = 'Start and End';
+            function buildFilter(params) {
+                // If supplied, use param to filter animals; otherwise, include
+                // all animals.
+                var cqlFilterAnimalIds =
+                    params.animalIds
+                        ? params.animalIds.split(',')
+                        : $.map(that.animals, function(animal) {return animal.id;});
 
-        that.createStartEndLayer = function(params, category) {
-            params['projectId'] = that.project.id;
-            var startEndLayerId = that.projectMapLayerIdSeq++;
-            var startEndLayer = new OpenLayers.Layer.Vector('Start and End Points', {
-                projection : that.projection4326,
-                protocol : new OpenLayers.Protocol.WFS.v1_1_0({
-                    url : '/wfs/start-end',
-                    params : params,
-                    featureType : 'StartEnd',
-                    featureNS : 'http://oztrack.org/xmlns#'
-                }),
-                strategies : [
-                    new OpenLayers.Strategy.Fixed()
-                ],
-                styleMap : that.startEndStyleMap,
-                eventListeners : {
-                    loadend : function(e) {
-                        that.updateAnimalInfoFromStartEndLayer(e.object, startEndLayerId);
-                        that.onLayerSuccess && that.onLayerSuccess();
-                    }
-                },
-                metadata: {
-                    category: category,
-                    showInformation: false
-                }
-            });
-            that.projectMapLayers[startEndLayerId] = startEndLayer;
-            return startEndLayer;
-        };
+                // Exclude animals not currently visible on the map.
+                cqlFilterAnimalIds = $.grep(cqlFilterAnimalIds, function(id) {return getAnimal(id).visible;});
 
-        that.updateAnimalInfoFromStartEndLayer = function(startEndLayer, startEndLayerId) {
-            var animalProcessed = {};
-            for (var key in startEndLayer.features) {
-                var feature = startEndLayer.features[key];
-                if (feature.attributes && feature.attributes.animalId) {
-                    if (animalProcessed[feature.attributes.animalId]) {
-                        continue;
-                    }
-                    animalProcessed[feature.attributes.animalId] = true;
-                    feature.renderIntent = 'default';
-                    that.onUpdateAnimalInfoFromLayer && that.onUpdateAnimalInfoFromLayer(
-                        startEndLayer.name,
-                        startEndLayerId,
-                        feature.attributes.animalId,
-                        [feature.attributes.animalId],
-                        feature.attributes.fromDate,
-                        feature.attributes.toDate,
-                        {}
-                    );
-                }
+                // If filter is empty, include dummy ID (i.e. -1) that will
+                // never be matched.
+                // This prevents the CQL_FILTER parameter from being
+                // syntactically invalid.
+                cqlFilterAnimalIds = (cqlFilterAnimalIds.length > 0) ? cqlFilterAnimalIds : [-1];
+
+                var cqlFilter = 'project_id = ' + that.project.id;
+                cqlFilter += ' and animal_id in (' + cqlFilterAnimalIds.join(',') + ')';
+                var fromDate = (params.fromDate && new Date(params.fromDate).getTime() > that.fromDate.getTime()) ? new Date(params.fromDate) : that.fromDate;
+                var toDate = (params.toDate && new Date(params.toDate).getTime() < that.toDate.getTime()) ? new Date(params.toDate) : that.toDate;
+                cqlFilter += ' and startdetectiontime >= \'' + moment(new Date(fromDate)).format('YYYY-MM-DD') + '\'';
+                cqlFilter += ' and enddetectiontime < \'' + moment(new Date(toDate)).add('days', 1).format('YYYY-MM-DD') + '\'';
+                return cqlFilter;
             }
+            var wmsLayer = new OpenLayers.Layer.WMS(
+                title,
+                '/geoserver/wms',
+                {
+                    layers: 'oztrack:startendlayer',
+                    styles: 'oztrack_startendlayer',
+                    cql_filter: buildFilter(params),
+                    format: 'image/png',
+                    transparent: true
+                },
+                {
+                    isBaseLayer: false,
+                    tileSize: new OpenLayers.Size(512,512),
+                    metadata: {
+                        category: category,
+                        showInformation: false
+                    }
+                }
+            );
+            var layer = {
+                id: that.projectMapLayerIdSeq++,
+                getTitle: function() {
+                    return title;
+                },
+                getParams: function() {
+                    return params;
+                },
+                getCQLFilter: function() {
+                    return buildFilter(params);
+                },
+                getWMSLayer: function() {
+                    return wmsLayer;
+                }
+            };
+            that.projectMapLayers[layer.id] = layer;
+            that.startEndLayers.push(layer);
+            var layerAnimalIds =
+                layer.getParams().animalIds
+                    ? layer.getParams().animalIds.split(',')
+                    : $.map(that.animals, function(animal) {return animal.id});
+            function updateAnimalInfoFromLayer(options) {
+                $.each(layerAnimalIds, function(i, animalId) {
+                    var fromDate =
+                        (options.getFromDate && options.getFromDate(animalId)) ||
+                        layer.getParams().fromDate ||
+                        moment(that.project.minDate).format('YYYY-MM-DD');
+                    var toDate =
+                        (options.getToDate && options.getToDate(animalId)) ||
+                        layer.getParams().toDate ||
+                        moment(that.project.maxDate).format('YYYY-MM-DD');
+                    var layerAttrs = options.getLayerAttrs ? options.getLayerAttrs(animalId) : {};
+                    that.onUpdateAnimalInfoFromLayer && that.onUpdateAnimalInfoFromLayer(
+                        layer.getTitle(),
+                        layer.id,
+                        animalId,
+                        layerAnimalIds,
+                        fromDate,
+                        toDate,
+                        layerAttrs
+                    );
+                });
+                that.onLayerSuccess && that.onLayerSuccess();
+            }
+            return layer;
         };
+
+        function updateStartEndLayers() {
+            for (var i = 0; i < that.startEndLayers.length; i++) {
+                that.startEndLayers[i].getWMSLayer().params['CQL_FILTER'] = that.startEndLayers[i].getCQLFilter();
+                that.startEndLayers[i].getWMSLayer().redraw(true);
+            }
+        }
 
         if (that.showAllDetections) {
             that.allDetectionsLayer = that.createDetectionLayer({}, 'project');
@@ -1001,7 +1052,9 @@
             that.map.addLayer(that.allTrajectoriesLayer.getWMSLayer());
         }
         if (that.showAllStartEnd) {
-            that.map.addLayer(that.createStartEndLayer({}, 'project'));
+            //that.map.addLayer(that.createStartEndLayer({}, 'project'));
+            that.allStartEndsLayer = that.createStartEndWmsLayer({}, 'project');
+            that.map.addLayer(that.allStartEndsLayer.getWMSLayer());
         }
 
         function coordString(geometry) {
@@ -1026,6 +1079,7 @@
                 .append(feature.attributes.TYPE + ', IUCN Code ' + feature.attributes.IUCN);
         };
         var getFeatureInfoControl = new OzTrack.OpenLayers.Control.WMSGetFeatureInfo({
+            id: 'wmsFeatureInfoControl',
             url: '/geoserver/wms',
             layerUrls: ['/geoserver/gwc/service/wms'],
             crosses180: that.project.crosses180,
@@ -1308,21 +1362,40 @@
                 },
                 {
                     layerName: 'Start and End Points',
+                    layer: that.allStartEndsLayer && that.allStartEndsLayer.getWMSLayer(),
                     propertyNames: [
-                        'animalId',
-                        'fromDate',
-                        'toDate',
-                        'identifier'
+                        'animal_id',
+                        'startdetectiontime',
+                        'enddetectiontime',
+                        'startlocationgeometry',
+                        'endlocationgeometry'
                     ],
                     summary: function(feature) {
-                        var date = (feature.attributes.identifier === 'start') ? feature.attributes.fromDate : feature.attributes.toDate;
                         return $('<span>')
-                            .append(getAnimal(feature.attributes.animalId).name)
-                            .append(' ' + feature.attributes.identifier)
-                            .append(' ' + moment(date, 'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DD HH:mm:ss'))
-                            .append(' ' + coordString(feature.geometry.clone().transform(that.projection900913, that.projection4326)));
+                            .append(getAnimal(feature.attributes.animal_id).name)
+                            .append(' from ' + moment(feature.attributes.startdetectiontime, 'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DD HH:mm:ss'))
+                            .append(' ' + coordString(feature.geometry.components[0]) + '<br />')
+                            .append(' to ' + moment(feature.attributes.enddetectiontime, 'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DD HH:mm:ss'))
+                            .append(' ' + coordString(feature.geometry.components[1]));
                     }
                 },
+                // {
+                //     layerName: 'Start and End Points',
+                //     propertyNames: [
+                //         'animalId',
+                //         'fromDate',
+                //         'toDate',
+                //         'identifier'
+                //     ],
+                //     summary: function(feature) {
+                //         var date = (feature.attributes.identifier === 'start') ? feature.attributes.fromDate : feature.attributes.toDate;
+                //         return $('<span>')
+                //             .append(getAnimal(feature.attributes.animalId).name)
+                //             .append(' ' + feature.attributes.identifier)
+                //             .append(' ' + moment(date, 'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DD HH:mm:ss'))
+                //             .append(' ' + coordString(feature.geometry.clone().transform(that.projection900913, that.projection4326)));
+                //     }
+                // },
                 {
                     layerName: 'Kalman Filter',
                     propertyNames: [
@@ -1729,40 +1802,7 @@
             });
             return polygonStyleMap;
         }
-
-        function createStartEndStyleMap() {
-            var styleContext = {
-                getColour : function(feature) {
-                    if (feature.attributes.identifier === 'start') {
-                        return '#00CD00';
-                    }
-                    if (feature.attributes.identifier === 'end') {
-                        return '#CD0000';
-                    }
-                    return '#CDCDCD';
-                }
-            };
-            var startEndPointsOnStyle = new OpenLayers.Style({
-                pointRadius : 2,
-                strokeColor : '${getColour}',
-                strokeWidth : 1.2,
-                strokeOpacity : 1.0,
-                fillColor : '${getColour}',
-                fillOpacity : 0
-            }, {
-                context : styleContext
-            });
-            var startEndPointsOffStyle = {
-                strokeOpacity : 0,
-                fillOpacity : 0
-            };
-            var startEndStyleMap = new OpenLayers.StyleMap({
-                'default' : startEndPointsOnStyle,
-                'temporary' : startEndPointsOffStyle
-            });
-            return startEndStyleMap;
-        }
-
+        
         that.deleteProjectMapLayer = function(id) {
             if (!confirm('This will delete the layer for all animals. Do you wish to continue?')) {
                 return;
@@ -1778,6 +1818,7 @@
             }
             that.detectionLayers = $.grep(that.detectionLayers, function(x) {return x.id !== id});
             that.trajectoryLayers = $.grep(that.trajectoryLayers, function(x) {return x.id !== id});
+            that.startEndLayers = $.grep(that.startEndLayers, function(x) { return x.id !== id});
         };
 
         that.zoomToAnimal = function(animalId) {
@@ -1870,6 +1911,7 @@
         that.updateLayers = function() {
             updateDetectionLayers();
             updateTrajectoryLayers();
+            updateStartEndLayers();
             updateVectorLayers();
         };
 

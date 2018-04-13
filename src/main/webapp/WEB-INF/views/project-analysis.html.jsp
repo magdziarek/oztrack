@@ -294,6 +294,7 @@
             .scroller-left {
                 float:left;
             }
+
         </style>
     </jsp:attribute>
     <jsp:attribute name="tail">
@@ -807,9 +808,9 @@
                 );
                 $('#projectMap').height(mainHeight);
                 $('#projectMap').width($(window).width() - $('#projectMapOptions').width());
-                if (analysisMap) {
-                    analysisMap.updateSize();
-                }
+//                if (analysisMap) {
+//                    analysisMap.updateSize();
+//                }
                 //distanceCharts.adjustChartTabs();
                 chartTabs();
 
