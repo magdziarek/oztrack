@@ -371,7 +371,7 @@
                     var newMaxHeight = (maxHeight === 'none') ? '54px' : 'none';
                     prev.css('max-height', newMaxHeight);
                 });
-                
+
                 $('#homeRangeCalculatorPanel .accordion .collapse').on('show', function() {
                     $('#homeRangeCalculatorPanel .accordion')
                         .not($(this).closest('.accordion'))
@@ -1280,7 +1280,6 @@
                     </dl>
                 </c:if>
             </div>
-
 
             <a id="toggleSidebar" href="#toggleSidebar"><i class="icon-chevron-left"></i></a>
         </div>

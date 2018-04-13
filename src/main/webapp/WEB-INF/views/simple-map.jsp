@@ -17,6 +17,7 @@
     <jsp:attribute name="head">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/optimised/openlayers.css" type="text/css"/>
         <style type="text/css">
+
             .animalCheckbox {
                 float: left;
                 width: 15px;

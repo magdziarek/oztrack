@@ -13,6 +13,9 @@
     <jsp:attribute name="head">
         <style type="text/css">
 
+            #main{
+                padding-top:10px;
+            }
             #caro {
                 width:900px;
                 margin-left:20px;

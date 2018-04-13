@@ -13,6 +13,7 @@
     <jsp:attribute name="head">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/optimised/openlayers.css" type="text/css">
         <style type="text/css">
+
             #welcome{
                 background-color: #e6e6c0;
                 padding: 6px;
@@ -22,12 +23,13 @@
                 -ms-border-radius: 8px;
                 -o-border-radius: 8px;
                 border-radius: 8px;
-                margin-left:10px;
+                margin: 10px 0px 10px;
             }
 
             #homeMap{
                 height:300px;
                 background-color: #e6e6c0;
+                z-index:2;
             }
 
             #map-instructions-container {
@@ -112,6 +114,7 @@
 
             tr.clickable-row { cursor: pointer; }
 
+
             #createprojectbutton {
                 position:absolute;
                 padding: 2px 20px;
@@ -144,8 +147,6 @@
                     window.document.location = $(this).data('url');
                 });
 
-
-
                 $('#projects-table').DataTable({
                    "aLengthMenu": [[5, 10, 50, -1], [5, 10, 50, "All"]],
                     //"pageLength": 5,
@@ -177,6 +178,7 @@
     </jsp:attribute>
 
     <jsp:body>
+
         <div class="row">
         <div class="span12" id="welcome">
             <div class="span12" id="homeMap">
