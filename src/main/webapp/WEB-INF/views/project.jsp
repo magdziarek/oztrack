@@ -28,9 +28,16 @@
         </c:otherwise>
         </c:choose>
     </jsp:attribute>
+    <jsp:attribute name="navExtra">
+        <tags:project-dropdown project="${project}"/>
+    </jsp:attribute>
     <jsp:attribute name="head">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/optimised/openlayers.css" type="text/css">
         <style type="text/css">
+
+            #main {
+                padding-bottom:20px;
+            }
             #coverageMap {
                 width: 220px;
                 height: 180px;

@@ -103,6 +103,7 @@ public class ProjectAnalysisController {
         model.addAttribute("projectBoundingBox", projectDao.getBoundingBox(project, false));
         model.addAttribute("animalBoundingBoxes", projectDao.getAnimalBoundingBoxes(project, false));
         model.addAttribute("projectDetectionDateRange", projectDao.getDetectionDateRange(project, false));
+        model.addAttribute("googleApiKey", configuration.getGoogleApiKey());
         User currentUser = permissionEvaluator.getAuthenticatedUser(authentication);
         HttpSession currentSession = request.getSession(false);
         String currentSessionId = (currentSession != null) ? currentSession.getId() : null;

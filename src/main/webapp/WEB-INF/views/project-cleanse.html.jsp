@@ -72,11 +72,12 @@
         </style>
     </jsp:attribute>
     <jsp:attribute name="tail">
-        <script src="${pageContext.request.scheme}://maps.google.com/maps/api/js?v=3.9&sensor=false"></script>
+        <script async defer src="${pageContext.request.scheme}://maps.googleapis.com/maps/api/js?v=3&key=${googleApiKey}&callback=initMap"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/optimised/openlayers.js"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/project-map.js"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/project-cleanse.js"></script>
         <script type="text/javascript">
+
             function submitCleanseForm(operation, mode) {
                 var params = {operation: operation, mode: mode};
                 $.extend(params, OzTrack.serializeHash('#form-context,#form-' + mode));
@@ -218,6 +219,10 @@
                     var newMaxHeight = (maxHeight === 'none') ? '54px' : 'none';
                     prev.css('max-height', newMaxHeight);
                 });
+
+            });
+
+            function initMap() {
                 cleanseMap = null;
                 onResize();
                 cleanseMap = new OzTrack.CleanseMap('projectMap', {
@@ -233,8 +238,8 @@
                         </c:if>
                         crosses180: ${project.crosses180},
                         bounds: new OpenLayers.Bounds(
-                            ${projectBoundingBox.envelopeInternal.minX}, ${projectBoundingBox.envelopeInternal.minY},
-                            ${projectBoundingBox.envelopeInternal.maxX}, ${projectBoundingBox.envelopeInternal.maxY}
+                                ${projectBoundingBox.envelopeInternal.minX}, ${projectBoundingBox.envelopeInternal.minY},
+                                ${projectBoundingBox.envelopeInternal.maxX}, ${projectBoundingBox.envelopeInternal.maxY}
                         ),
                         minDate: new Date(${projectDetectionDateRange.minimum.time}),
                         maxDate: new Date(${projectDetectionDateRange.maximum.time})
@@ -368,26 +373,26 @@
                     },
                     onPolygonFeatureAdded: function(id, title, wkt) {
                         $('#cleanse-list').append(
-                            $('<li>')
-                                .attr('id', 'cleanse-li-' + id)
-                                .append(title)
-                                .append(' (')
-                                .append(
-                                    $('<a>')
-                                        .attr('href', 'javascript:void(0)')
-                                        .attr('onclick', 'cleanseMap.deletePolygonFeature(\'' + id + '\');')
-                                        .attr('onmouseover', 'cleanseMap.selectPolygonFeature(\'' + id + '\', true);')
-                                        .attr('onmouseout', 'cleanseMap.selectPolygonFeature(\'' + id + '\', false);')
-                                        .append('unselect')
-                                )
-                                .append(')')
+                                $('<li>')
+                                        .attr('id', 'cleanse-li-' + id)
+                                        .append(title)
+                                        .append(' (')
+                                        .append(
+                                                $('<a>')
+                                                        .attr('href', 'javascript:void(0)')
+                                                        .attr('onclick', 'cleanseMap.deletePolygonFeature(\'' + id + '\');')
+                                                        .attr('onmouseover', 'cleanseMap.selectPolygonFeature(\'' + id + '\', true);')
+                                                        .attr('onmouseout', 'cleanseMap.selectPolygonFeature(\'' + id + '\', false);')
+                                                        .append('unselect')
+                                        )
+                                        .append(')')
                         );
                         $('#cleanse-select').append(
-                            $('<option>')
-                                .attr('id', 'cleanse-option-' + id)
-                                .attr('value', wkt)
-                                .attr('selected', 'selected')
-                                .append(title)
+                                $('<option>')
+                                        .attr('id', 'cleanse-option-' + id)
+                                        .attr('value', wkt)
+                                        .attr('selected', 'selected')
+                                        .append(title)
                         );
                     },
                     onDeletePolygonFeature: function(id) {
@@ -395,7 +400,9 @@
                         $('*[id=\'cleanse-option-' + id + '\']').remove();
                     }
                 });
-            });
+                $(window).resize(onResize);
+            }
+
             function onResize() {
                 var mainHeight = $(window).height() - $('#header').outerHeight();
                 $('#projectMapOptions').height(mainHeight);
@@ -412,7 +419,7 @@
                     cleanseMap.updateSize();
                 }
             }
-            $(window).resize(onResize);
+
         </script>
     </jsp:attribute>
     <jsp:body>

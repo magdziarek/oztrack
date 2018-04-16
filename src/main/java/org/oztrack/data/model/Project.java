@@ -136,6 +136,9 @@ public class Project extends OzTrackBaseEntity {
     @Column(name="ala_data_resource_id")
     private String alaDataResourceId;
 
+    @Column(name="simple_map_access")
+    private Boolean simpleMapAccess;
+
     public Project() {
     }
 
@@ -375,6 +378,13 @@ public class Project extends OzTrackBaseEntity {
         this.institution = institution;
     }
 
+    public Boolean getSimpleMapAccess() {
+        return simpleMapAccess;
+    }
+
+    public void setSimpleMapAccess(Boolean simpleMapAccess) {
+        this.simpleMapAccess = simpleMapAccess;
+    }
 
     @Override
     public boolean equals(Object obj) {

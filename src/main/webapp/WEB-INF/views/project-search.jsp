@@ -11,6 +11,9 @@
     <jsp:attribute name="description">
         View data in the ${project.title} project.
     </jsp:attribute>
+    <jsp:attribute name="navExtra">
+        <tags:project-dropdown project="${project}"/>
+    </jsp:attribute>
     <jsp:attribute name="tail">
         <script type="text/javascript">
             $(document).ready(function() {

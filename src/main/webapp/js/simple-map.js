@@ -1,8 +1,8 @@
 /*global OpenLayers*/
 
 (function(OzTrack) {
-    OzTrack.AnalysisMap = function(div, options) {
-        if (!(this instanceof OzTrack.AnalysisMap)) {
+    OzTrack.SimpleMap = function(div, options) {
+        if (!(this instanceof OzTrack.SimpleMap)) {
             throw new Error('Constructor called as a function');
         }
         var that = this;
@@ -10,15 +10,7 @@
         that.projectMap = new OzTrack.ProjectMap(div, {
             project: options.project,
             animals: options.animals,
-            extraCategories: {'analysis': {label: 'Analysis layers'}},
-            onLayerSuccess: options.onLayerSuccess,
-            onUpdateAnimalInfoFromLayer: options.onUpdateAnimalInfoFromLayer,
-            onAnalysisCreate: options.onAnalysisCreate,
-            onAnalysisDelete: options.onAnalysisDelete,
-            onAnalysisError: options.onAnalysisError,
-            onAnalysisSuccess: options.onAnalysisSuccess,
-            onUpdateAnimalInfoFromAnalysisCreate: options.onUpdateAnimalInfoFromAnalysisCreate,
-            onUpdateAnimalInfoFromAnalysisSuccess: options.onUpdateAnimalInfoFromAnalysisSuccess
+            onUpdateAnimalInfoFromLayer: options.onUpdateAnimalInfoFromLayer
         });
 
         that.addProjectMapLayer = function(layerTypeValue, layerTypeLabel) {
@@ -58,19 +50,15 @@
                 that.projectMap.createAnalysisLayer(params, layerName, 'analysis');
             }
         };
-
         // Delegate to properties/functions of OzTrack.ProjectMap
         that.updateSize = that.projectMap.updateSize;
         that.zoomToAnimal = that.projectMap.zoomToAnimal;
-        that.deleteProjectMapLayer = function(id) {
-            that.projectMap.deleteProjectMapLayer(id);
-            $('.projectMapLayerInfo-' + id).fadeOut({complete: function() {$(this).remove();}});
-        };
         that.setAnimalVisible = that.projectMap.setAnimalVisible;
-        that.createAnalysisLayer = that.projectMap.createAnalysisLayer;
-        that.addAnalysisLayer = that.projectMap.addAnalysisLayer;
-        that.deleteCurrentAnalysis = that.projectMap.deleteCurrentAnalysis;
-        that.deleteAnalysis = that.projectMap.deleteAnalysis;
-        that.openAlaPolygon = that.projectMap.openAlaPolygon;
+
+        // remove map feature calls
+        var featureInfoControl = that.projectMap.map.getControlsBy("displayClass","OzTrackOpenLayersControlWMSGetFeatureInfo")[0];
+        featureInfoControl.deactivate();
+        that.projectMap.map.removeControl(featureInfoControl);
+
     };
 }(window.OzTrack = window.OzTrack || {}));

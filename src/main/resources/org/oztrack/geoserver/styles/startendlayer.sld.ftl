@@ -14,11 +14,11 @@
                 <sld:WellKnownName>circle</sld:WellKnownName>
                 <sld:Stroke>
                   <sld:CssParameter name="stroke">#00CD00</sld:CssParameter>
-                  <sld:CssParameter name="stroke-width">1.2</sld:CssParameter>
+                  <sld:CssParameter name="stroke-width">0.8</sld:CssParameter>
                   <sld:CssParameter name="stroke-opacity">1.0</sld:CssParameter>
                 </sld:Stroke>
               </sld:Mark>
-              <sld:Size>5</sld:Size>
+              <sld:Size>4</sld:Size>
             </sld:Graphic>
           </sld:PointSymbolizer>
         </sld:Rule>
@@ -32,11 +32,11 @@
                 <sld:WellKnownName>circle</sld:WellKnownName>
                 <sld:Stroke>
                   <sld:CssParameter name="stroke">#CD0000</sld:CssParameter>
-                  <sld:CssParameter name="stroke-width">1.2</sld:CssParameter>
+                  <sld:CssParameter name="stroke-width">0.8</sld:CssParameter>
                   <sld:CssParameter name="stroke-opacity">1.0</sld:CssParameter>
                 </sld:Stroke>
               </sld:Mark>
-              <sld:Size>5</sld:Size>
+              <sld:Size>4</sld:Size>
             </sld:Graphic>
           </sld:PointSymbolizer>
         </sld:Rule>
