@@ -204,8 +204,8 @@
 <c:if test="${not fluid}">
     <div id="footer">
         <div id="logos">
-            <a target="_blank" href="http://ala.org.au/"><img src="${pageContext.request.contextPath}/img/logo_ala.png" width="77px" height="60px"/></a>
-            <a target="_blank" href="http://nectar.org.au/"><img src="${pageContext.request.contextPath}/img/nectar-logo.png" width="140px" height="32px"/></a>
+            <a target="_blank" href="http://ala.org.au/"><img src="${pageContext.request.contextPath}/img/logo_ala-2016-inline.png"/></a>
+            <a target="_blank" href="http://nectar.org.au/"><img src="${pageContext.request.contextPath}/img/logo_nectardirectorate.png"/></a>
         </div>
         <div id="site-licence">
             All site content, except where otherwise noted, is licensed under a
