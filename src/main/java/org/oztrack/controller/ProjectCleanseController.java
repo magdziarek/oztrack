@@ -91,7 +91,7 @@ public class ProjectCleanseController {
         model.addAttribute("kalmanAnalysisType", AnalysisType.KALMAN);
         model.addAttribute("kalmanSstAnalysisType", AnalysisType.KALMAN_SST);
         model.addAttribute("argosClasses", ArgosClass.values());
-        model.addAttribute("googleApiKey", configuration.getGoogleApiKey());
+        model.addAttribute("googleMapsApiKey", configuration.getGoogleMapsApiKey());
         return "project-cleanse.html";
     }
 

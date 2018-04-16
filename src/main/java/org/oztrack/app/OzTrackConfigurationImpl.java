@@ -30,6 +30,8 @@ public class OzTrackConfigurationImpl implements OzTrackConfiguration {
     private String doiClientId;
     private String doiLandingBaseUrl;
     private String googleApiKey;
+
+    private String googleMapsApiKey;
     private String alaApiKey;
     private String bccvlClientId;
    private String bccvlAuthUrl;
@@ -241,6 +243,15 @@ public class OzTrackConfigurationImpl implements OzTrackConfiguration {
 
     public void setGoogleApiKey(String googleApiKey) {
         this.googleApiKey = googleApiKey;
+    }
+
+    @Override
+    public String getGoogleMapsApiKey() {
+        return googleMapsApiKey;
+    }
+
+    public void setGoogleMapsApiKey(String googleMapsApiKey) {
+        this.googleMapsApiKey = googleMapsApiKey;
     }
 
     @Override

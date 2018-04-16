@@ -132,7 +132,7 @@
         </style>
     </jsp:attribute>
     <jsp:attribute name="tail">
-        <script src="${pageContext.request.scheme}://maps.google.com/maps/api/js?v=3.9&sensor=false"></script>
+
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/optimised/openlayers.js"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/home.js"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/oztrack.js"></script>
@@ -140,7 +140,6 @@
 
 
             $(document).ready(function() {
-
                 $('#navBrowse').addClass('active');
 
                 $(".clickable-row").click(function() {
@@ -169,12 +168,15 @@
                 });
                 $('#table-loading').hide();
                 $('#projects-table').show();
-                map = createHomeMap('homeMap');
-
 
             });
 
+            function initMap() {
+                map = createHomeMap('homeMap');
+            }
+
         </script>
+        <script async defer src="${pageContext.request.scheme}://maps.googleapis.com/maps/api/js?v=3&key=${googleMapsApiKey}&callback=initMap"></script>
     </jsp:attribute>
 
     <jsp:body>

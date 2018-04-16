@@ -70,12 +70,12 @@
         <property name="doiClientId" value="${org.oztrack.conf.doiClientId}"/>
         <property name="doiLandingBaseUrl" value="${org.oztrack.conf.doiLandingBaseUrl}"/>
         <property name="googleApiKey" value="${org.oztrack.conf.googleApiKey}"/>
+        <property name="googleMapsApiKey" value="${org.oztrack.conf.googleMapsApiKey}"/>
         <property name="alaApiKey" value="${org.oztrack.conf.alaApiKey}"/>
         <property name="bccvlClientId" value="${org.oztrack.conf.bccvlClientId}"/>
         <property name="bccvlAuthUrl" value="${org.oztrack.conf.bccvlAuthUrl}"/>
         <property name="bccvlApiUrl" value="${org.oztrack.conf.bccvlApiUrl}"/>
         <property name="whaleSharkRaceId" value="${org.oztrack.conf.whaleSharkRaceId}"/>
-
         <property name="oaiPmhConfiguration">
             <bean class="org.oztrack.app.OzTrackOaiPmhConfigurationImpl">
                 <property name="oaiPmhEnabled" value="${org.oztrack.conf.oaipmh.oaiPmhEnabled}"/>

@@ -133,6 +133,7 @@ public class ProjectListController {
     @PreAuthorize("permitAll")
     public String getListView(Model model) {
         List<Project> projects = projectDao.getAll();
+        model.addAttribute("googleMapsApiKey", configuration.getGoogleMapsApiKey());
         model.addAttribute("projects", projects);
         return "projects";
     }
@@ -141,6 +142,7 @@ public class ProjectListController {
     @PreAuthorize("permitAll")
     public String getSearchView(Model model, @RequestParam(value="s", required=false) String s) {
         List<Project> projects = projectDao.getAll();
+        model.addAttribute("googleMapsApiKey", configuration.getGoogleMapsApiKey());
         model.addAttribute("projects", projects);
         model.addAttribute("searchTerm", s); //eg. search?cane+toad
         return "projects";

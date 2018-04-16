@@ -72,7 +72,7 @@
         </style>
     </jsp:attribute>
     <jsp:attribute name="tail">
-        <script async defer src="${pageContext.request.scheme}://maps.googleapis.com/maps/api/js?v=3&key=${googleApiKey}&callback=initMap"></script>
+
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/optimised/openlayers.js"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/project-map.js"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/project-cleanse.js"></script>
@@ -421,6 +421,7 @@
             }
 
         </script>
+        <script async defer src="${pageContext.request.scheme}://maps.googleapis.com/maps/api/js?v=3&key=${googleMapsApiKey}&callback=initMap"></script>
     </jsp:attribute>
     <jsp:body>
         <div class="mapTool">

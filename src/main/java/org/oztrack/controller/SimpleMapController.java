@@ -78,7 +78,7 @@ public class SimpleMapController {
             model.addAttribute("projectBoundingBox", projectDao.getBoundingBox(project, false));
             model.addAttribute("animalBoundingBoxes", projectDao.getAnimalBoundingBoxes(project, false));
             model.addAttribute("projectDetectionDateRange", projectDao.getDetectionDateRange(project, false));
-            model.addAttribute("googleApiKey", configuration.getGoogleApiKey());
+            model.addAttribute("googleMapsApiKey", configuration.getGoogleMapsApiKey());
             return "simple-map";
         } else {
             return "redirect:" + "/projects/{id}";

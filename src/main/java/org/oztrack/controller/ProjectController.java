@@ -137,6 +137,7 @@ public class ProjectController {
         model.addAttribute("projectBoundingBox", projectDao.getBoundingBox(project, false));
         model.addAttribute("projectDetectionDateRange", projectDao.getDetectionDateRange(project, false));
         model.addAttribute("projectDetectionCount", projectDao.getDetectionCount(project, false));
+        model.addAttribute("googleMapsApiKey", configuration.getGoogleMapsApiKey());
         return getView(model, project, "project");
     }
 
