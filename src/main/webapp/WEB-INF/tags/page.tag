@@ -27,25 +27,36 @@
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/optimised/core.css"/>
     <style type="text/css">
 
-
         #header {
+            background-color:#1b1b1b;
             position: relative;
             z-index: 1;
-            background-color: #1b1b1b;
-            opacity:0.95;
         }
 
+        #login > ul > li {
+            padding: 2px;
+        }
         #login {
             padding-top: 8px;
+            right: 3px;
         }
         .icon-user {
             margin-top:3px;
         }
 
         .navbar {
-            opacity:0.95;
             border-radius: 0;
+            background-color:#1b1b1b !important;
+
         }
+
+        .navbar-inner {
+        .border-radius(0);
+            min-height: 0;
+            line-height: 0;
+            text-align: center;
+        }
+
         .navbar .nav {
             float: none;
             display: inline-block;
@@ -53,6 +64,7 @@
             vertical-align: middle;
             *display: inline; /* ie7 fix */
             *zoom: 1; /* hasLayout ie7 trigger */
+            z-index: 1;
 
         }
         .navbar-brand {
@@ -60,11 +72,6 @@
         }
         .navbar-brand img {
             padding: 3px 20px;
-        }
-
-        .navbar-inverse .nav .active > a {
-            background-color:transparent;
-            color:#D78B00;
         }
 
         .navbar-outer .btn {
@@ -91,6 +98,7 @@
         .navbar .nav > li.active > a,
         .navbar .nav > li.active > a:link,
         .navbar .nav > li.active > a:visited {
+            background-color:#1b1b1b;
             color: #D78B00;
         }
 
@@ -99,7 +107,7 @@
         .dropdown-menu > .active > a:hover,
         .dropdown-menu > .active > a:focus  {
             color:#D78B00;
-            background-color:#000000;
+            background-color:transparent;
             background-image:none;
         }
 
@@ -107,37 +115,31 @@
             height: auto;
         }
 
-
-
-        #login {
-            right: 3px;
-        }
-        #nav-extra {
-            left: 3px;
-        }
-
     </style>
     <jsp:invoke fragment="head"/>
 </head>
 <body>
 
-
-<div id="header">
+<div id="header" style="width:100%;">
     <div class="container${fluid ? '-fluid' : ''}">
-    <div class="navbar navbar-inverse navbar-static-top">
-        <div class="navbar-inner">
-
-                <!--class="navbar-brand"-->
-                <a class="navbar-brand" href="${pageContext.request.contextPath}/home"><img src="${pageContext.request.contextPath}/img/zoatrack_logo.png"/></a>
+        <div class="navbar navbar-inverse navbar-static-top">
+            <div class="navbar-inner">
+               <a class="navbar-brand" href="${pageContext.request.contextPath}/home">
+                   <img src="${pageContext.request.contextPath}/img/zoatrack_logo.png"/></a>
                 <ul class="nav">
                     <c:if test="${!empty navExtra}">
                         <jsp:invoke fragment="navExtra"/>
                     </c:if>
-                    <li id="navBrowse"><a href="${pageContext.request.contextPath}/projects">Browse the repository</a></li>
-                    <li id="navPub"><a href="${pageContext.request.contextPath}/publication">Published Data</a></li>
+                    <li id="liSearch" class="dropdown">
+                        <a id="navSearch" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Search<b class="caret"></b></a>
+                        <ul id="navBrowse" class="dropdown-menu" role="menu" aria-labelledby="drop1">
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="${pageContext.request.contextPath}/projects">Browse the repository</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="${pageContext.request.contextPath}/publication">Published Data</a></li>
+                        </ul>
+                    </li>
                     <li id="navToolkit" class="dropdown">
-                        <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Toolkit <b class="caret"></b></a>
-                        <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
+                        <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">About<b class="caret"></b></a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="drop2">
                             <li role="presentation"><a role="menuitem" tabindex="-1" href="${pageContext.request.contextPath}/projects/new">Create a Project</a></li>
                             <li role="presentation" class="divider"></li>
                             <li role="presentation"><a role="menuitem" tabindex="-1" href="${pageContext.request.contextPath}/toolkit/getstarted">Getting Started</a></li>
@@ -152,12 +154,12 @@
                     <li id="navContact"><a href="${pageContext.request.contextPath}/contact">Contact Us</a></li>
                 </ul>
                 <ul id="login" class="nav pull-right"  >
-
-                    <c:choose>
+                   <c:choose>
                         <c:when test="${currentUser != null}">
                             <li id="navLogin" class="dropdown">
-                                <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-user icon-white"></i>&nbsp;&nbsp;<c:out value="${currentUser.fullName}"/> <b class="caret"></b></a>
-                                <ul class="dropdown-menu" role="menu" aria-labelledby="drop2">
+                                <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">
+                                    <i class="icon-user icon-white"></i>&nbsp;&nbsp;<c:out value="${currentUser.fullName}"/> <b class="caret"></b></a>
+                                <ul class="dropdown-menu" role="menu" aria-labelledby="drop3">
                                     <li role="presentation"><a role="menuitem" tabindex="-1" href="${pageContext.request.contextPath}/projects">Projects</a></li>
                                     <li role="presentation"><a role="menuitem" tabindex="-1" href="${pageContext.request.contextPath}/projects/new">Create a Project</a></li>
                                     <li role="presentation" class="divider"></li>
@@ -180,6 +182,7 @@
     </div>
 </div>
 
+
 <div id="main">
     <div class="container${fluid ? '-fluid' : ''}">
         <c:if test="${!empty breadcrumbs}">
@@ -201,6 +204,7 @@
         </div>
     </div>
 </div>
+
 <c:if test="${not fluid}">
     <div id="footer">
         <div id="logos">

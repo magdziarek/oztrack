@@ -14,24 +14,12 @@
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/optimised/openlayers.css" type="text/css">
         <style type="text/css">
 
-            #welcome{
-                background-color: #e6e6c0;
-                padding: 6px;
-                -khtml-border-radius: 8px;
-                -webkit-border-radius: 8px;
-                -moz-border-radius: 8px;
-                -ms-border-radius: 8px;
-                -o-border-radius: 8px;
-                border-radius: 8px;
-                margin: 10px 0px 10px;
-            }
-
             #homeMap{
                 height:300px;
-                background-color: #e6e6c0;
-                z-index:2;
             }
-
+            .olMapViewport {
+                z-index: 0;
+            }
             #map-instructions-container {
                 position: relative;
                 z-index: 1100;
@@ -72,24 +60,6 @@
                 margin-top: 1em;
             }
 
-            #welcome-table {
-                background-color: #e6e6c0;
-                font-size: 11px;
-            }
-            #welcome-table h1 {
-                font-size: 13px;
-                margin: 4px 0px;
-            }
-
-            #blog-table td a {
-                text-decoration: none;
-            }
-
-            #blog-table td {
-                padding-top:15px;
-                padding-bottom:15px;
-            }
-
             #project-list-div {
                 margin:10px 0;
             }
@@ -112,15 +82,22 @@
             }
 
 
-            tr.clickable-row { cursor: pointer; }
+            tr.clickable-row {
+                cursor: pointer;
+                background-color: #FBFEEE !important;
+            }
 
 
             #createprojectbutton {
                 position:absolute;
                 padding: 2px 20px;
                 margin-left:200px;
+                font-size: 1em;
             }
 
+            #projects-table {
+                background-color: #FBFEEE;
+            }
             #projects-table_length {
                 float: right;
             }
@@ -132,16 +109,13 @@
         </style>
     </jsp:attribute>
     <jsp:attribute name="tail">
-
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/optimised/openlayers.js"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/home.js"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/oztrack.js"></script>
         <script type="text/javascript">
 
-
             $(document).ready(function() {
-                $('#navBrowse').addClass('active');
-
+                $('#liSearch').addClass('active');
                 $(".clickable-row").click(function() {
                     window.document.location = $(this).data('url');
                 });
@@ -162,7 +136,7 @@
                     "bDeferRender": true,
                     "search": { "search": "${searchTerm}" }
                 } );
-                $( "#createprojectbuttonarea" ).html('<button id="createprojectbutton">Create a new ZoaTrack Project</button>');
+                $( "#createprojectbuttonarea" ).html('<button id="createprojectbutton" class="btn">Create a new ZoaTrack Project</button>');
                 $("#createprojectbutton").click( function () {
                     window.document.location = "${pageContext.request.contextPath}/projects/new"
                 });
@@ -176,24 +150,22 @@
             }
 
         </script>
-        <script async defer src="${pageContext.request.scheme}://maps.googleapis.com/maps/api/js?v=3&key=${googleMapsApiKey}&callback=initMap"></script>
+    <script async defer src="${pageContext.request.scheme}://maps.googleapis.com/maps/api/js?v=3&key=${googleMapsApiKey}&callback=initMap"></script>
     </jsp:attribute>
 
     <jsp:body>
-
         <div class="row">
-        <div class="span12" id="welcome">
-            <div class="span12" id="homeMap">
-                <div id="map-instructions-container">
-                    <div id="map-instructions">
-                        Click markers to view project details
+        <!--div class="span12" id="welcome"-->
+            <div id="projectBrowser">
+                <div class="span12" id="homeMap">
+                    <div id="map-instructions-container">
+                        <div id="map-instructions">Click markers to view project details</div>
                     </div>
                 </div>
-            </div>
 
-            <div class="span12" id="project-list-div">
-                <div class="span6 offset6" id="table-loading"><img src="${pageContext.request.contextPath}/img/ui-anim_basic_16x16.gif"></div>
-                <table id="projects-table" class="table table-condensed table-hover"
+                <div class="span12" id="project-list-div">
+                    <div class="span6 offset6" id="table-loading"><img src="${pageContext.request.contextPath}/img/ui-anim_basic_16x16.gif"></div>
+                    <table id="projects-table" class="table table-condensed table-hover"
                        data-page-length='5'
                        data-order='[[0, "desc"], [4, "desc"],[ 1, "desc" ]]'
                        style="display:none" >
@@ -250,7 +222,7 @@
                             <td><fmt:formatDate value="${project.updateDate}" type="date" pattern="dd/MM/yyyy"/></td>
                             <td><fmt:formatDate value="${project.updateDate}" type="date" pattern="yyyyMMdd" /></td>
 
-                            <td>
+                            <td style="text-align:center">
                                 <c:choose>
                                     <c:when test="${project.access == 'OPEN'}">Open Access<br/></c:when>
                                     <c:when test="${project.access == 'CLOSED'}">Closed Access<br/></c:when>
@@ -258,9 +230,9 @@
                                 </c:choose>
                                 <c:choose>
                                     <c:when test="${userAccessToTracks == 'true'}">
-                                        <span class="label label-success">Tracks</span></c:when>
+                                        <span class="label label-success">Tracks</span><br/></c:when>
                                     <c:otherwise>
-                                        <span class="label label-info">Metadata</span></c:otherwise>
+                                        <span class="label label-info">Metadata</span><br/></c:otherwise>
                                 </c:choose>
                                 <c:if test="${currentUser != null}">
                                     <c:if test="${userRole != ''}"><c:out value="${userRole}"/></c:if>
@@ -269,7 +241,8 @@
                         </tr>
                     </c:forEach>
                     </tbody>
-                </table>
+                    </table>
+                </div>
             </div>
         </div>
      </jsp:body>

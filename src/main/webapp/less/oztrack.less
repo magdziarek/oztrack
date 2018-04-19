@@ -55,8 +55,6 @@
 @import "vendor/bootstrap/breadcrumbs.less";
 @import "vendor/bootstrap/pagination.less";
 @import "vendor/bootstrap/pager.less";
-@import "vendor/bootstrap/responsive.less";
-@import "vendor/bootstrap/responsive-navbar.less";
 
 // Components: Popovers
 @import "vendor/bootstrap/modals.less";
@@ -304,6 +302,9 @@ input[type="color"],
   width: 400px;
 }
 
+.container {
+  width: 940px;
+}
 
 .container-fluid {
   padding-left: 0;
@@ -383,6 +384,19 @@ a.thumbnail:hover {
   border-color: #899e47;
 }
 
+.navbar-outer .btn {
+  margin-top: 12px;
+}
+
+.container-fluid {
+  #login {
+    right: 3px;
+  }
+  #nav-extra {
+    left: 3px;
+  }
+}
+
 #crumbs {
   margin: 16px 0px;
   padding: 4px 0;
@@ -393,14 +407,19 @@ a.thumbnail:hover {
   padding: 9px 0;
 }
 
+#content {
+  padding: 9px 0;
+}
+
 #content h1 {
   margin-top: 9px;
 }
 
 #main {
-  margin: 0px auto;
+  margin: 0px 0px;
   min-height: 500px;
   background-color: #FBFEEE;
+  padding-bottom: 0px;
 }
 
 #main .container-fluid {
