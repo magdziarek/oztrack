@@ -40,6 +40,9 @@ Setup the database, including PostGIS and UUID module:
     sudo -u postgres psql -d oztrack -c "alter table spatial_ref_sys owner to oztrack;"
     sudo -u postgres psql -d oztrack -c "alter view geography_columns owner to oztrack;"
     sudo -u postgres psql -d oztrack -c 'create extension "uuid-ossp";'
+    
+Alternatively,  We can use 'create extension postgis'; 'create extension topology' to replace the steps from the 3rd to 5th
+   
 
 ### Installing Linux packages
 
@@ -355,6 +358,8 @@ Restart all the services.
 ZoaTrack can be compiled from source into a WAR file by running `mvn package`.
 
 The WAR file can be run using any Java Servlet container.
+
+We can deploy as ROOT.war. In this case, we don't need to modify oztrack.conf for Apache proxy.
 
 Alternatively, it can be run as a normal Java application via the `org.oztrack.app.OzTrackJettyServer` class.
 
