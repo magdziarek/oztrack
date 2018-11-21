@@ -95,7 +95,10 @@ downloads, compiles, tests, and installs a large number of dependencies.
             "RColorBrewer",
             "googleVis",
             "spacetime",
-            "plotKML"
+            "plotKML",
+            "ncdf4",
+            "date",
+            "alphahull"
         ),
         repos='http://cran.csiro.au/'
     )
@@ -110,6 +113,12 @@ The `kftrack` and `ukfsst` packages need to be downloaded and installed from fil
     install.packages(c('date', 'ncdf'), repos='http://cran.csiro.au/')
     install.packages('/tmp/ukfsst_0.3-x64.tar.gz', repos=NULL)
     EOF
+    
+Grid2Polygons 0.2.1  not available for R 3.4.4  
+CRAN suggests to use package inlmisc, but does notwork
+We need to download from archive and mannully install it
+    wget https://cran.r-project.org/src/contrib/Archive/Grid2Polygons/Grid2Polygons_0.2.1.tar.gz
+    R CMD INSTALL Grid2Polygons_0.2.1.tar.gz
 
 If `Rserve` is running on the same host as the Web application, it will be started automatically.
 To run Rserve on other hosts, place the following script in `/etc/init/rserve.conf`.
