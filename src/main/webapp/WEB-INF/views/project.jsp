@@ -291,6 +291,34 @@
                         jQuery('#addProjectUserLabel').val(ui.item ? ui.item.label : '');
                     }
                 });
+
+                jQuery('#searchAlaForm input#q').autocomplete({
+                    source: function (request, response) {
+                        $.ajax({
+                            url: '${pageContext.request.contextPath}/proxy/bie.ala.org.au/search',
+                            data: { query: request.term },
+                            success: function (data) {
+                                var j_data = $.parseJSON(data)
+
+                                    var re = [];
+                                    var results = j_data.searchResults.results;
+                                    for(var i in results){
+                                        re.push({label: results[i].name, value: results[i].scientificName})
+                                    }
+                                response(re);
+                            },
+                            error: function () {
+                                response([]);
+                            }
+                        });
+                    },
+
+                    minLength: 2,
+                    select: function(event, ui) {
+                        jQuery('#searchAlaForm input#q').val(ui.value);
+                    }
+                });
+
             });
         </script>
         <script type="text/javascript">
@@ -298,7 +326,7 @@
                 $.ajax({
                     url: '${pageContext.request.contextPath}/proxy/portal.tern.org.au/ternapi/search',
                     data: $('#searchTernForm').serialize(),
-                    dataType: "jsonp",
+                    dataType: "json",
                     success: function(data, textStatus, jqXHR) {
                         var items =
                             $.isArray(data.response.item) ? data.response.item : // array of results
@@ -334,7 +362,7 @@
                 $.ajax({
                     url: '${pageContext.request.contextPath}/proxy/bie.ala.org.au/search',
                     data: $('#searchAlaForm').serialize(),
-                    dataType: "jsonp",
+                    dataType: "json",
                     success: function(data, textStatus, jqXHR) {
                         var results = data.searchResults.results;
                         var output = $('#searchAlaOutput').empty();
@@ -356,6 +384,9 @@
                         }
                         $('#searchAlaForm').append(output.fadeIn());
                         $('body').animate({scrollTop: output.offset().top});
+                    },
+                    error: function(d,t,e){
+                        console.log(t)
                     }
                 });
             }

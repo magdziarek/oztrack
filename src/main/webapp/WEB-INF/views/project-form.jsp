@@ -302,7 +302,7 @@
                                 idxType: 'TAXON',
                                 limit: 10
                             },
-                            dataType: "jsonp",
+                            dataType: "json",
                             success: function(data, textStatus, jqXHR) {
                                 response($.map(data.autoCompleteList, function(item) {
                                     // The label property is displayed in the suggestion menu.
