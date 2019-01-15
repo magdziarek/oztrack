@@ -292,10 +292,10 @@
                     }
                 });
 
-                jQuery('#searchAlaForm input#q').autocomplete({
+/*                jQuery('#searchAlaForm input#q').autocomplete({
                     source: function (request, response) {
                         $.ajax({
-                            url: '${pageContext.request.contextPath}/proxy/bie.ala.org.au/search',
+                            url: '${pageContext.request.contextPath}/proxy/bie.ala.org.au/search/auto.json',
                             data: { query: request.term },
                             success: function (data) {
                                 var j_data = $.parseJSON(data)
@@ -317,7 +317,7 @@
                     select: function(event, ui) {
                         jQuery('#searchAlaForm input#q').val(ui.value);
                     }
-                });
+                });*/
 
             });
         </script>
