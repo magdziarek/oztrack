@@ -32,7 +32,7 @@ public class PersonDaoImpl implements PersonDao {
     @Override
     public List<Person> getAllOrderedByName() {
         @SuppressWarnings("unchecked")
-        List<Person> resultList = em.createQuery("from org.oztrack.data.model.Person order by lastName, firstName").getResultList();
+        List<Person> resultList = em.createQuery("from org.oztrack.data.model.Person order by firstName, lastName").getResultList();
         return resultList;
     }
 

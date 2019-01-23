@@ -4,17 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URI;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -517,7 +507,10 @@ public class ProjectController {
 
     private void addFormAttributes(Model model, Project project) {
         GregorianCalendar currentCalendar = new GregorianCalendar();
-        model.addAttribute("people", personDao.getAllOrderedByName());
+        List<Person> persons = personDao.getAllOrderedByName();
+        //persons.sort(Comparator.comparing(Person::getFirstName, Comparator.nullsFirst(Comparator.naturalOrder())));
+
+        model.addAttribute("people", persons);
         model.addAttribute("dataLicences", dataLicenceDao.getAll());
         model.addAttribute("srsList", srsDao.getAllOrderedByBoundsAreaDesc());
         model.addAttribute("currentYear", currentCalendar.get(Calendar.YEAR));

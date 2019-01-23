@@ -67,7 +67,7 @@
             <div class="${aafEnabled ? 'span6' : 'span12'}">
 
                 <form id="nativeLoginForm" class="form-vertical form-bordered" style="height: 230px;"
-                    method="POST" action="${fn:replace(baseUrl, 'http://', 'https://')}/login">
+                    method="POST" action="/login">
 
                     <fieldset>
                         <div class="legend">Login ${aafEnabled ? 'using' : 'to'} ZoaTrack</div>

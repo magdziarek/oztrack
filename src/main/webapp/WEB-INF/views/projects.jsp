@@ -4,6 +4,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="tags" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <tags:page>
     <jsp:attribute name="description">
@@ -179,6 +180,7 @@
                         <th>Sortable Date</th>
                         <th width="15%">Access Type</th>
                         <!--<c:if test="${currentUser != null}"><th>Role</th></c:if>-->
+                        <th width="15%">Data Files</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -238,6 +240,14 @@
                                     <c:if test="${userRole != ''}"><c:out value="${userRole}"/></c:if>
                                 </c:if>
                             </td>
+                            <td>
+                                <sec:authorize access="hasPermission(#project, 'manage')">
+                                    <a href="${pageContext.request.contextPath}/projects/${project.id}/datafiles"><span class="label label-success">View</span></a>
+                                </sec:authorize>
+
+                            </td>
+
+
                         </tr>
                     </c:forEach>
                     </tbody>
