@@ -104,7 +104,7 @@ public class DataFileRunner {
                     String hoursStr = new DecimalFormat("0.##").format(completeDataFile.getLocalTimeConversionHours());
                     statusMessage += " Local time conversion is " + hoursStr + " hours.";
                 }
-                completeDataFile.setStatusMessage(statusMessage);
+                completeDataFile.appendStatusMessage(statusMessage);
                 completeDataFile.setUpdateDate(new Date());
                 completeDataFile.setUpdateUser(completeDataFile.getCreateUser());
                 dataFileDao.update(completeDataFile);
@@ -130,7 +130,7 @@ public class DataFileRunner {
             try {
                 DataFile failureDataFile = dataFileDao.getDataFileById(dataFileId);
                 failureDataFile.setStatus(DataFileStatus.FAILED);
-                failureDataFile.setStatusMessage(e.getMessage());
+                failureDataFile.appendStatusMessage(e.getMessage());
                 failureDataFile.setUpdateDate(new Date());
                 failureDataFile.setUpdateUser(failureDataFile.getCreateUser());
                 dataFileDao.update(failureDataFile);

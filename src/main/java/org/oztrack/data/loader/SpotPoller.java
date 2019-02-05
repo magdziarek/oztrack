@@ -35,6 +35,7 @@ public class SpotPoller extends DataFeedPoller {
     private static class SpotMessage {
         private String messengerId;
         private String messengerName;
+        private String messageType;
         private String latitude;
         private String longitude;
         private Calendar dateTime;
@@ -71,32 +72,35 @@ public class SpotPoller extends DataFeedPoller {
                 boolean detectionsFound = false;
                 List<SpotMessage> spotMessages = extractSpotMessages(messagesJson);
                 for (SpotMessage spotMessage : spotMessages) {
-
-                    DataFeedDevice device = getDevice(dataFeed, spotMessage.messengerName);
-                    Date latestDetectionDate = deviceDao.getDeviceLatestDetectionDate(device);
-                    String lastDetectionDateString = (latestDetectionDate == null) ? "null" : latestDetectionDate.toString();
-                    //                   logger.info(device.getDeviceIdentifier() + " latest detection: " + lastDetectionDateString +
-                    //                           " this spotMessageDate: " + isoDateTimeFormat.format(spotMessage.dateTime.getTime()));
-                    if ((latestDetectionDate == null) || (spotMessage.dateTime.getTime().after(latestDetectionDate))) {
-                        DataFeedDetection detection = createNewDetection(device);
-                        detectionDao.saveRawSpotData(detection.getId()
-                                , spotMessage.messengerId
-                                , spotMessage.messengerName
-                                , spotMessage.dateTime
-                                , spotMessage.json);
-                        detection.setDetectionDate(spotMessage.dateTime.getTime());
-                        detection.setLocationDate(spotMessage.dateTime.getTime());
-                        detection.setTimezoneId(spotMessage.timeZoneId);
-                        detectionDao.update(detection);
-                        try {
-                            PositionFix positionFix = createPositionFix(detection, spotMessage.latitude, spotMessage.longitude);
-                            saveDetectionWithPositionFix(detection, positionFix);
-                        } catch (DataFeedException d) {
-                            String errorText = "Spot poller: Problem creating positionfix record for a detection dated: " + isoDateTimeFormat.format(spotMessage.dateTime.getTime());
-                            logger.error(errorText + d.getMessage());
-                            sendErrorNotification(emailBuilderFactory, new DataFeedException(errorText + d.getMessage())); // keep going though
-                        }
-                        detectionsFound = true;
+                    if (!spotMessage.messageType.equals("POWER-OFF")){
+                        DataFeedDevice device = getDevice(dataFeed, spotMessage.messengerName);
+                        Date latestDetectionDate = deviceDao.getDeviceLatestDetectionDate(device);
+                        String lastDetectionDateString = (latestDetectionDate == null) ? "null" : latestDetectionDate.toString();
+                        //                   logger.info(device.getDeviceIdentifier() + " latest detection: " + lastDetectionDateString +
+                        //                           " this spotMessageDate: " + isoDateTimeFormat.format(spotMessage.dateTime.getTime()));
+                        if ((latestDetectionDate == null) || (spotMessage.dateTime.getTime().after(latestDetectionDate))) {
+                            DataFeedDetection detection = createNewDetection(device);
+                            detectionDao.saveRawSpotData(detection.getId()
+                                    , spotMessage.messengerId
+                                    , spotMessage.messengerName
+                                    , spotMessage.dateTime
+                                    , spotMessage.json);
+                            detection.setDetectionDate(spotMessage.dateTime.getTime());
+                            detection.setLocationDate(spotMessage.dateTime.getTime());
+                            detection.setTimezoneId(spotMessage.timeZoneId);
+                            detectionDao.update(detection);
+                            try {
+                                PositionFix positionFix = createPositionFix(detection, spotMessage.latitude, spotMessage.longitude);
+                                saveDetectionWithPositionFix(detection, positionFix);
+                            } catch (DataFeedException d) {
+                                String errorText = "Spot poller: Problem creating positionfix record for a detection dated: " + isoDateTimeFormat.format(spotMessage.dateTime.getTime());
+                                logger.error(errorText + d.getMessage());
+                                sendErrorNotification(emailBuilderFactory, new DataFeedException(errorText + d.getMessage())); // keep going though
+                            }
+                            detectionsFound = true;
+                      }
+                    }else{
+                        logger.warn("POWER-OFF warning is detected!");
                     }
                 }
                 if (detectionsFound) {
@@ -119,6 +123,7 @@ public class SpotPoller extends DataFeedPoller {
                 JSONObject message = messagesJson.getJSONObject(i);
                 spotMessage.messengerId = message.getString("messengerId");
                 spotMessage.messengerName = message.getString("messengerName");
+                spotMessage.messageType = message.getString("messageType");
                 spotMessage.latitude = message.getString("latitude");
                 spotMessage.longitude = message.getString("longitude");
                 spotMessage.dateTime.setTime(isoDateTimeFormat.parse(message.getString("dateTime")));

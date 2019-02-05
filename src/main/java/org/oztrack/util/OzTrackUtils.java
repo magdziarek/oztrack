@@ -20,7 +20,7 @@ import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 
 public class OzTrackUtils {
-    public static void removeDuplicateLinesFromFile(String fileName) throws FileProcessingException {
+    public static int removeDuplicateLinesFromFile(String fileName) throws FileProcessingException {
         File inFile = new File(fileName);
         File outFile = new File(fileName + ".dedup");
 
@@ -28,6 +28,7 @@ public class OzTrackUtils {
         FileOutputStream fileOutputStream = null;
         CSVReader csvReader = null;
         CSVWriter csvWriter = null;
+        int duplicates = 0;
         try {
             try {
                 fileInputStream = new FileInputStream(inFile);
@@ -64,6 +65,8 @@ public class OzTrackUtils {
                     if (!hashSet.contains(valuesList)) {
                         hashSet.add(valuesList);
                         csvWriter.writeNext(values);
+                    }else{
+                        duplicates ++;
                     }
                 }
 
@@ -81,6 +84,8 @@ public class OzTrackUtils {
             IOUtils.closeQuietly(fileInputStream);
             IOUtils.closeQuietly(fileOutputStream);
         }
+
+        return duplicates;
     }
 
     public static String getConfigProperty(String key) throws IOException, FileNotFoundException {

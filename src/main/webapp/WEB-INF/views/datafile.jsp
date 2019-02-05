@@ -16,7 +16,7 @@
                 if (dataFile) {
                     $('#numPositionFixes').text(dataFile.numPositionFixes || '');
                     $('#status').text(dataFile.status || 'UNKNOWN');
-                    $('#statusMessage').text(dataFile.statusMessage || '');
+                    $('#statusMessage').html(dataFile.statusMessage.split(';').join("<br/>") || '');
                     if ((dataFile.status == 'NEW') || (dataFile.status == 'PROCESSING')) {
                         $('#statusMessage')
                             .append(' ')
@@ -95,7 +95,8 @@
         </tr>
         <tr>
             <th>Processing Messages:</th>
-            <td id="statusMessage"></td>
+            <td id="statusMessage" >
+            </td>
         </tr>
 
         </table>

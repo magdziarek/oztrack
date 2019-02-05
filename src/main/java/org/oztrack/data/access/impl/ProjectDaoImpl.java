@@ -161,7 +161,7 @@ public class ProjectDaoImpl implements ProjectDao {
 
     @Override
     public HashMap<Long, Point> getProjectCentroids(boolean shiftLongitudes) {
-        Query query = em.createNativeQuery(
+        /*Query query = em.createNativeQuery(
             "select project.id, ST_AsText(ST_Centroid(ST_Collect(\n" +
             "    case\n" +
             "        when project.crosses180 then ST_Shift_Longitude(positionfix.locationgeometry)\n" +
@@ -172,7 +172,9 @@ public class ProjectDaoImpl implements ProjectDao {
             "where positionfix.project_id = project.id\n" +
             "and not(positionfix.deleted)\n" +
             "group by project.id"
-        );
+        );*/
+
+        Query query = em.createNativeQuery("select id, ST_AsText(ST_Centroid(bbox)) from project");
         @SuppressWarnings("unchecked")
         List<Object[]> resultList = query.getResultList();
         GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory(null);

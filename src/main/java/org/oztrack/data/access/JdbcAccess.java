@@ -4,5 +4,6 @@ import org.oztrack.data.model.DataFile;
 
 public interface JdbcAccess {
     public int loadObservations(DataFile dataFile);
+    public int[] statObservations(DataFile dataFile);
     public void truncateRawObservations(DataFile dataFile);
 }

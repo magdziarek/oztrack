@@ -19,6 +19,9 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import au.com.bytecode.opencsv.CSVWriter;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.io.WKTReader;
 import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.log4j.Logger;
@@ -42,6 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.io.WKTWriter;
+
 
 @Service
 public class PositionFixDaoImpl implements PositionFixDao {
@@ -567,6 +571,34 @@ public class PositionFixDaoImpl implements PositionFixDao {
                 .setParameter("projectId", project.getId())
                 .setParameter("animalIds", animalIds)
                 .executeUpdate();
+
+                //Caculating BBox of a project
+                //box(x,x,x,x)
+                String bboxQuery =  "select cast(st_extent(locationgeometry) as varchar) from positionfix  where project_id = ?1 group by project_id";
+
+                // return ploygon with SRID
+                //select st_asewkt(st_setsrid(st_extent(locationgeometry),3857)) from positionfix  where project_id = 1 group by project_id;
+                //SRID=3857;POLYGON((146.064391 -17.600091,146.064391 -17.55135,146.119275 -17.55135,146.119275 -17.600091,146.064391 -17.600091))
+
+                // return ploygon without SRID
+                //select st_asewkt(st_extent(locationgeometry)) from positionfix  where project_id = 1 group by project_id;
+                //POLYGON((146.064391 -17.600091,146.064391 -17.55135,146.119275 -17.55135,146.119275 -17.600091,146.064391 -17.600091))
+
+                try {
+                    Long id = project.getId();
+                    String geomQuery =  "UPDATE project SET bbox = (SELECT st_setsrid(st_extent(locationgeometry),4326) from positionfix  where project_id = "+id + " group by project_id) WHERE id = "+id;
+                    Query qbbox = em.createNativeQuery(geomQuery);
+                    //qbbox.setParameter("projectId", id);
+                    qbbox.executeUpdate();
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+
+
+
+
+
+
             }
         });
     }

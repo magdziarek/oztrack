@@ -24,7 +24,7 @@ public class JdbcAccessImpl extends JdbcDaoSupport implements JdbcAccess {
                 " ,argosclass" +
                 " ,dop" +
                 " ,sst)" +
-                " SELECT rpf.id" +
+                " SELECT DISTINCT rpf.id" +
                 " ,rpf.detectiontime" +
                 " ,rpf.latitude" +
                 " ,rpf.longitude" +
@@ -44,10 +44,39 @@ public class JdbcAccessImpl extends JdbcDaoSupport implements JdbcAccess {
         else {
             sql += " WHERE rpf.animalid = ani.projectanimalid AND  ani.project_id = ?" ;
         }
+
+        sql += " AND (not exists ( select id from positionfix where animal_id = ani.id and latitude = rpf.latitude and longitude = rpf.longitude and detectiontime = rpf.detectiontime ))";
         logger.debug(sql);
 
         int nbrObservations = getJdbcTemplate().update(sql, new Object [] {projectId, dataFileId, projectId});
         return nbrObservations;
+    }
+
+    public int[] statObservations(DataFile dataFile) {
+        long dataFileId = dataFile.getId();
+        long projectId = dataFile.getProject().getId();
+
+        String sql =
+                        " SELECT  count(rpf.id)" +
+                        " FROM rawpositionfix rpf" +
+                        " ,animal ani" ;
+        if (dataFile.getSingleAnimalInFile()) {
+            sql += " WHERE ani.id = (select max(a.id) from animal a where a.project_id = ?)";
+        }
+        else {
+            sql += " WHERE rpf.animalid = ani.projectanimalid AND  ani.project_id = ?" ;
+        }
+
+        String uniqueSql = sql +
+                "and (not exists (select pf.id from positionfix pf " +
+                "where pf.animal_id=ani.id and pf.detectiontime=rpf.detectiontime and " +
+                "latitude = rpf.latitude and longitude = rpf.longitude and detectiontime = rpf.detectiontime))";
+
+
+        int allobs = getJdbcTemplate().queryForInt(sql, new Object [] {projectId});
+        int uniqueObs = getJdbcTemplate().queryForInt(uniqueSql, new Object [] {projectId});
+        int[] stats = {allobs,uniqueObs};
+        return stats;
     }
 
     @Override

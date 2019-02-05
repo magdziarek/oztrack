@@ -54,8 +54,9 @@ public class DataFile extends OzTrackBaseEntity {
     @Enumerated(STRING)
     @Column(name="datafilestatus")
     private DataFileStatus status;
+
     @Column(columnDefinition="TEXT")
-    private String statusMessage;
+    private String statusMessage = "";
 
     @ManyToOne(fetch=FetchType.LAZY, cascade={}) //persist project yourself
     @JoinColumn(nullable=false)
@@ -175,6 +176,10 @@ public class DataFile extends OzTrackBaseEntity {
 
     public void setStatusMessage(String statusMessage) {
         this.statusMessage = statusMessage;
+    }
+
+    public void appendStatusMessage(String statusMessage){
+        this.statusMessage += statusMessage +";";
     }
 
     public Boolean getSingleAnimalInFile() {

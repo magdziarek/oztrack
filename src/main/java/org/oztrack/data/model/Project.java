@@ -27,10 +27,15 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+
+import com.vividsolutions.jts.geom.Geometry;
 import org.hibernate.annotations.Sort;
 import org.hibernate.annotations.SortType;
+import org.hibernate.annotations.Type;
 import org.oztrack.app.OzTrackApplication;
 import org.oztrack.data.model.types.ProjectAccess;
+
+
 
 @Entity(name="Project")
 public class Project extends OzTrackBaseEntity {
@@ -59,6 +64,11 @@ public class Project extends OzTrackBaseEntity {
     private Date embargoNotificationDate;
 
     private String spatialCoverageDescr;
+
+    @Column(name="bbox")
+    @Type(type = "org.hibernatespatial.GeometryUserType")
+    private Geometry bbox;
+
 
     @Column(columnDefinition="TEXT")
     private String dataDirectoryPath;
@@ -406,5 +416,13 @@ public class Project extends OzTrackBaseEntity {
         } else {
             return super.hashCode();
         }
+    }
+
+    public Geometry getBbox() {
+        return bbox;
+    }
+
+    public void setBbox(Geometry bbox) {
+        this.bbox = bbox;
     }
 }

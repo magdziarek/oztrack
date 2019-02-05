@@ -212,6 +212,8 @@ CREATE TABLE project (
     dataspaceagent_id bigint
 );
 
+ALTER Table project ADD COLUMN bbox geometry(Geometry, 4326);
+
 
 ALTER TABLE public.project OWNER TO oztrack;
 
