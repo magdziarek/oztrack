@@ -161,8 +161,6 @@ public class AnimalController {
         List<Long> animalIds = Arrays.asList(animal.getId());
         animalDao.delete(animal);
         positionFixDao.renumberPositionFixes(animal.getProject(), animalIds);
-        animal.getProject().setUpdateDateForOaiPmh(new Date());
-        projectDao.update(animal.getProject());
         response.setStatus(204);
     }
 }

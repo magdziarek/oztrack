@@ -473,8 +473,6 @@ public class AnalysisController {
             animalIds.add(animal.getId());
         }
         positionFixDao.renumberPositionFixes(analysis.getProject(), animalIds);
-        analysis.getProject().setUpdateDateForOaiPmh(new Date());
-        projectDao.update(analysis.getProject());
     }
 
     private static void writeResultError(HttpServletResponse response, String error) {

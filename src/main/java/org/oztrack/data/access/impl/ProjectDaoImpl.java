@@ -75,8 +75,17 @@ public class ProjectDaoImpl implements ProjectDao {
     @Override
     @Transactional
     public Project update(Project object) {
-        return em.merge(object);
+        Project project = em.merge(object);
+        return project;
     }
+
+
+    @Transactional
+    public void updateBBox(Long id){
+        String geomQuery =  "UPDATE project SET bbox = a.bbox from  (SELECT st_setsrid(st_extent(locationgeometry),4326) as bbox from positionfix  where project_id = "+id + " group by project_id ) a WHERE id = "+id;
+        em.createNativeQuery(geomQuery).executeUpdate();
+    }
+
 
     @Override
     @Transactional
@@ -149,9 +158,9 @@ public class ProjectDaoImpl implements ProjectDao {
     @Override
     public int getDetectionCount(Project project, boolean includeDeleted) {
         String sql =
-            "select count(*)\n" +
-            "from PositionFix o\n" +
-            "where ((o.deleted = false) or (:includeDeleted = true))\n" +
+            "select count(*) " +
+            "from PositionFix o " +
+            "where ((o.deleted = false) or (:includeDeleted = true)) " +
             "and o.project.id = :projectId";
         Query query = em.createQuery(sql);
         query.setParameter("projectId", project.getId());

@@ -76,8 +76,6 @@ public class DataFileController {
         }
         dataFileDao.delete(dataFile);
         positionFixDao.renumberPositionFixes(dataFile.getProject(), animalIds);
-        dataFile.getProject().setUpdateDateForOaiPmh(new Date());
-        projectDao.update(dataFile.getProject());
         response.setStatus(204);
     }
 }

@@ -573,32 +573,10 @@ public class PositionFixDaoImpl implements PositionFixDao {
                 .executeUpdate();
 
                 //Caculating BBox of a project
-                //box(x,x,x,x)
-                String bboxQuery =  "select cast(st_extent(locationgeometry) as varchar) from positionfix  where project_id = ?1 group by project_id";
-
-                // return ploygon with SRID
-                //select st_asewkt(st_setsrid(st_extent(locationgeometry),3857)) from positionfix  where project_id = 1 group by project_id;
-                //SRID=3857;POLYGON((146.064391 -17.600091,146.064391 -17.55135,146.119275 -17.55135,146.119275 -17.600091,146.064391 -17.600091))
-
-                // return ploygon without SRID
-                //select st_asewkt(st_extent(locationgeometry)) from positionfix  where project_id = 1 group by project_id;
-                //POLYGON((146.064391 -17.600091,146.064391 -17.55135,146.119275 -17.55135,146.119275 -17.600091,146.064391 -17.600091))
-
-                try {
-                    Long id = project.getId();
-                    String geomQuery =  "UPDATE project SET bbox = (SELECT st_setsrid(st_extent(locationgeometry),4326) from positionfix  where project_id = "+id + " group by project_id) WHERE id = "+id;
-                    Query qbbox = em.createNativeQuery(geomQuery);
-                    //qbbox.setParameter("projectId", id);
-                    qbbox.executeUpdate();
-                }catch(Exception e){
-                    e.printStackTrace();
-                }
-
-
-
-
-
-
+                //Update date of oaipmh as well
+                Long id = project.getId();
+                String geomQuery =  "UPDATE project SET  updatedateforoaipmh = now(), bbox = a.bbox from  (SELECT st_setsrid(st_extent(locationgeometry),4326) as bbox from positionfix  where project_id = "+id + " group by project_id ) a  WHERE id = "+id;
+                em.createNativeQuery(geomQuery).executeUpdate();
             }
         });
     }

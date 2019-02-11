@@ -9,6 +9,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
+import com.vividsolutions.jts.geom.Geometry;
 import org.apache.log4j.Logger;
 import org.oztrack.data.access.AnimalDao;
 import org.oztrack.data.access.DataFileDao;
@@ -17,6 +18,7 @@ import org.oztrack.data.access.PositionFixDao;
 import org.oztrack.data.access.ProjectDao;
 import org.oztrack.data.model.Animal;
 import org.oztrack.data.model.DataFile;
+import org.oztrack.data.model.Project;
 import org.oztrack.error.FileProcessingException;
 
 public abstract class DataFileLoader {
@@ -167,9 +169,14 @@ public abstract class DataFileLoader {
             for (Animal animal : animals) {
                 animalIds.add(animal.getId());
             }
+//            Due to double tranactions, the project update may overwrite bbox afterwards
+//            Project project = projectDao.getProjectById(dataFile.getProject().getId());
+//            project.setUpdateDateForOaiPmh(new Date());
+//            projectDao.update(project);
+
             positionFixDao.renumberPositionFixes(dataFile.getProject(), animalIds);
-            dataFile.getProject().setUpdateDateForOaiPmh(new Date());
-            projectDao.update(dataFile.getProject());
+
+
         }
         catch (Exception e) {
             jdbcAccess.truncateRawObservations(dataFile);
