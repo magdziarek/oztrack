@@ -52,8 +52,9 @@ public abstract class DataFileLoader {
     }
 
     public void process() throws Exception {
-        int duplicates = removeDuplicateLinesFromFile(this.dataFile.getAbsoluteDataFilePath());
-        this.dataFile.appendStatusMessage(duplicates +" duplicates were found in data files");
+        int[] stats = removeDuplicateLinesFromFile(this.dataFile.getAbsoluteDataFilePath());
+        this.dataFile.appendStatusMessage(stats[0] +" detections found in data files");
+        this.dataFile.appendStatusMessage(stats[1] +" duplicates found ");
         processRawObservations();
         processFinalObservations();
     }
@@ -153,15 +154,14 @@ public abstract class DataFileLoader {
     private void createFinalObservations() throws FileProcessingException {
         try {
             int[] stats = jdbcAccess.statObservations(dataFile);
-            dataFile.appendStatusMessage(stats[0] +" records were found in the data file.");
-            dataFile.appendStatusMessage((stats[0]-stats[1]) +" records have been loaded, ignore uploading.");
+            dataFile.appendStatusMessage((stats[0]-stats[1]) +" detections previously uploaded.");
 
             int count = jdbcAccess.loadObservations(dataFile);
 
 
             dataFile.setUpdateDate(new Date());
             dataFile.setUpdateUser(dataFile.getCreateUser());
-            dataFile.appendStatusMessage(count + " observations have been added");
+            dataFile.appendStatusMessage(count + " detections in totoal uploaded from data file");
             dataFileDao.update(dataFile);
             jdbcAccess.truncateRawObservations(dataFile);
             List<Animal> animals = dataFileDao.getAnimals(dataFile);

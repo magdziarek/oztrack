@@ -210,7 +210,12 @@ public class ProjectDaoImpl implements ProjectDao {
 
     @Override
     public Polygon getBoundingBox(Project project, boolean includeDeleted) {
-        String geomExpr = project.getCrosses180()
+        try{
+         return  (Polygon)project.getBbox();
+        }catch(Exception e){
+            return null;
+        }
+       /* String geomExpr = project.getCrosses180()
             ? "ST_Shift_Longitude(positionfix.locationgeometry)"
             : "positionfix.locationgeometry";
         Query query = em.createNativeQuery(
@@ -234,7 +239,8 @@ public class ProjectDaoImpl implements ProjectDao {
         catch (Exception e) {
             return null;
         }
-        return polygon;
+        return polygon;*/
+
     }
 
     @Override
