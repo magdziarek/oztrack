@@ -1,4 +1,6 @@
 /*global OpenLayers, google*/
+
+
 function createHomeMap(div) {
     var projection900913 = new OpenLayers.Projection('EPSG:900913');
     var projection4326 =  new OpenLayers.Projection('EPSG:4326');
@@ -34,7 +36,7 @@ function createProjectPointsLayer() {
         'Projects',
         {
             projection: new OpenLayers.Projection('EPSG:4326'),
-            styleMap: createProjectPointsStyleMap(),
+            styleMap:  createProjectALAStyleMap(),
             strategies: [
                 new OpenLayers.Strategy.Fixed(),
                 new OpenLayers.Strategy.Cluster()
@@ -49,6 +51,44 @@ function createProjectPointsLayer() {
     );
 }
 
+function createProjectALAStyleMap(){
+    var style = new OpenLayers.StyleMap(
+            OpenLayers.Util.applyDefaults( new OpenLayers.Style({
+                externalGraphic: "/img/marker-icon.png",
+                graphicWidth: '${iconWidth}',
+                graphicHeight: '${iconHeight}',
+                graphicOpacity:1,
+
+                label:'${label}',
+                    labelXOffset: 0,
+                    labelYOffset: -1,
+                    labelAlign: 'center'
+                },
+                {
+                context : {
+                    iconHeight: function(feature){
+                        return Math.min(2 * feature.attributes.count, 10) + 20 || 20;
+                    },
+                    iconWidth: function(feature){
+                        return (Math.min(2 * feature.attributes.count, 10) + 20 || 20) * (25/41);
+                    },
+                    label: function(feature) {
+                        return (feature.attributes.count > 1) ? feature.attributes.count : '';
+                    }
+                  }
+                }
+
+              ),
+            OpenLayers.Feature.Vector.style["default"]
+          )
+
+    )
+
+
+    return style;
+
+}
+
 function createProjectPointsStyleMap() {
     var wfsStyleContext = {
         pointRadius: function(feature) {
@@ -61,6 +101,7 @@ function createProjectPointsStyleMap() {
             return (feature.attributes.count > 1) ? feature.attributes.count : '';
         }
     };
+
     var pointsDefaultStyle = new OpenLayers.Style(
         {
             pointRadius: '${pointRadius}',

@@ -67,18 +67,26 @@ public class ProjectsFeatureBuilder {
 
     private SimpleFeature buildFeature(SimpleFeatureType featureType, Project project) {
         SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(featureType);
-        featureBuilder.set("projectCentroid", projectCentroidMap.get(project.getId()));
-        featureBuilder.set("crosses180", project.getCrosses180());
-        featureBuilder.set("projectId", project.getId().toString());
-        featureBuilder.set("projectTitle", project.getTitle());
-        featureBuilder.set("projectDescription", project.getDescription());
-        Range<Date> projectDetectionDateRange = projectDetectionDateRangeMap.get(project.getId());
-        featureBuilder.set("firstDetectionDate", sdf.format(projectDetectionDateRange.getMinimum()));
-        featureBuilder.set("lastDetectionDate", sdf.format(projectDetectionDateRange.getMaximum()));
-        featureBuilder.set("spatialCoverageDescr", project.getSpatialCoverageDescr());
-        featureBuilder.set("speciesScientificName", project.getSpeciesScientificName());
-        featureBuilder.set("speciesCommonName", project.getSpeciesCommonName());
-        featureBuilder.set("access", project.getAccess().name());
+        try {
+            featureBuilder.set("projectCentroid", projectCentroidMap.get(project.getId()));
+            featureBuilder.set("crosses180", project.getCrosses180());
+            featureBuilder.set("projectId", project.getId().toString());
+            featureBuilder.set("projectTitle", project.getTitle());
+            featureBuilder.set("projectDescription", project.getDescription());
+
+            Range<Date> projectDetectionDateRange = projectDetectionDateRangeMap.get(project.getId());
+            if (projectDetectionDateRange != null){
+                featureBuilder.set("firstDetectionDate", sdf.format(projectDetectionDateRange.getMinimum()));
+                featureBuilder.set("lastDetectionDate", sdf.format(projectDetectionDateRange.getMaximum()));
+            }
+
+            featureBuilder.set("spatialCoverageDescr", project.getSpatialCoverageDescr());
+            featureBuilder.set("speciesScientificName", project.getSpeciesScientificName());
+            featureBuilder.set("speciesCommonName", project.getSpeciesCommonName());
+            featureBuilder.set("access", project.getAccess().name());
+        }catch(Exception e){
+            System.out.println( "Failed in build feature of project " + project.getId());
+        }
         return featureBuilder.buildFeature(project.getId().toString());
     }
 }
