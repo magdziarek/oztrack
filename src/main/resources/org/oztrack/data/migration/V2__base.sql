@@ -212,9 +212,7 @@ CREATE TABLE project (
     dataspaceagent_id bigint
 );
 
-ALTER Table project ADD COLUMN bbox geometry(Geometry, 4326);
 
--- UPDATE project SET bbox = a.bbox from (SELECT st_setsrid(st_extent(locationgeometry),4326) as bbox, project_id from positionfix group by project_id) a WHERE id = a.project_id;
 
 
 ALTER TABLE public.project OWNER TO oztrack;
