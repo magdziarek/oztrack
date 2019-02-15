@@ -69,11 +69,9 @@ public class Project extends OzTrackBaseEntity {
     @Type(type = "org.hibernatespatial.GeometryUserType")
     private Geometry bbox;
 
-    @Temporal(TemporalType.DATE)
     @Column(name="firstdetectiondate")
     private Date firstDetectionDate;
 
-    @Temporal(TemporalType.DATE)
     @Column(name="lastdetectiondate")
     private Date lastDetectionDate;
 

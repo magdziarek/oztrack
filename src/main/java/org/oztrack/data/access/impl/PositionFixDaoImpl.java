@@ -575,7 +575,7 @@ public class PositionFixDaoImpl implements PositionFixDao {
                 //Caculating BBox of a project
                 //Update date of oaipmh as well
                 Long id = project.getId();
-                String geomQuery =  "UPDATE project SET  updatedateforoaipmh = now(), bbox = a.bbox from  (SELECT st_setsrid(st_extent(locationgeometry),4326) as bbox from positionfix  where project_id = "+id + " group by project_id ) a  WHERE id = "+id;
+                String geomQuery =  "UPDATE project SET  updatedateforoaipmh = now(), bbox = a.bbox, firstdetectiondate=a.startdate, lastdetectiondate=a.enddate from  (SELECT st_setsrid(st_extent(locationgeometry),4326) as bbox,  min(detectionTime) as startdate, max(detectionTime) as enddate from positionfix  where project_id = "+id + " group by project_id ) a  WHERE id = "+id;
                 em.createNativeQuery(geomQuery).executeUpdate();
             }
         });

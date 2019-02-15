@@ -169,7 +169,7 @@ public abstract class DataFileLoader {
             for (Animal animal : animals) {
                 animalIds.add(animal.getId());
             }
-//            Due to double tranactions, the project update may overwrite bbox afterwards
+//            DAO is also in tranactions, it may disturbs transaction, so that the project update may overwrite bbox to null afterwards
 //            Project project = projectDao.getProjectById(dataFile.getProject().getId());
 //            project.setUpdateDateForOaiPmh(new Date());
 //            projectDao.update(project);

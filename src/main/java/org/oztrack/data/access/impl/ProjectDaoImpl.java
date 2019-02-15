@@ -134,14 +134,15 @@ public class ProjectDaoImpl implements ProjectDao {
 
     @Override
     public HashMap<Long, Range<Date>> getProjectDetectionDateRanges(boolean includeDeleted) {
-        String sql =
+/*        String sql =
             "select p.id, min(o.detectionTime), max(o.detectionTime)\n" +
             "from org.oztrack.data.model.Project p\n" +
             "left join p.positionFixes o\n" +
             "where ((o.deleted = false) or (:includeDeleted = true))\n" +
-            "group by p.id";
+            "group by p.id";*/
+        String sql =  "Select p.id, p.firstDetectionDate, p.lastDetectionDate from org.oztrack.data.model.Project p";
         Query query = em.createQuery(sql);
-        query.setParameter("includeDeleted", includeDeleted);
+
         @SuppressWarnings("unchecked")
         List<Object[]> resultList = query.getResultList();
         HashMap<Long, Range<Date>> map = new HashMap<Long, Range<Date>>();
