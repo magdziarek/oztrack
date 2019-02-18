@@ -24,6 +24,7 @@ public interface ProjectDao {
     Project update(Project object);
     void delete(Project project);
     void create(Project project, User currentUser) throws Exception;
+    @Deprecated
     Range<Date> getDetectionDateRange(Project project, boolean includeDeleted);
     HashMap<Long, Range<Date>> getProjectDetectionDateRanges(boolean includeDeleted);
     int getDetectionCount(Project project, boolean includeDeleted);

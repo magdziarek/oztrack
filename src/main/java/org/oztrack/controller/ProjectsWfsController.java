@@ -32,7 +32,6 @@ public class ProjectsWfsController {
         HashMap<Long, Point> projectCentroidMap = projectDao.getProjectCentroids(false);
         SimpleFeatureCollection featureCollection = new ProjectsFeatureBuilder(
             projects,
-            projectDetectionDateRangeMap,
             projectCentroidMap
         ).buildFeatureCollection();
         WfsControllerUtils.writeWfsResponse(response, featureCollection);

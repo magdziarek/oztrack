@@ -64,10 +64,10 @@ function createProjectPointsStyleMap() {
     var pointsDefaultStyle = new OpenLayers.Style(
         {
             pointRadius: '${pointRadius}',
-            strokeColor: '#D6FF99',
+            strokeColor: '#E46D5D',
             strokeWidth: '${strokeWidth}',
             strokeOpacity: 0.6,
-            fillColor: '#B3DE69',
+            fillColor: '#E46D4D',
             fillOpacity: 0.6,
             fontColor: '#DBFF9F',
             fontSize: '10px',

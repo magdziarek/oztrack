@@ -21,16 +21,13 @@ public class ProjectsFeatureBuilder {
     private final SimpleDateFormat sdf = new SimpleDateFormat("MMMM yyyy");
 
     private final List<Project> projectList;
-    private final HashMap<Long, Range<Date>> projectDetectionDateRangeMap;
     private final HashMap<Long, Point> projectCentroidMap;
 
     public ProjectsFeatureBuilder(
         List<Project> projectList,
-        HashMap<Long, Range<Date>> projectDetectionDateRangeMap,
         HashMap<Long, Point> projectCentroidMap
     ) {
         this.projectList = projectList;
-        this.projectDetectionDateRangeMap = projectDetectionDateRangeMap;
         this.projectCentroidMap = projectCentroidMap;
     }
 
@@ -73,8 +70,7 @@ public class ProjectsFeatureBuilder {
             featureBuilder.set("projectId", project.getId().toString());
             featureBuilder.set("projectTitle", project.getTitle());
             featureBuilder.set("projectDescription", project.getDescription());
-
-            Range<Date> projectDetectionDateRange = projectDetectionDateRangeMap.get(project.getId());
+            Range<Date> projectDetectionDateRange = ((project.getFirstDetectionDate() == null) || (project.getLastDetectionDate() == null)) ? null : Range.between(project.getFirstDetectionDate(),project.getLastDetectionDate());
             if (projectDetectionDateRange != null){
                 featureBuilder.set("firstDetectionDate", sdf.format(projectDetectionDateRange.getMinimum()));
                 featureBuilder.set("lastDetectionDate", sdf.format(projectDetectionDateRange.getMaximum()));

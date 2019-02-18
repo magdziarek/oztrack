@@ -133,6 +133,7 @@ public class ProjectDaoImpl implements ProjectDao {
     }
 
     @Override
+    @Deprecated
     public HashMap<Long, Range<Date>> getProjectDetectionDateRanges(boolean includeDeleted) {
 /*        String sql =
             "select p.id, min(o.detectionTime), max(o.detectionTime)\n" +
