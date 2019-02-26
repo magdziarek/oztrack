@@ -122,6 +122,9 @@ We need to download from archive and mannully install it
 
 If `Rserve` is running on the same host as the Web application, it will be started automatically.
 To run Rserve on other hosts, place the following script in `/etc/init/rserve.conf`.
+
+#### Run Rserve on Ubuntu 14
+
 If necessary, replace "ubuntu" on the `setuid` with the name of another non-root user.
 
     description "Rserve"
@@ -142,6 +145,44 @@ If necessary, replace "ubuntu" on the `setuid` with the name of another non-root
 
 The service will start automatically at boot but can be started at other times
 using `sudo service rserve start`.
+
+#### Run Rserve on Ubuntu 16
+Create a rserve.sh under /usr/lib/R/bin with the content:
+
+    R --slave -e 'library(Rserve); run.Rserve(interactive="no", remote="enable")'
+
+And
+    chmod +x /usr/lib/R/bin/rserve.sh
+
+Create a rserve.service under /etc/systemd/system
+    [Unit]
+    Description=Rserve Service
+
+    [Service]
+    User=ubuntu
+    #WorkingDirectory=/home/ubuntu/workspace
+    #path to executable.
+    #executable is a bash script which calls jar file
+    ExecStart=/bin/bash /usr/lib/R/bin/rserve.sh
+    SuccessExitStatus=0
+    TimeoutStopSec=10
+    UMask=0007
+    Restart=always
+    RestartSec=5
+
+    [Install]
+    WantedBy=multi-user.target
+    
+Run:
+    #reload new changed services
+    systemctl daemon-reload
+    #start it
+    systemctl start daemon-reload
+    #check status
+    systemctl status rserve.service
+
+
+
 
 ### Installing Tomcat
 
