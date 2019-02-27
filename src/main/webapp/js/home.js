@@ -179,6 +179,10 @@ function buildProjectPopup(f) {
     var div = $('<div>');
     var content = $('<div class="home-popup">').appendTo(div);
     content.append($('<div class="home-popup-title">').append(f.attributes.projectTitle));
+    content.append('<a href="' + f.attributes.projectId + '">View summary</a>')
+    content.append(' | ');
+    content.append('<a href="' + f.attributes.projectId + '/analysis">View tracks</a>');
+    content.append(' <hr> ');
     var pairs = [];
     pairs.push(['Species',
         ((f.attributes.speciesScientificName) ? ('<i>' + f.attributes.speciesScientificName + '</i>') : '') +
@@ -199,13 +203,13 @@ function buildProjectPopup(f) {
             content.append($('<div class="home-popup-attr-value">').append(p[1]));
         }
     });
-    var footer = $('<div class="home-popup-footer">');
-    footer.append('<a href="' + f.attributes.projectId + '">View summary</a>')
-    if (f.attributes.access == 'OPEN') {
-        footer.append(' | ');
-        footer.append('<a href="' + f.attributes.projectId + '/analysis">View tracks</a>');
-    }
-    content.append(footer);
+    // var footer = $('<div class="home-popup-footer">');
+    // footer.append('<a href="' + f.attributes.projectId + '">View summary</a>')
+    // if (f.attributes.access == 'OPEN') {
+    //     footer.append(' | ');
+    //     footer.append('<a href="' + f.attributes.projectId + '/analysis">View tracks</a>');
+    // }
+    // content.append(footer);
     var lonlat = f.geometry.getBounds().getCenterLonLat().clone();
     if ((f.attributes.crosses180 === 'true') && (lonlat.lon < 0)) {
         lonlat.lon += 20037508.34 * 2;
