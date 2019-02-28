@@ -53,8 +53,11 @@ public abstract class DataFileLoader {
 
     public void process() throws Exception {
         int[] stats = removeDuplicateLinesFromFile(this.dataFile.getAbsoluteDataFilePath());
-        this.dataFile.appendStatusMessage(stats[0] +" detections found in data files");
-        this.dataFile.appendStatusMessage(stats[1] +" duplicates found ");
+
+        this.dataFile.appendStatusMessage(stats[0] +" line"+(stats[0]!=1?"s":"")+" found in this file");
+
+        this.dataFile.appendStatusMessage(stats[1] + " duplicate line"+(stats[1]!=1?"s":"")+" found (ignoring)");
+
         processRawObservations();
         processFinalObservations();
     }
@@ -154,14 +157,14 @@ public abstract class DataFileLoader {
     private void createFinalObservations() throws FileProcessingException {
         try {
             int[] stats = jdbcAccess.statObservations(dataFile);
-            dataFile.appendStatusMessage((stats[0]-stats[1]) +" detections previously uploaded.");
+            dataFile.appendStatusMessage((stats[0]-stats[1]) +" detection"+(((stats[0]-stats[1])!=1)?"s":"")+" in this file "+(((stats[0]-stats[1])!=1)?"have":"has")+" previously been uploaded (ignoring)");
 
             int count = jdbcAccess.loadObservations(dataFile);
 
 
             dataFile.setUpdateDate(new Date());
             dataFile.setUpdateUser(dataFile.getCreateUser());
-            dataFile.appendStatusMessage(count + " detections in totoal uploaded from data file");
+            dataFile.appendStatusMessage(count + " detection"+ ((count!=1)?"s":"") + " in this file "+((count!=1)?"have":"has")+" been successfully uploaded");
             dataFileDao.update(dataFile);
             jdbcAccess.truncateRawObservations(dataFile);
             List<Animal> animals = dataFileDao.getAnimals(dataFile);

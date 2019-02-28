@@ -61,14 +61,17 @@ public class OzTrackUtils {
 
                 HashSet<List<String>> hashSet = new HashSet<List<String>>();
                 String[] values;
+
                 while ((values = csvReader.readNext()) != null) {
-                    total ++;
-                    List<String> valuesList = Arrays.asList(values);
-                    if (!hashSet.contains(valuesList)) {
-                        hashSet.add(valuesList);
-                        csvWriter.writeNext(values);
-                    }else{
-                        duplicates ++;
+                    if(values.length>4)   {
+                        total++;
+                        List<String> valuesList = Arrays.asList(values);
+                        if (!hashSet.contains(valuesList)) {
+                            hashSet.add(valuesList);
+                            csvWriter.writeNext(values);
+                        } else {
+                            duplicates++;
+                        }
                     }
                 }
 
