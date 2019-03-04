@@ -155,6 +155,7 @@ And
     chmod +x /usr/lib/R/bin/rserve.sh
 
 Create a rserve.service under /etc/systemd/system
+
     [Unit]
     Description=Rserve Service
 
@@ -174,14 +175,13 @@ Create a rserve.service under /etc/systemd/system
     WantedBy=multi-user.target
     
 Run:
+
     #reload new changed services
     systemctl daemon-reload
     #start it
     systemctl start daemon-reload
     #check status
     systemctl status rserve.service
-
-
 
 
 ### Installing Tomcat

@@ -355,6 +355,10 @@
                         }
                         $('#searchTernForm').append(output.fadeIn());
                         $('body').animate({scrollTop: output.offset().top});
+                    },
+                    error:function(d,t){
+                        alert("Error: " +d.status +" : " +d.statusText);
+                        console.log(d.responseText);
                     }
                 });
             }
@@ -385,8 +389,9 @@
                         $('#searchAlaForm').append(output.fadeIn());
                         $('body').animate({scrollTop: output.offset().top});
                     },
-                    error: function(d,t,e){
-                        console.log(t)
+                    error: function(d){
+                        alert("Error: " +d.status +" : " +d.statusText);
+                        console.log(d.responseText);
                     }
                 });
             }

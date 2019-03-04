@@ -41,6 +41,11 @@ public class ProxyController {
         handle("http://bie.ala.org.au/ws/search/auto.json", outerRequest, outerResponse);
     }
 
+    @RequestMapping(value="/proxy/biocache.ala.org.au/ws/autocomplete/search", method=RequestMethod.GET)
+    public void handleBiocacheSearchAuto(HttpServletRequest outerRequest, HttpServletResponse outerResponse) throws IOException {
+        handle("https://biocache.ala.org.au/ws/autocomplete/search", outerRequest, outerResponse);
+    }
+
     @RequestMapping(value="/proxy/blog", method=RequestMethod.GET)
     public void getBlogFeed(HttpServletRequest outerRequest, HttpServletResponse outerResponse) throws IOException {
         handle("https://zoatrack.wordpress.com/feed", outerRequest, outerResponse);
