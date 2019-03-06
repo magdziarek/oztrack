@@ -296,7 +296,7 @@
                 $('#searchSpeciesName').autocomplete({
                     source: function(request, response) {
                         $.ajax({
-                            url: '${pageContext.request.contextPath}/proxy/bie.ala.org.au/search/auto.json',
+                            url: '${pageContext.request.contextPath}/proxy/biocache.ala.org.au/ws/autocomplete/search',
                             data: {
                                 q: request.term,
                                 idxType: 'TAXON',
@@ -304,26 +304,34 @@
                             },
                             dataType: "json",
                             success: function(data, textStatus, jqXHR) {
-                                response($.map(data.autoCompleteList, function(item) {
-                                    // The label property is displayed in the suggestion menu.
-                                    var label = $.trim(item.scientificNameMatches[0] || item.name || '');
-                                    if (item.commonNameMatches && item.commonNameMatches.length > 0) {
-                                        label += ' (' + item.commonNameMatches.join(', ') + ')';
-                                    }
-                                    else if (item.commonName) {
-                                        label += ' (' + $.trim(item.commonName) + ')';
-                                    }
-                                    // The value will be inserted into the input element when a user selects an item.
-                                    var value = $.trim(item.name || '');
-                                    if (item.commonName) {
-                                        value += ' (' + $.trim(item.commonName) + ')';
-                                    }
-                                    return {
-                                        label: label.replace(/\s+/g, ' '),
-                                        value: value.replace(/\s+/g, ' '),
-                                        speciesScientificName: $.trim((item.name || '').replace(/\s+/g, ' ')),
-                                        speciesCommonName: $.trim((item.commonName || '').replace(/\s+/g, ' '))
-                                    };
+//                                response($.map(data.autoCompleteList, function(item) {
+//                                    // The label property is displayed in the suggestion menu.
+//                                    var label = $.trim(item.scientificNameMatches[0] || item.name || '');
+//                                    if (item.commonNameMatches && item.commonNameMatches.length > 0) {
+//                                        label += ' (' + item.commonNameMatches.join(', ') + ')';
+//                                    }
+//                                    else if (item.commonName) {
+//                                        label += ' (' + $.trim(item.commonName) + ')';
+//                                    }
+//                                    // The value will be inserted into the input element when a user selects an item.
+//                                    var value = $.trim(item.name || '');
+//                                    if (item.commonName) {
+//                                        value += ' (' + $.trim(item.commonName) + ')';
+//                                    }
+//                                    return {
+//                                        label: label.replace(/\s+/g, ' '),
+//                                        value: value.replace(/\s+/g, ' '),
+//                                        speciesScientificName: $.trim((item.name || '').replace(/\s+/g, ' ')),
+//                                        speciesCommonName: $.trim((item.commonName || '').replace(/\s+/g, ' '))
+//                                    };
+//                                }));
+
+                                response($.map(data.searchResults.results, function(item) {
+                                        return{
+                                            label:item.name,
+                                            value: item.nameComplete
+                                        }
+
                                 }));
                             }
                         });
