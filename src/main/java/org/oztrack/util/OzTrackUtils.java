@@ -63,7 +63,7 @@ public class OzTrackUtils {
                 String[] values;
 
                 while ((values = csvReader.readNext()) != null) {
-                    if(values.length>4)   {
+                    if(values.length>=3)   {
                         total++;
                         List<String> valuesList = Arrays.asList(values);
                         if (!hashSet.contains(valuesList)) {
