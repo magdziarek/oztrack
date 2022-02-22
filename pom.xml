@@ -25,7 +25,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <geotools.version>9.3</geotools.version>
-        <jetty.version>8.1.5.v20120716</jetty.version>
+        <jetty.version>9.4.33.v20201020</jetty.version>
     </properties>
     <build>
         <finalName>oztrack</finalName>
@@ -344,7 +344,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
-            <version>3.6.9.Final</version>
+            <version>5.4.24.Final</version>
         </dependency>
         <dependency>
             <groupId>org.hibernatespatial</groupId>
@@ -364,7 +364,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
-            <version>3.1.1.RELEASE</version>
+            <version>5.2.19.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -374,7 +374,7 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-web</artifactId>
-            <version>3.1.0.RELEASE</version>
+            <version>5.2.9.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -399,12 +399,12 @@
         <dependency>
            <groupId>commons-fileupload</groupId>
            <artifactId>commons-fileupload</artifactId>
-           <version>1.2.1</version>
+           <version>1.3.3</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>1.3.2</version>
+            <version>2.7</version>
         </dependency>
         <dependency>
             <groupId>commons-pool</groupId>
@@ -414,7 +414,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.2.2</version>
+            <version>4.5.13</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -424,22 +424,22 @@
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
-            <version>3.1</version>
+            <version>3.2.2</version>
         </dependency>
         <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
-            <version>2.3.19</version>
+            <version>2.3.30</version>
         </dependency>
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
-            <version>1.8.5</version>
+            <version>2.3.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-email</artifactId>
-            <version>1.3</version>
+            <version>1.5</version>
         </dependency>
         <dependency>
             <groupId>javax.mail</groupId>
@@ -466,12 +466,12 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>3.9</version>
+            <version>3.17</version>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>3.9</version>
+            <version>4.1.0</version>
             <exclusions>
                 <!--  StAX included in JRE 6 -->
                 <exclusion>
@@ -551,7 +551,7 @@
         <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
-            <version>2.10.0</version>
+            <version>2.12.2</version>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
