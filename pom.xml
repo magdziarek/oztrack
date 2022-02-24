@@ -369,32 +369,32 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-orm</artifactId>
-            <version>3.1.1.RELEASE</version>
+            <version>5.2.19.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-web</artifactId>
-            <version>3.1.0.RELEASE</version>
+            <version>3.2.0.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-config</artifactId>
-            <version>3.1.0.RELEASE</version>
+            <version>5.2.9.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-crypto</artifactId>
-            <version>3.1.0.RELEASE</version>
+            <version>3.2.6.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-taglibs</artifactId>
-            <version>3.1.0.RELEASE</version>
+            <version>5.2.9.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>3.1.1.RELEASE</version>
+            <version>5.2.19.RELEASE</version>
         </dependency>
         <dependency>
            <groupId>commons-fileupload</groupId>
@@ -561,7 +561,7 @@
         <dependency>
             <groupId>com.googlecode.flyway</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>1.5</version>
+            <version>1.7</version>
         </dependency>
     </dependencies>
     <repositories>
